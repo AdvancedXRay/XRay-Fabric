@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "xray",
+  "version": "${version}",
+
+  "name": "Advanced XRay (Fabric)",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://github.com/michaelhillcox/xray-fabric",
+    "sources": "https://github.com/michaelhillcox/xray-fabric"
+  },
+
+  "license": "CC0-1.0",
+  "icon": "assets/modid/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "pro.mikey.fabric.xray.XRay"
+    ]
+  },
+  "mixins": [
+    "xray.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "flamingo": "*"
+  }
+}
