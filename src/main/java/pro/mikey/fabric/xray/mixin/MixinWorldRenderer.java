@@ -20,6 +20,6 @@ public class MixinWorldRenderer {
 
     @Inject(method=RENDER, at=@At(value = "TAIL"))
     public void renderWorldOverlay(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-        System.out.println("Hello");
+//        System.out.println("Hello");
     }
 }
