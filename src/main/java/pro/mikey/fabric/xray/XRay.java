@@ -16,6 +16,8 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import pro.mikey.fabric.xray.jobs.ChunkJob;
 
@@ -26,7 +28,10 @@ import java.util.concurrent.TimeUnit;
 
 public class XRay implements ModInitializer {
 	public ChunkJob chunkJob = new ChunkJob();
-	private KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
+
+	public static final String MOD_ID = "xray";
+	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+	private final KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
 
 	private static final Cache<ChunkPos, Set<BlockPos>> cacheByChunk = CacheBuilder
 			.newBuilder()
@@ -37,7 +42,7 @@ public class XRay implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		System.out.println("Hello Fabric world!");
+		LOGGER.info("XRay mod has been initialized");
 
 		ClientChunkEvents.CHUNK_LOAD.register(chunkJob::load);
 		ClientChunkEvents.CHUNK_UNLOAD.register(chunkJob::unload);
