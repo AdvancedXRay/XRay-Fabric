@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray.render;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
@@ -26,7 +27,9 @@ public class RenderOutlines {
 
         ScanController.renderQueue.forEach(e -> renderBlockBounding(matrices.peek().getModel(), builder, e));
 
+        RenderSystem.disableDepthTest();
         matrices.pop();
+        entityVertexConsumers.draw(XRayRenderType.OVERLAY_LINES);
     }
 
     private static void renderBlockBounding(Matrix4f matrix4f, VertexConsumer builder, BlockPos b) {
