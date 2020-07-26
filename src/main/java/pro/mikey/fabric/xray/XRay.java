@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
 
 public class XRay implements ModInitializer {
 	public ChunkJob chunkJob = new ChunkJob();
-	private KeyBinding trigger = new KeyBinding("Crap", GLFW.GLFW_KEY_G, "xray");
+	private KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
 
 	private static final Cache<ChunkPos, Set<BlockPos>> cacheByChunk = CacheBuilder
 			.newBuilder()
