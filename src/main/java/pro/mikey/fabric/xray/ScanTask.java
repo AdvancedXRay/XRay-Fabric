@@ -1,56 +1,51 @@
 package pro.mikey.fabric.xray;
 
-import net.java.games.input.Controller;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 public class ScanTask implements Runnable {
     private final ScanArea area;
-    private final ChunkPos chunkPos;
 
-    public ScanTask(ScanArea area, ChunkPos chunkPos) {
-        this.chunkPos = chunkPos;
-        this.area = area;
+    public ScanTask(BlockPos pos) {
+        this.area = new ScanArea(pos, StateStore.getInstance().getRange());
+    }
+
+    @Override
+    public void run() {
+        ScanController.renderQueue.clear();
+        ScanController.renderQueue.addAll(this.collectBlocks());
+
+        System.out.println("Added list");
+        System.out.println(ScanController.renderQueue);
     }
 
     /**
      * This is an "exact" copy from the forge version of the mod but with the optimisations
      * that the rewrite (Fabric) version has brought like chunk location based cache, etc.
+     *
+     * This is only run if the cache is invalidated.
+     * @implNote Using the {@link BlockPos#iterate(BlockPos, BlockPos)} may be a better system for the scanning.
      */
-    @Override
-    public void run() {
-//        HashMap<UUID, BlockData> blocks = Controller.getBlockStore().getStore();
-        ScanController.renderQueue.clear();
-
-        // The cache can fail so we protect against that.
-        try {
-            ScanController.renderQueue.addAll(ScanController.cacheByChunk.get(this.chunkPos, this::collectBlocks));
-        } catch (ExecutionException ignored) {}
-    }
-
-    // This is only run if the cache is invalidate
-    private Set<BlockPos> collectBlocks() {
+    private List<BlockPos> collectBlocks() {
         Set<Block> blocks = ScanController.scanningBlocks;
 
         // If we're not looking for blocks, don't run.
         if ( blocks.isEmpty() ) {
             if( !ScanController.renderQueue.isEmpty() )
                 ScanController.renderQueue.clear();
-            return new HashSet<>();
+            return new ArrayList<>();
         }
 
         final World world = MinecraftClient.getInstance().world;
@@ -58,9 +53,9 @@ public class ScanTask implements Runnable {
 
         // Just stop if we can't get the player or world.
         if( world == null || player == null )
-            return new HashSet<>();
+            return new ArrayList<>();
 
-        final Set<BlockPos> renderQueue = new HashSet<>();
+        final List<BlockPos> renderQueue = new ArrayList<>();
         int lowBoundX, highBoundX, lowBoundY, highBoundY, lowBoundZ, highBoundZ;
 
         // Used for cleaning up the searching process
@@ -109,7 +104,7 @@ public class ScanTask implements Runnable {
                                 currentState = ebs.getBlockState(i, j, k);
                                 currentFluid = currentState.getFluidState();
 
-                                renderQueue.add(new BlockPos(i, j, k));
+                                renderQueue.add(new BlockPos(x + i, y + j, z + k));
 //                                if( (currentFluid.getFluid() == Fluids.LAVA || currentFluid.getFluid() == Fluids.FLOWING_LAVA) && Controller.isLavaActive() ) {
 //                                    renderQueue.add(new RenderBlockProps(x + i, y + j, z + k, 0xff0000));
 //                                    continue;
@@ -158,14 +153,13 @@ public class ScanTask implements Runnable {
         public int maxChunkY;
         public int maxChunkZ;
 
-
         /**
          * Constructs a world region from a player location and a radius.
          * Vertical extend is 92 blocks down and 32 blocks up
          * @param pos a world position
          * @param radius a block radius
          */
-        public ScanArea(Vec3i pos, int radius)
+        public ScanArea(BlockPos pos, int radius)
         {
             minX = pos.getX() - radius;
             maxX = pos.getX() + radius;

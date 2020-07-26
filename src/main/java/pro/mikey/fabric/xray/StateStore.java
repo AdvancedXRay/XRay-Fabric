@@ -11,7 +11,7 @@ public class StateStore {
     private StateStore() {
         this.isActive = false;
         this.showLava = false;
-        this.range = 1;
+        this.range = 3;
     }
 
     public void setActive(boolean active) {

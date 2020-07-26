@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import pro.mikey.fabric.xray.render.RenderOutlines;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldRenderer.class)
@@ -20,6 +21,7 @@ public class MixinWorldRenderer {
 
     @Inject(method=RENDER, at=@At(value = "TAIL"))
     public void renderWorldOverlay(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-//        System.out.println("Hello");
+        RenderOutlines.render(matrices, camera);
     }
+
 }

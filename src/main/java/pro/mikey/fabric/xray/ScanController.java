@@ -1,34 +1,19 @@
 package pro.mikey.fabric.xray;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 
 public class ScanController {
-
-    /**
-     * We Cache the entire list based on the players chunk, once they exit that chunk,
-     * we'll rescan by triggering our thread.
-     */
-    public static final Cache<ChunkPos, Set<BlockPos>> cacheByChunk = CacheBuilder
-            .newBuilder()
-            .expireAfterWrite(5, TimeUnit.SECONDS)
-            .build();
-
-    public static Set<BlockPos> renderQueue = Collections.synchronizedSet( new HashSet<>() );
+    public static List<BlockPos> renderQueue = Collections.synchronizedList( new ArrayList<>() );
 
     // Temp
     public static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE));
@@ -36,6 +21,20 @@ public class ScanController {
     // Handles the threading system
     private static Future<?> task;
     private static ExecutorService executor;
+
+    private static ChunkPos playerLastChunk;
+
+    /**
+     * No point even running if the player is still in the same chunk.
+     */
+    private static boolean playerLocationChanged() {
+        ClientPlayerEntity player = MinecraftClient.getInstance().player;
+        if (player == null) {
+            return false;
+        }
+
+        return playerLastChunk == null || playerLastChunk.x != player.chunkX || playerLastChunk.z != player.chunkZ;
+    }
 
     /**
      * Runs the scan task by checking if the thread is ready but first attempting
@@ -49,15 +48,15 @@ public class ScanController {
             return;
         }
 
-        if (!StateStore.getInstance().isActive() || (task != null && !task.isDone())) {
+        if (!StateStore.getInstance().isActive() || (task != null && !task.isDone()) || (!forceRerun && !playerLocationChanged())) {
             return;
         }
 
-        if (executor == null) {
-            executor = Executors.newSingleThreadExecutor();
-        }
+        executor = Executors.newSingleThreadExecutor();
 
-        task = executor.submit(new ScanTask());
+        // Update the players last chunk to eval against above.
+        playerLastChunk = new ChunkPos(client.player.chunkX, client.player.chunkZ);
+        task = executor.submit(new ScanTask(client.player.getBlockPos()));
     }
 
     /**

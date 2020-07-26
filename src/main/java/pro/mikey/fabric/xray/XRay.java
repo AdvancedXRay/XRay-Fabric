@@ -1,6 +1,7 @@
 package pro.mikey.fabric.xray;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
@@ -22,6 +23,7 @@ public class XRay implements ModInitializer {
 		LOGGER.info("XRay mod has been initialized");
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
+
 
 		KeyBindingHelper.registerKeyBinding(trigger);
 	}
@@ -45,9 +47,16 @@ public class XRay implements ModInitializer {
 			return;
 		}
 
-		if (trigger.isPressed()) {
+		StateStore state = StateStore.getInstance();
+		if (trigger.isPressed() && !state.isActive()) {
 			System.out.println("Triggered");
-			StateStore.getInstance().setActive(!StateStore.getInstance().isActive());
+
+			if (state.isActive()) {
+				ScanController.shutdownTask();
+				state.setActive(false);
+			} else {
+				state.setActive(true);
+			}
 		}
 	}
 }
