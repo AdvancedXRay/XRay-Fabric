@@ -23,15 +23,15 @@ public class ScanController {
      * We Cache the entire list based on the players chunk, once they exit that chunk,
      * we'll rescan by triggering our thread.
      */
-    private static final Cache<ChunkPos, Set<BlockPos>> cacheByChunk = CacheBuilder
+    public static final Cache<ChunkPos, Set<BlockPos>> cacheByChunk = CacheBuilder
             .newBuilder()
             .expireAfterWrite(5, TimeUnit.SECONDS)
             .build();
 
-    private static Set<BlockPos> renderQueue = Collections.synchronizedSet( new HashSet<>() );
+    public static Set<BlockPos> renderQueue = Collections.synchronizedSet( new HashSet<>() );
 
     // Temp
-    private static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE));
+    public static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE));
 
     // Handles the threading system
     private static Future<?> task;
