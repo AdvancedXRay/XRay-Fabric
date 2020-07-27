@@ -37,7 +37,7 @@ public class RenderOutlines {
             return;
 
         final float size = 1.0f;
-        final int x = b.getX(), y = b.getY(), z = b.getZ(), opacity = 1;
+        final float x = b.getX(), y = b.getY(), z = b.getZ(), opacity = .5f;
 
         final float red = 0;//(b.getColor() >> 16 & 0xff) / 255f;
         final float green = 0;//(b.getColor() >> 8 & 0xff) / 255f;

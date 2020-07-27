@@ -3,16 +3,13 @@ package pro.mikey.fabric.xray;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkSection;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -63,14 +60,37 @@ public class ScanTask implements Runnable {
         BlockState currentState;
         FluidState currentFluid;
 
-        int cX = player.chunkX << 4;
-        int cZ = player.chunkZ << 4;
+        int cX = player.chunkX;
+        int cZ = player.chunkZ;
 
-        for (int i = cX; i < cX + 16; i++) {
-            for (int j = cZ; j < cZ + 16; j++) {
-//                for (int k = 0; k < player.getPos().y; k++) {
-                    renderQueue.add(new BlockPos(i, player.getPos().y, j));
-//                }
+        int range = 2 / 2;
+        for(int i = cX - range; i <= cX + range; i ++) {
+            int chunkStartX = i << 4;
+            for (int j = cZ - range; j <= cZ + range; j++) {
+                int chunkStartZ = j << 4;
+
+                ChunkSection[] sectionArray = world.getChunk(i, j).getSectionArray();
+                for (ChunkSection chunkSection : sectionArray) {
+                    if (chunkSection.isEmpty()) {
+                        continue;
+                    }
+
+                    System.out.println(chunkSection.getYOffset());
+                }
+
+                for (int k = chunkStartX; k < chunkStartX + 16; k++) {
+                    for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
+                        for (int m = 0; m < world.getHeight(); m++) {
+                            BlockPos pos = new BlockPos(k, m, l);
+                            BlockState state = world.getBlockState(pos);
+                            if (state.isAir() || !blocks.contains(state.getBlock())) {
+                                continue;
+                            }
+
+                            renderQueue.add(pos);
+                        }
+                    }
+                }
             }
         }
 

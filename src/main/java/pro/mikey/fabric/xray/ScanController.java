@@ -16,7 +16,7 @@ public class ScanController {
     public static List<BlockPos> renderQueue = Collections.synchronizedList( new ArrayList<>() );
 
     // Temp
-    public static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE));
+    public static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.GRASS, Blocks.GRASS_BLOCK, Blocks.SAND));
 
     // Handles the threading system
     private static Future<?> task;
