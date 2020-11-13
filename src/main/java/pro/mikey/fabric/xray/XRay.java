@@ -15,7 +15,10 @@ public class XRay implements ModInitializer {
 
 	public static final String MOD_ID = "advanced-xray-fabric";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+
 	private final KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
+
+	private int keyCoolDown = 0;
 
 	@Override
 	public void onInitialize() {
@@ -44,8 +47,13 @@ public class XRay implements ModInitializer {
 		// Try and run the task :D
 		ScanController.runTask(false);
 
+		if (keyCoolDown > 0) {
+			keyCoolDown --;
+			return;
+		}
+
 		StateStore state = StateStore.getInstance();
-		if (trigger.isPressed() && !state.isActive()) {
+		if (trigger.isPressed()) {
 			if (state.isActive()) {
 				ScanController.shutdownTask();
 				state.setActive(false);
@@ -54,6 +62,8 @@ public class XRay implements ModInitializer {
 				state.setActive(true);
 				System.out.println("Xray Enabled");
 			}
+
+			keyCoolDown = 10;
 		}
 	}
 }
