@@ -6,17 +6,21 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Formatting;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import pro.mikey.fabric.xray.screens.MainScreen;
 
 public class XRay implements ModInitializer {
 
 	public static final String MOD_ID = "advanced-xray-fabric";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	private final KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
+	private final KeyBinding trigger = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_G, "category.xray");
+	private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
 
 	private int keyCoolDown = 0;
 
@@ -54,14 +58,18 @@ public class XRay implements ModInitializer {
 		}
 
 		StateStore state = StateStore.getInstance();
+		if (guiButton.isPressed()) {
+			mc.openScreen(new MainScreen());
+		}
+
 		if (trigger.isPressed()) {
 			if (state.isActive()) {
 				ScanController.shutdownTask();
 				state.setActive(false);
-				System.out.println("Xray Disabled");
+				mc.player.sendMessage(new TranslatableText("message.xray_deactivate").formatted(Formatting.RED), true);
 			} else {
 				state.setActive(true);
-				System.out.println("Xray Enabled");
+				mc.player.sendMessage(new TranslatableText("message.xray_active").formatted(Formatting.GREEN), true);
 			}
 
 			keyCoolDown = 10;
