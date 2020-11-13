@@ -19,7 +19,7 @@ public class XRay implements ModInitializer {
 	public static final String MOD_ID = "advanced-xray-fabric";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	private final KeyBinding trigger = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_G, "category.xray");
+	private final KeyBinding xrayButton = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_G, "category.xray");
 	private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
 
 	private int keyCoolDown = 0;
@@ -29,7 +29,8 @@ public class XRay implements ModInitializer {
 		LOGGER.info("XRay mod has been initialized");
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
-		KeyBindingHelper.registerKeyBinding(trigger);
+		KeyBindingHelper.registerKeyBinding(xrayButton);
+		KeyBindingHelper.registerKeyBinding(guiButton);
 	}
 
 	/**
@@ -62,7 +63,7 @@ public class XRay implements ModInitializer {
 			mc.openScreen(new MainScreen());
 		}
 
-		if (trigger.isPressed()) {
+		if (xrayButton.isPressed()) {
 			if (state.isActive()) {
 				ScanController.shutdownTask();
 				state.setActive(false);
