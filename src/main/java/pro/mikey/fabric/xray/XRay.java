@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 
 public class XRay implements ModInitializer {
 
-	public static final String MOD_ID = "xray";
+	public static final String MOD_ID = "advanced-xray-fabric";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 	private final KeyBinding trigger = new KeyBinding("Enable XRay", GLFW.GLFW_KEY_G, "xray");
 
@@ -22,8 +22,6 @@ public class XRay implements ModInitializer {
 		LOGGER.info("XRay mod has been initialized");
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
-
-
 		KeyBindingHelper.registerKeyBinding(trigger);
 	}
 
@@ -34,27 +32,27 @@ public class XRay implements ModInitializer {
 		PlayerEntity player = mc.player;
 		World world = mc.world;
 
-		if (player == null || world == null ) {
+		if (player == null || world == null) {
 			return;
 		}
-
-		// Try and run the task :D
-		ScanController.runTask(false);
 
 		// Don't handle key bindings
 		if (mc.currentScreen != null) {
 			return;
 		}
 
+		// Try and run the task :D
+		ScanController.runTask(false);
+
 		StateStore state = StateStore.getInstance();
 		if (trigger.isPressed() && !state.isActive()) {
-			System.out.println("Triggered");
-
 			if (state.isActive()) {
 				ScanController.shutdownTask();
 				state.setActive(false);
+				System.out.println("Xray Disabled");
 			} else {
 				state.setActive(true);
+				System.out.println("Xray Enabled");
 			}
 		}
 	}

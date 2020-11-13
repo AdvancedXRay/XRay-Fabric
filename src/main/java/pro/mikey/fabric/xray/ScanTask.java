@@ -69,18 +69,19 @@ public class ScanTask implements Runnable {
             for (int j = cZ - range; j <= cZ + range; j++) {
                 int chunkStartZ = j << 4;
 
+                int highestHeight = 0;
                 ChunkSection[] sectionArray = world.getChunk(i, j).getSectionArray();
                 for (ChunkSection chunkSection : sectionArray) {
                     if (chunkSection.isEmpty()) {
                         continue;
                     }
 
-                    System.out.println(chunkSection.getYOffset());
+                    highestHeight = chunkSection.getYOffset();
                 }
 
                 for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-                        for (int m = 0; m < world.getHeight(); m++) {
+                        for (int m = 0; m < highestHeight; m++) {
                             BlockPos pos = new BlockPos(k, m, l);
                             BlockState state = world.getBlockState(pos);
                             if (state.isAir() || !blocks.contains(state.getBlock())) {
