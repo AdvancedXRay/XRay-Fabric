@@ -56,7 +56,7 @@ public class ScanController {
 
         // Update the players last chunk to eval against above.
         playerLastChunk = new ChunkPos(client.player.chunkX, client.player.chunkZ);
-        task = executor.submit(new ScanTask(client.player.getBlockPos()));
+        task = executor.submit(new ScanTask());
     }
 
     /**
