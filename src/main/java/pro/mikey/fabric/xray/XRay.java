@@ -47,6 +47,7 @@ public class XRay implements ModInitializer {
 		// Try and run the task :D
 		ScanController.runTask(false);
 
+		// Handle cooldown for the keybinding to stop it spamming
 		if (keyCoolDown > 0) {
 			keyCoolDown --;
 			return;

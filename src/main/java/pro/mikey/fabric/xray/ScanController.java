@@ -68,6 +68,8 @@ public class ScanController {
         }
 
         try { executor.shutdownNow(); }
-        catch (Throwable ignore) {}
+        catch (Throwable e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

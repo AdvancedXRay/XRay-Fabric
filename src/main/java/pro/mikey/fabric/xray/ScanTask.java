@@ -9,9 +9,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class ScanTask implements Runnable {
     private final ScanArea area;
@@ -64,24 +62,20 @@ public class ScanTask implements Runnable {
         int cZ = player.chunkZ;
 
         int range = 2 / 2;
+        System.out.println("Running");
         for(int i = cX - range; i <= cX + range; i ++) {
             int chunkStartX = i << 4;
             for (int j = cZ - range; j <= cZ + range; j++) {
                 int chunkStartZ = j << 4;
 
-                int highestHeight = 0;
-                ChunkSection[] sectionArray = world.getChunk(i, j).getSectionArray();
-                for (ChunkSection chunkSection : sectionArray) {
-                    if (chunkSection.isEmpty()) {
-                        continue;
-                    }
-
-                    highestHeight = chunkSection.getYOffset();
-                }
+                int height = Arrays.stream(world.getChunk(i, j).getSectionArray())
+                        .filter(Objects::nonNull)
+                        .mapToInt(ChunkSection::getYOffset)
+                        .max().orElse(0);
 
                 for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-                        for (int m = 0; m < highestHeight; m++) {
+                        for (int m = 0; m < height + (1 << 4); m++) {
                             BlockPos pos = new BlockPos(k, m, l);
                             BlockState state = world.getBlockState(pos);
                             if (state.isAir() || !blocks.contains(state.getBlock())) {
