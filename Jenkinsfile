@@ -20,7 +20,7 @@ pipeline {
     }
 
     stage('Publish') {
-      when { 
+      when {
         branch 'main'
       }
       steps {
@@ -30,6 +30,6 @@ pipeline {
 
   }
   environment {
-    local_maven = '/var/maven/'
+    local_maven = '/var/jenkins_maven/'
   }
 }
