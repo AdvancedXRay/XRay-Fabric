@@ -4,7 +4,7 @@
 Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/MichaelHillcox/XRay-Mod/) which is typically the more up-to-date version of the mod.
 
 ## Disclaimer
-I am a Forge Mod developer, not a Fabric Mod Developer, I am doing this mod per user request and out of pure intrest in learning a new API. The current status of this mod is `Unreleased` as the mod is currently a WIP. I will only support Fabric support MC versions and I will attempt to continue to support this mod going forwards. This mod is currently based on Fabric for `1.16.1`. You have been notified :D
+I am a Forge Mod developer, not a Fabric Mod Developer, I am doing this mod per user request and out of pure intrest in learning a new API. The current status of this mod is `Unreleased` as the mod is currently a WIP. I will only support Fabric support MC versions and I will attempt to continue to support this mod going forwards. This mod is currently based on Fabric for `1.16.4`. You have been notified :D
 
 ## Feature
 Advanced XRay Mod for Fabric is a feature rich XRay / Block ESP mod designed to aid players in the Ore searching process. I personally do not see it as cheating and thus maintain the mod as if it is a legitimate Minecraft enchancement mod. With this I've designed it to be as user friendly as possible. Out of the box you'll have *Easy to use GUI for adding, deleting and editing block you want to find*, *Full RGB color picker support*, *Searchable block list with in-hand and in-world options for adding blocks*, *Json Stored list to share and edit easily outside of the game*.
