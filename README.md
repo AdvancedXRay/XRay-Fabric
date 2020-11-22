@@ -1,4 +1,4 @@
-![XRay Logo](http://i.imgur.com/002LJvM.jpg)
+![XRay Logo](.github/advanced-xray-fabric-logo.svg)
 
 # Advanced XRay (Fabric Edition)
 Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/MichaelHillcox/XRay-Mod/) which is typically the more up-to-date version of the mod.
