@@ -4,24 +4,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import pro.mikey.fabric.xray.storage.SettingsStore;
+import pro.mikey.fabric.xray.storage.Stores;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 
 public class ScanController {
     public static List<BlockPos> renderQueue = Collections.synchronizedList( new ArrayList<>() );
 
     // Temp
     public static final Set<Block> scanningBlocks = new HashSet<>(Arrays.asList(Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.GRASS, Blocks.GRASS_BLOCK, Blocks.SAND));
-
-    // Handles the threading system
-    private static Future<?> task;
-    private static ExecutorService executor;
-
     private static ChunkPos playerLastChunk;
 
     /**
@@ -48,28 +43,12 @@ public class ScanController {
             return;
         }
 
-        if (!StateStore.getInstance().isActive() || (task != null && !task.isDone()) || (!forceRerun && !playerLocationChanged())) {
+        if (!Stores.SETTINGS.get().isActive() || (!forceRerun && !playerLocationChanged())) {
             return;
         }
 
-        executor = Executors.newSingleThreadExecutor();
-
         // Update the players last chunk to eval against above.
         playerLastChunk = new ChunkPos(client.player.chunkX, client.player.chunkZ);
-        task = executor.submit(new ScanTask());
-    }
-
-    /**
-     * Shut down the job. We disable xray here as a fail safe.
-     */
-    public static void shutdownTask() {
-        if (StateStore.getInstance().isActive()) {
-            StateStore.getInstance().setActive(false);
-        }
-
-        try { executor.shutdownNow(); }
-        catch (Throwable e) {
-            System.out.println(e.getMessage());
-        }
+        Util.getMainWorkerExecutor().execute(new ScanTask());
     }
 }

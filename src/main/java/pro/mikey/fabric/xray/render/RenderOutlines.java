@@ -5,16 +5,17 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.WorldRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
 import pro.mikey.fabric.xray.ScanController;
-import pro.mikey.fabric.xray.StateStore;
+import pro.mikey.fabric.xray.storage.Stores;
 
 public class RenderOutlines {
     public static void render(MatrixStack matrices, Camera camera) {
-        if (ScanController.renderQueue.isEmpty() || !StateStore.getInstance().isActive()) {
+        if (ScanController.renderQueue.isEmpty() || !Stores.SETTINGS.get().isActive()) {
             return;
         }
 
@@ -25,14 +26,14 @@ public class RenderOutlines {
         matrices.push();
         matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
-        ScanController.renderQueue.forEach(e -> renderBlockBounding(matrices.peek().getModel(), builder, e));
+        ScanController.renderQueue.forEach(e -> renderBlockBounding(matrices, builder, e));
 
         RenderSystem.disableDepthTest();
         matrices.pop();
         entityVertexConsumers.draw(XRayRenderType.OVERLAY_LINES);
     }
 
-    private static void renderBlockBounding(Matrix4f matrix4f, VertexConsumer builder, BlockPos b) {
+    private static void renderBlockBounding(MatrixStack matrices, VertexConsumer builder, BlockPos b) {
         if( b == null )
             return;
 
@@ -43,39 +44,6 @@ public class RenderOutlines {
         final float green = 0;//(b.getColor() >> 8 & 0xff) / 255f;
         final float blue = 255;//(b.getColor() & 0xff) / 255f;
 
-        builder.vertex(matrix4f, x, y + size, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y + size, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y + size, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y + size, z).color(red, green, blue, opacity).next();
-
-        // BOTTOM
-        builder.vertex(matrix4f, x + size, y, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y, z).color(red, green, blue, opacity).next();
-
-        // Edge 1
-        builder.vertex(matrix4f, x + size, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z + size).color(red, green, blue, opacity).next();
-
-        // Edge 2
-        builder.vertex(matrix4f, x + size, y, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x + size, y + size, z).color(red, green, blue, opacity).next();
-
-        // Edge 3
-        builder.vertex(matrix4f, x, y, z + size).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y + size, z + size).color(red, green, blue, opacity).next();
-
-        // Edge 4
-        builder.vertex(matrix4f, x, y, z).color(red, green, blue, opacity).next();
-        builder.vertex(matrix4f, x, y + size, z).color(red, green, blue, opacity).next();
+        WorldRenderer.drawBox(matrices, builder, x, y, z, x + size, y + size, z + size, red, green, blue, opacity);
     }
 }

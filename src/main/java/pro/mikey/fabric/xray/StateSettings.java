@@ -1,14 +1,12 @@
 package pro.mikey.fabric.xray;
 
-public class StateStore {
-    private static StateStore instance;
-
+public class StateSettings {
     private boolean isActive;
     private boolean showLava;
     private int range;
 
     // Singleton
-    private StateStore() {
+    public StateSettings() {
         this.isActive = false;
         this.showLava = false;
         this.range = 3;
@@ -36,14 +34,5 @@ public class StateStore {
 
     public int getRange() {
         return range;
-    }
-
-    public static StateStore getInstance() {
-        // Lazy Initialization
-        if (instance == null) {
-            instance = new StateStore();
-        }
-
-        return instance;
     }
 }

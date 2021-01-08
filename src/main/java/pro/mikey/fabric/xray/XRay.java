@@ -13,6 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import pro.mikey.fabric.xray.screens.MainScreen;
+import pro.mikey.fabric.xray.storage.Stores;
 
 public class XRay implements ModInitializer {
 
@@ -32,7 +33,7 @@ public class XRay implements ModInitializer {
 		KeyBindingHelper.registerKeyBinding(xrayButton);
 		KeyBindingHelper.registerKeyBinding(guiButton);
 	}
-
+	
 	/**
 	 * Handles the actual scanning process :D
 	 */
@@ -58,18 +59,18 @@ public class XRay implements ModInitializer {
 			return;
 		}
 
-		StateStore state = StateStore.getInstance();
 		if (guiButton.isPressed()) {
 			mc.openScreen(new MainScreen());
 		}
 
 		if (xrayButton.isPressed()) {
-			if (state.isActive()) {
-				ScanController.shutdownTask();
-				state.setActive(false);
+			StateSettings stateSettings = Stores.SETTINGS.get();
+
+			if (stateSettings.isActive()) {
+				stateSettings.setActive(false);
 				mc.player.sendMessage(new TranslatableText("message.xray_deactivate").formatted(Formatting.RED), true);
 			} else {
-				state.setActive(true);
+				stateSettings.setActive(true);
 				mc.player.sendMessage(new TranslatableText("message.xray_active").formatted(Formatting.GREEN), true);
 			}
 
