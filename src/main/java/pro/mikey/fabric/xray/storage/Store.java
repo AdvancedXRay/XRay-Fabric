@@ -29,7 +29,9 @@ public abstract class Store<T> {
         try {
             try {
                 return gson.fromJson(new FileReader(this.file), this.getType());
-            } catch (JsonIOException | JsonSyntaxException ignored) {}
+            } catch (JsonIOException | JsonSyntaxException e) {
+                XRay.LOGGER.fatal("Fatal error with json loading on {}.json", this.name, e);
+            }
         } catch (FileNotFoundException ignored) {
             // Write a blank version of the file
             if (new File(CONFIG_PATH).mkdirs()) {

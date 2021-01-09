@@ -1,8 +1,10 @@
 package pro.mikey.fabric.xray;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,8 +14,15 @@ import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import pro.mikey.fabric.xray.cache.BlockSearchEntry;
+import pro.mikey.fabric.xray.records.BlockEntry;
+import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.screens.MainScreen;
+import pro.mikey.fabric.xray.storage.BlockStore;
 import pro.mikey.fabric.xray.storage.Stores;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class XRay implements ModInitializer {
 
@@ -30,10 +39,24 @@ public class XRay implements ModInitializer {
 		LOGGER.info("XRay mod has been initialized");
 
 		ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
+		ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
 		KeyBindingHelper.registerKeyBinding(xrayButton);
 		KeyBindingHelper.registerKeyBinding(guiButton);
+
+		BlockStore blocks = Stores.BLOCKS;
+
+		blocks.read();
+		blocks.updateCache(blocks.get());
+
+		System.out.println(blocks.cache.get());
 	}
-	
+
+	private void gameClosing(MinecraftClient client) {
+		// When the game stops we want to save our stores quickly
+		Stores.SETTINGS.write();
+		Stores.BLOCKS.write();
+	}
+
 	/**
 	 * Handles the actual scanning process :D
 	 */

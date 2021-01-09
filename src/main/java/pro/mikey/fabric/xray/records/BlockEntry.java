@@ -16,4 +16,28 @@ public class BlockEntry {
         this.isDefault = isDefault;
         this.active = active;
     }
+
+    public String getState() {
+        return state;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getHex() {
+        return hex;
+    }
+
+    public int getOrder() {
+        return order;
+    }
+
+    public boolean isDefault() {
+        return isDefault;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
 }
