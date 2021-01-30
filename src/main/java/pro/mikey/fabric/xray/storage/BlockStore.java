@@ -9,41 +9,41 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockStore extends Store<List<BlockGroup>> {
-    private List<BlockGroup> blockEntries = new ArrayList<>();
-    public final BlockSearchCache cache = new BlockSearchCache();
+  private static BlockStore instance;
+  public final BlockSearchCache cache = new BlockSearchCache();
+  private List<BlockGroup> blockEntries = new ArrayList<>();
 
-    private static BlockStore instance;
+  private BlockStore() {
+    super("blocks");
 
-    public static BlockStore getInstance() {
-        if (instance == null) {
-            instance = new BlockStore();
-        }
-
-        return instance;
+    List<BlockGroup> entries = this.read();
+    if (entries == null) {
+      return;
     }
 
-    private BlockStore() {
-        super("blocks");
+    this.blockEntries = entries;
+  }
 
-        List<BlockGroup> entries = this.read();
-        if (entries == null) {
-            return;
-        }
-
-        this.blockEntries = entries;
+  public static BlockStore getInstance() {
+    if (instance == null) {
+      instance = new BlockStore();
     }
 
-    public void updateCache(List<BlockGroup> data) {
-        this.cache.processGroupedList(data);
-    }
+    return instance;
+  }
 
-    @Override
-    public List<BlockGroup> get() {
-        return this.blockEntries;
-    }
+  public void updateCache(List<BlockGroup> data) {
+    this.cache.processGroupedList(data);
+  }
 
-    @Override
-    Type getType() {
-        return new TypeToken<List<BlockGroup>>() {}.getType();
-    }
+  @Override
+  public List<BlockGroup> get() {
+    return this.blockEntries;
+  }
+
+  @Override
+  Type getType() {
+    return new TypeToken<List<BlockGroup>>() {
+    }.getType();
+  }
 }

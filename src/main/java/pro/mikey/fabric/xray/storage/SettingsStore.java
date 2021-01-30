@@ -5,35 +5,35 @@ import pro.mikey.fabric.xray.StateSettings;
 import java.lang.reflect.Type;
 
 public class SettingsStore extends Store<StateSettings> {
-    private StateSettings settings = new StateSettings();
-    private static SettingsStore instance;
+  private static SettingsStore instance;
+  private StateSettings settings = new StateSettings();
 
-    public static SettingsStore getInstance() {
-        if (instance == null) {
-            instance = new SettingsStore();
-        }
+  private SettingsStore() {
+    super("settings");
 
-        return instance;
+    StateSettings settings = this.read();
+    if (settings == null) {
+      return;
     }
 
-    private SettingsStore() {
-        super("settings");
+    this.settings = this.read();
+  }
 
-        StateSettings settings = this.read();
-        if (settings == null) {
-            return;
-        }
-
-        this.settings = this.read();
+  static SettingsStore getInstance() {
+    if (instance == null) {
+      instance = new SettingsStore();
     }
 
-    @Override
-    public StateSettings get() {
-        return settings;
-    }
+    return instance;
+  }
 
-    @Override
-    Type getType() {
-        return StateSettings.class;
-    }
+  @Override
+  public StateSettings get() {
+    return this.settings;
+  }
+
+  @Override
+  Type getType() {
+    return StateSettings.class;
+  }
 }

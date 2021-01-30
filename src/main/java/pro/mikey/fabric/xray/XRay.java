@@ -4,100 +4,73 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
-import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-import pro.mikey.fabric.xray.cache.BlockSearchEntry;
-import pro.mikey.fabric.xray.records.BlockEntry;
-import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.screens.MainScreen;
-import pro.mikey.fabric.xray.storage.BlockStore;
 import pro.mikey.fabric.xray.storage.Stores;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class XRay implements ModInitializer {
 
-	public static final String MOD_ID = "advanced-xray-fabric";
-	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+  public static final String MOD_ID = "advanced-xray-fabric";
+  public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	private final KeyBinding xrayButton = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_G, "category.xray");
-	private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
+  private final KeyBinding xrayButton = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
+  private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
 
-	private int keyCoolDown = 0;
+  private int keyCoolDown = 0;
 
-	@Override
-	public void onInitialize() {
-		LOGGER.info("XRay mod has been initialized");
+  @Override
+  public void onInitialize() {
+    LOGGER.info("XRay mod has been initialized");
 
-		ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
-		ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
-		KeyBindingHelper.registerKeyBinding(xrayButton);
-		KeyBindingHelper.registerKeyBinding(guiButton);
+    ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
+    ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
 
-		BlockStore blocks = Stores.BLOCKS;
+    KeyBindingHelper.registerKeyBinding(xrayButton);
+    KeyBindingHelper.registerKeyBinding(guiButton);
+  }
 
-		blocks.read();
-		blocks.updateCache(blocks.get());
+  /**
+   * Upon game closing, attempt to save our json stores. This means we can be a little lazy with how
+   * we go about saving throughout the rest of the mod
+   */
+  private void gameClosing(MinecraftClient client) {
+    Stores.SETTINGS.write();
+    Stores.BLOCKS.write();
+  }
 
-		System.out.println(blocks.cache.get());
-	}
+  /**
+   * Used to handle keybindings and fire off threaded scanning tasks
+   */
+  private void clientTickEvent(MinecraftClient mc) {
+    if (mc.player == null || mc.world == null || mc.currentScreen != null) {
+      return;
+    }
 
-	private void gameClosing(MinecraftClient client) {
-		// When the game stops we want to save our stores quickly
-		Stores.SETTINGS.write();
-		Stores.BLOCKS.write();
-	}
+    // Try and run the task :D
+    ScanController.runTask(false);
 
-	/**
-	 * Handles the actual scanning process :D
-	 */
-	private void clientTickEvent(MinecraftClient mc) {
-		PlayerEntity player = mc.player;
-		World world = mc.world;
+    // Handle cooldown for the keybinding to stop it spamming
+    if (keyCoolDown > 0) {
+      keyCoolDown --;
+      return;
+    }
 
-		if (player == null || world == null) {
-			return;
-		}
+    if (guiButton.isPressed()) {
+      mc.openScreen(new MainScreen());
+    }
 
-		// Don't handle key bindings
-		if (mc.currentScreen != null) {
-			return;
-		}
+    if (xrayButton.isPressed()) {
+      StateSettings stateSettings = Stores.SETTINGS.get();
+      stateSettings.setActive(!stateSettings.isActive());
+      mc.player.sendMessage(new TranslatableText("message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active")).formatted(stateSettings.isActive() ? Formatting.GREEN : Formatting.RED), true);
 
-		// Try and run the task :D
-		ScanController.runTask(false);
-
-		// Handle cooldown for the keybinding to stop it spamming
-		if (keyCoolDown > 0) {
-			keyCoolDown --;
-			return;
-		}
-
-		if (guiButton.isPressed()) {
-			mc.openScreen(new MainScreen());
-		}
-
-		if (xrayButton.isPressed()) {
-			StateSettings stateSettings = Stores.SETTINGS.get();
-
-			if (stateSettings.isActive()) {
-				stateSettings.setActive(false);
-				mc.player.sendMessage(new TranslatableText("message.xray_deactivate").formatted(Formatting.RED), true);
-			} else {
-				stateSettings.setActive(true);
-				mc.player.sendMessage(new TranslatableText("message.xray_active").formatted(Formatting.GREEN), true);
-			}
-
-			keyCoolDown = 10;
-		}
-	}
+      keyCoolDown = 5;
+    }
+  }
 }
