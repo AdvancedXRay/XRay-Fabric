@@ -1,6 +1,7 @@
 package pro.mikey.fabric.xray.screens;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -68,26 +69,26 @@ public class MainScreen extends AbstractScreen {
     super.onClose();
   }
 
-  //  private static class ScrollingList extends EntryListWidget<ScrollingList.Entry> {
-  //    public ScrollingList(
-  //        MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-  //      super(client, width, height, top, bottom, itemHeight);
-  //    }
-  //
-  //    public static class Entry extends EntryListWidget.Entry<ScrollingList.Entry> {
-  //
-  //      @Override
-  //      public void render(
-  //          MatrixStack matrices,
-  //          int index,
-  //          int y,
-  //          int x,
-  //          int entryWidth,
-  //          int entryHeight,
-  //          int mouseX,
-  //          int mouseY,
-  //          boolean hovered,
-  //          float tickDelta) {}
-  //    }
-  //  }
+  private static class ScrollingList extends EntryListWidget<ScrollingList.Entry> {
+    public ScrollingList(
+        MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+      super(client, width, height, top, bottom, itemHeight);
+    }
+
+    public static class Entry extends EntryListWidget.Entry<ScrollingList.Entry> {
+
+      @Override
+      public void render(
+          MatrixStack matrices,
+          int index,
+          int y,
+          int x,
+          int entryWidth,
+          int entryHeight,
+          int mouseX,
+          int mouseY,
+          boolean hovered,
+          float tickDelta) {}
+    }
+  }
 }
