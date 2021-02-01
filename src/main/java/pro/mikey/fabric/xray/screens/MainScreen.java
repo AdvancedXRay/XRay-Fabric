@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray.screens;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -26,6 +27,11 @@ public class MainScreen extends AbstractScreen {
   }
 
   @Override
+  public void init(MinecraftClient client, int width, int height) {
+    super.init(client, width, height);
+  }
+
+  @Override
   public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
     super.render(matrices, mouseX, mouseY, delta);
 
@@ -35,7 +41,8 @@ public class MainScreen extends AbstractScreen {
 
       y += this.textRenderer.fontHeight + 10;
       for (BlockEntry entry : group.getEntries()) {
-        drawStringWithShadow(matrices, this.textRenderer, entry.getName(), this.width / 2 - 40, y, 0xFFFFFF);
+        drawStringWithShadow(
+            matrices, this.textRenderer, entry.getName(), this.width / 2 - 40, y, 0xFFFFFF);
 
         matrices.push();
         matrices.translate(this.width / 2f - 60, y - 5, 0);
@@ -61,17 +68,26 @@ public class MainScreen extends AbstractScreen {
     super.onClose();
   }
 
-  //    private static class ScrollingList extends EntryListWidget<ScrollingList.Entry> {
-  //        public ScrollingList(MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
-  //            super(client, width, height, top, bottom, itemHeight);
-  //        }
-  //
-  //        public static class Entry extends EntryListWidget.Entry<ScrollingList.Entry> {
-  //
-  //            @Override
-  //            public void render(MatrixStack matrices, int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean hovered, float tickDelta) {
-  //
-  //            }
-  //        }
+  //  private static class ScrollingList extends EntryListWidget<ScrollingList.Entry> {
+  //    public ScrollingList(
+  //        MinecraftClient client, int width, int height, int top, int bottom, int itemHeight) {
+  //      super(client, width, height, top, bottom, itemHeight);
   //    }
+  //
+  //    public static class Entry extends EntryListWidget.Entry<ScrollingList.Entry> {
+  //
+  //      @Override
+  //      public void render(
+  //          MatrixStack matrices,
+  //          int index,
+  //          int y,
+  //          int x,
+  //          int entryWidth,
+  //          int entryHeight,
+  //          int mouseX,
+  //          int mouseY,
+  //          boolean hovered,
+  //          float tickDelta) {}
+  //    }
+  //  }
 }

@@ -19,8 +19,10 @@ public class XRay implements ModInitializer {
   public static final String MOD_ID = "advanced-xray-fabric";
   public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-  private final KeyBinding xrayButton = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
-  private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
+  private final KeyBinding xrayButton =
+      new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
+  private final KeyBinding guiButton =
+      new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
 
   private int keyCoolDown = 0;
 
@@ -31,8 +33,8 @@ public class XRay implements ModInitializer {
     ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
     ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
 
-    KeyBindingHelper.registerKeyBinding(xrayButton);
-    KeyBindingHelper.registerKeyBinding(guiButton);
+    KeyBindingHelper.registerKeyBinding(this.xrayButton);
+    KeyBindingHelper.registerKeyBinding(this.guiButton);
   }
 
   /**
@@ -44,9 +46,7 @@ public class XRay implements ModInitializer {
     Stores.BLOCKS.write();
   }
 
-  /**
-   * Used to handle keybindings and fire off threaded scanning tasks
-   */
+  /** Used to handle keybindings and fire off threaded scanning tasks */
   private void clientTickEvent(MinecraftClient mc) {
     if (mc.player == null || mc.world == null || mc.currentScreen != null) {
       return;
@@ -56,21 +56,25 @@ public class XRay implements ModInitializer {
     ScanController.runTask(false);
 
     // Handle cooldown for the keybinding to stop it spamming
-    if (keyCoolDown > 0) {
-      keyCoolDown --;
+    if (this.keyCoolDown > 0) {
+      this.keyCoolDown--;
       return;
     }
 
-    if (guiButton.isPressed()) {
+    if (this.guiButton.isPressed()) {
       mc.openScreen(new MainScreen());
     }
 
-    if (xrayButton.isPressed()) {
+    if (this.xrayButton.isPressed()) {
       StateSettings stateSettings = Stores.SETTINGS.get();
       stateSettings.setActive(!stateSettings.isActive());
-      mc.player.sendMessage(new TranslatableText("message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active")).formatted(stateSettings.isActive() ? Formatting.GREEN : Formatting.RED), true);
+      mc.player.sendMessage(
+          new TranslatableText(
+                  "message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active"))
+              .formatted(stateSettings.isActive() ? Formatting.GREEN : Formatting.RED),
+          true);
 
-      keyCoolDown = 5;
+      this.keyCoolDown = 5;
     }
   }
 }
