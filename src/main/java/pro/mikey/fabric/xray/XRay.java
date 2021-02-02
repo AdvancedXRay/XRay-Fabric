@@ -11,6 +11,7 @@ import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import pro.mikey.fabric.xray.render.XRayRenderer;
 import pro.mikey.fabric.xray.screens.MainScreen;
 import pro.mikey.fabric.xray.storage.Stores;
 
@@ -18,6 +19,8 @@ public class XRay implements ModInitializer {
 
   public static final String MOD_ID = "advanced-xray-fabric";
   public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+
+  public static final XRayRenderer xrayRenderer = new XRayRenderer();
 
   private final KeyBinding xrayButton =
       new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
@@ -42,8 +45,7 @@ public class XRay implements ModInitializer {
    * we go about saving throughout the rest of the mod
    */
   private void gameClosing(MinecraftClient client) {
-    Stores.SETTINGS.write();
-    Stores.BLOCKS.write();
+    Stores.write();
   }
 
   /** Used to handle keybindings and fire off threaded scanning tasks */

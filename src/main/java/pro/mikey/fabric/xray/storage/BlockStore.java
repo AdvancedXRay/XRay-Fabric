@@ -10,7 +10,7 @@ import java.util.List;
 
 public class BlockStore extends Store<List<BlockGroup>> {
   private static BlockStore instance;
-  public final BlockSearchCache cache = new BlockSearchCache();
+  private final BlockSearchCache cache = new BlockSearchCache();
   private List<BlockGroup> blockEntries = new ArrayList<>();
 
   private BlockStore() {
@@ -22,9 +22,10 @@ public class BlockStore extends Store<List<BlockGroup>> {
     }
 
     this.blockEntries = entries;
+    this.updateCache(entries);
   }
 
-  public static BlockStore getInstance() {
+  static BlockStore getInstance() {
     if (instance == null) {
       instance = new BlockStore();
     }
@@ -32,7 +33,7 @@ public class BlockStore extends Store<List<BlockGroup>> {
     return instance;
   }
 
-  public void updateCache(List<BlockGroup> data) {
+  private void updateCache(List<BlockGroup> data) {
     this.cache.processGroupedList(data);
   }
 
@@ -43,7 +44,6 @@ public class BlockStore extends Store<List<BlockGroup>> {
 
   @Override
   Type getType() {
-    return new TypeToken<List<BlockGroup>>() {
-    }.getType();
+    return new TypeToken<List<BlockGroup>>() {}.getType();
   }
 }

@@ -1,6 +1,5 @@
 package pro.mikey.fabric.xray.screens;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
@@ -17,15 +16,15 @@ public abstract class AbstractScreen extends Screen {
   public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
     this.renderBackground(matrices);
     super.render(matrices, mouseX, mouseY, delta);
-
-    RenderSystem.pushMatrix();
-    RenderSystem.translatef(0.0F, 0.0F, 100.0F);
-    this.client.getTextureManager().bindTexture(TEXTURE);
-    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-    int i = (this.width - 147) / 2;
-    int j = (this.height - 166) / 2;
-
-    this.drawTexture(matrices, i, j, 1, 1, 147, 166);
-    RenderSystem.popMatrix();
+    //
+    //    RenderSystem.pushMatrix();
+    //    RenderSystem.translatef(0.0F, 0.0F, 100.0F);
+    //    this.client.getTextureManager().bindTexture(TEXTURE);
+    //    RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+    //    int i = (this.width - 147) / 2;
+    //    int j = (this.height - 166) / 2;
+    //
+    //    this.drawTexture(matrices, i, j, 1, 1, 147, 166);
+    //    RenderSystem.popMatrix();
   }
 }

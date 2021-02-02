@@ -12,15 +12,25 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import pro.mikey.fabric.xray.render.RenderOutlines;
+import pro.mikey.fabric.xray.XRay;
 
 @Environment(EnvType.CLIENT)
 @Mixin(WorldRenderer.class)
 public class MixinWorldRenderer {
-  private static final String RENDER = "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V";
+  private static final String RENDER =
+      "render(Lnet/minecraft/client/util/math/MatrixStack;FJZLnet/minecraft/client/render/Camera;Lnet/minecraft/client/render/GameRenderer;Lnet/minecraft/client/render/LightmapTextureManager;Lnet/minecraft/util/math/Matrix4f;)V";
 
   @Inject(method = RENDER, at = @At(value = "TAIL"))
-  public void renderWorldOverlay(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline, Camera camera, GameRenderer gameRenderer, LightmapTextureManager lightmapTextureManager, Matrix4f matrix4f, CallbackInfo ci) {
-    RenderOutlines.render(matrices, camera);
+  public void renderWorldOverlay(
+      MatrixStack matrices,
+      float tickDelta,
+      long limitTime,
+      boolean renderBlockOutline,
+      Camera camera,
+      GameRenderer gameRenderer,
+      LightmapTextureManager lightmapTextureManager,
+      Matrix4f matrix4f,
+      CallbackInfo ci) {
+    XRay.xrayRenderer.render(matrices, camera);
   }
 }
