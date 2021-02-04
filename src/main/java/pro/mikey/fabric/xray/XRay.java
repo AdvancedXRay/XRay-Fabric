@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
 import pro.mikey.fabric.xray.render.XRayRenderer;
+import pro.mikey.fabric.xray.scan.ScanController;
 import pro.mikey.fabric.xray.screens.MainScreen;
 import pro.mikey.fabric.xray.storage.Stores;
 
@@ -65,6 +66,8 @@ public class XRay implements ModInitializer {
 
     if (this.guiButton.isPressed()) {
       mc.openScreen(new MainScreen());
+      ScanController.activeChunks.clear();
+      ScanController.scannedChunks.clear();
     }
 
     if (this.xrayButton.isPressed()) {

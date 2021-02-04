@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray.render;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.VertexBuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -10,11 +11,11 @@ import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import pro.mikey.fabric.xray.ScanController;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.scan.ScanController;
 
 import java.io.Closeable;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
@@ -54,11 +55,42 @@ public class XRayRenderer {
   }
 
   public void render(MatrixStack matrices, Camera camera) {
-    if (ScanController.renderQueue.isEmpty() || !Stores.SETTINGS.get().isActive()) {
-      if (!this.firstRender) {
-        this.firstRender = true;
-      }
-      return;
+    //    if (ScanController.renderQueue.isEmpty() || !Stores.SETTINGS.get().isActive()) {
+    //      if (!this.firstRender) {
+    //        this.firstRender = true;
+    //      }
+    //      return;
+    //    }
+
+    final Vec3d cameraPos = camera.getPos();
+    if (!ScanController.activeChunks.isEmpty()) {
+      VertexConsumerProvider.Immediate entityVertexConsumers =
+          MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers();
+      VertexConsumer builder = entityVertexConsumers.getBuffer(XRayRenderType.OVERLAY_LINES);
+
+      ScanController.activeChunks.forEach(
+          (chunk) -> {
+            matrices.push();
+            matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+            RenderSystem.disableDepthTest();
+
+            WorldRenderer.drawBox(
+                matrices,
+                builder,
+                chunk.getStartX(),
+                69,
+                chunk.getStartZ(),
+                chunk.getEndX() + 1,
+                70,
+                chunk.getEndZ() + 1,
+                (float) Math.random(),
+                (float) Math.random(),
+                (float) Math.random(),
+                1);
+
+            RenderSystem.enableDepthTest();
+            matrices.pop();
+          });
     }
 
     if (this.firstRender) {
@@ -66,6 +98,7 @@ public class XRayRenderer {
         this.renderBuffer.close();
       }
 
+      System.out.println("rendering buffer");
       this.renderBuffer =
           MultiVBORenderer.of(
               (buffer) -> {
@@ -73,7 +106,14 @@ public class XRayRenderer {
                 stack.push();
 
                 VertexConsumer buffer1 = buffer.getBuffer(XRayRenderType.OVERLAY_LINES);
-                ScanController.renderQueue.forEach(e -> renderBlockBounding(stack, buffer1, e));
+                synchronized (ScanController.renderQueue) {
+                  Iterator<BlockPos> iterator = ScanController.renderQueue.iterator();
+                  while (iterator.hasNext()) {
+                    renderBlockBounding(stack, buffer1, iterator.next());
+                  }
+                }
+                //                ScanController.renderQueue.forEach(e -> renderBlockBounding(stack,
+                // buffer1, e));
 
                 stack.pop();
               });
@@ -84,8 +124,6 @@ public class XRayRenderer {
     if (this.renderBuffer == null) {
       return;
     }
-
-    final Vec3d cameraPos = camera.getPos();
 
     matrices.push();
     RenderSystem.disableDepthTest();
