@@ -3,35 +3,37 @@ package pro.mikey.fabric.xray.cache;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockGroup;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Physical representation of what we're searching for. Contains the actual state,
- * Scraps unneeded data and cleans up some logic along the way.
- * <p>
- * I control when this list is populated and has changes through the first load
- * and the gui.
+ * Physical representation of what we're searching for. Contains the actual state, Scraps unneeded
+ * data and cleans up some logic along the way.
+ *
+ * <p>I control when this list is populated and has changes through the first load and the gui.
  */
 public class BlockSearchCache {
-  private List<BlockSearchEntry> cache = new ArrayList<>();
+  private Set<BlockSearchEntry> cache = new HashSet<>();
 
   public void processGroupedList(List<BlockGroup> blockEntries) {
     // Flatten the grouped list down to a single cacheable list
-    this.cache = blockEntries.stream()
-        .flatMap(e -> e.getEntries().stream()
-            .map(a -> new BlockSearchEntry(
-                    BlockSearchEntry.blockStateFromStringNBT(a.getState()),
-                    BasicColor.of(a.getHex()),
-                    a.isDefault()
-                )
-            ))
-        .distinct()
-        .collect(Collectors.toList());
+    this.cache =
+        blockEntries.stream()
+            .flatMap(
+                e ->
+                    e.getEntries().stream()
+                        .map(
+                            a ->
+                                new BlockSearchEntry(
+                                    BlockSearchEntry.blockStateFromStringNBT(a.getState()),
+                                    BasicColor.of(a.getHex()),
+                                    a.isDefault())))
+            .collect(Collectors.toSet());
   }
 
-  public List<BlockSearchEntry> get() {
+  public Set<BlockSearchEntry> get() {
     return this.cache;
   }
 }
