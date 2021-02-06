@@ -44,7 +44,6 @@ public class XRay implements ModInitializer {
   private void gameClosing(MinecraftClient client) {
     Stores.SETTINGS.write();
     Stores.BLOCKS.write();
-    Stores.BLOCKS.updateCache();
   }
 
   /** Used to handle keybindings and fire off threaded scanning tasks */
@@ -67,6 +66,8 @@ public class XRay implements ModInitializer {
     }
 
     if (this.xrayButton.isPressed()) {
+      Stores.BLOCKS.updateCache();
+
       StateSettings stateSettings = Stores.SETTINGS.get();
       stateSettings.setActive(!stateSettings.isActive());
       mc.player.sendMessage(
