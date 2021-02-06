@@ -4,6 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.text.TranslatableText;
@@ -11,12 +12,14 @@ import net.minecraft.util.Formatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
-import pro.mikey.fabric.xray.screens.MainScreen;
+import pro.mikey.fabric.xray.screens.forge.GuiOverlay;
+import pro.mikey.fabric.xray.screens.forge.GuiSelectionScreen;
 import pro.mikey.fabric.xray.storage.Stores;
 
 public class XRay implements ModInitializer {
 
   public static final String MOD_ID = "advanced-xray-fabric";
+  public static final String PREFIX_GUI = String.format("%s:textures/gui/", MOD_ID);
   public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
   private final KeyBinding xrayButton =
@@ -32,7 +35,7 @@ public class XRay implements ModInitializer {
 
     ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
     ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
-
+    HudRenderCallback.EVENT.register(GuiOverlay::RenderGameOverlayEvent);
     KeyBindingHelper.registerKeyBinding(this.xrayButton);
     KeyBindingHelper.registerKeyBinding(this.guiButton);
   }
@@ -62,7 +65,7 @@ public class XRay implements ModInitializer {
     }
 
     if (this.guiButton.isPressed()) {
-      mc.openScreen(new MainScreen());
+      mc.openScreen(new GuiSelectionScreen());
     }
 
     if (this.xrayButton.isPressed()) {
