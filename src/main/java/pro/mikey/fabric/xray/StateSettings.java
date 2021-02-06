@@ -1,13 +1,14 @@
 package pro.mikey.fabric.xray;
 
 public class StateSettings {
+  public static final int[] DISTANCE_STEPS = new int[] {2, 8, 16, 32, 64, 128, 256};
   private boolean isActive;
   private boolean showLava;
   private int range;
   private boolean showOverlay;
 
   // Singleton
-  public StateSettings() {
+  private StateSettings() {
     this.isActive = false;
     this.showLava = false;
     this.showOverlay = true;
@@ -30,12 +31,25 @@ public class StateSettings {
     this.showLava = showLava;
   }
 
+  // Fail softly if the index is out of bounds
   public int getRange() {
-    return this.range;
+    return Math.max(0, Math.min(DISTANCE_STEPS.length - 1, this.range));
   }
 
-  public void setRange(int range) {
-    this.range = range;
+  public void increaseRange() {
+    if (this.range < DISTANCE_STEPS.length - 1) {
+      this.range += 1;
+    } else {
+      this.range = 0;
+    }
+  }
+
+  public void decreaseRange() {
+    if (this.range > 0) {
+      this.range -= 1;
+    } else {
+      this.range = DISTANCE_STEPS.length - 1;
+    }
   }
 
   public boolean showOverlay() {

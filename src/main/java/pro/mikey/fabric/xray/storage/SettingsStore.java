@@ -6,7 +6,7 @@ import java.lang.reflect.Type;
 
 public class SettingsStore extends Store<StateSettings> {
   private static SettingsStore instance;
-  private StateSettings settings = new StateSettings();
+  private StateSettings settings;
 
   private SettingsStore() {
     super("settings");

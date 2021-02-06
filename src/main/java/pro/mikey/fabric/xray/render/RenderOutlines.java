@@ -13,7 +13,7 @@ import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.Stores;
 
 public class RenderOutlines {
-  public static void render(MatrixStack matrices, Camera camera) {
+  public static synchronized void render(MatrixStack matrices, Camera camera) {
     if (ScanController.renderQueue.isEmpty() || !Stores.SETTINGS.get().isActive()) {
       return;
     }

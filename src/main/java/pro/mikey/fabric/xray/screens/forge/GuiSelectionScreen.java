@@ -23,6 +23,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import pro.mikey.fabric.xray.StateSettings;
 import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.storage.Stores;
@@ -188,13 +189,16 @@ public class GuiSelectionScreen extends GuiBase {
                 this.getHeight() / 2 + 36,
                 120,
                 20,
-                I18n.translate("xray.input.distance", Stores.SETTINGS.get().getRange()),
+                I18n.translate(
+                    "xray.input.distance",
+                    StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]),
                 "xray.tooltips.distance",
                 button -> {
-                  //                  Controller.incrementCurrentDist();
+                  Stores.SETTINGS.get().increaseRange();
                   button.setMessage(
                       new TranslatableText(
-                          "xray.input.distance", Stores.SETTINGS.get().getRange()));
+                          "xray.input.distance",
+                          StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]));
                 }));
     this.addButton(
         new ButtonWidget(
@@ -256,12 +260,15 @@ public class GuiSelectionScreen extends GuiBase {
       this.setFocused(this.search);
     }
 
-    //    if (mouse == 1 && this.distButtons.isMouseOver(x, y)) {
-    //      Controller.decrementCurrentDist();
-    //      this.distButtons.setMessage(
-    //          new TranslatableText("xray.input.distance", Controller.getRadius()));
-    //      this.distButtons.playDownSound(this.client.getSoundHandler());
-    //    }
+    if (mouse == 1 && this.distButtons.isMouseOver(x, y)) {
+      Stores.SETTINGS.get().decreaseRange();
+
+      this.distButtons.setMessage(
+          new TranslatableText(
+              "xray.input.distance",
+              StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]));
+      this.distButtons.playDownSound(this.client.getSoundManager());
+    }
 
     return super.mouseClicked(x, y, mouse);
   }

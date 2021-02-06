@@ -19,8 +19,9 @@ public class ScanTask implements Runnable {
 
   @Override
   public void run() {
+    Set<BlockPosWithColor> c = this.collectBlocks();
     ScanController.renderQueue.clear();
-    ScanController.renderQueue.addAll(this.collectBlocks());
+    ScanController.renderQueue.addAll(c);
   }
 
   /**
@@ -58,7 +59,7 @@ public class ScanTask implements Runnable {
     int cX = player.chunkX;
     int cZ = player.chunkZ;
 
-    int range = Stores.SETTINGS.get().getRange() / 2;
+    int range = StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()] / 2;
 
     for (int i = cX - range; i <= cX + range; i++) {
       int chunkStartX = i << 4;
