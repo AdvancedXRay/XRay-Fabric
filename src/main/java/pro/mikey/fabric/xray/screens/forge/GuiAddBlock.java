@@ -2,7 +2,7 @@ package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.BufferBuilder;
@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class GuiAddBlock extends GuiBase {
-  private final Block selectBlock;
+  private final BlockState selectBlock;
   private final ItemStack itemStack;
   private final Supplier<GuiBase> previousScreenCallback;
   private TextFieldWidget oreName;
@@ -34,11 +34,11 @@ public class GuiAddBlock extends GuiBase {
   private RatioSliderWidget blueSlider;
   private boolean oreNameCleared = false;
 
-  GuiAddBlock(Block selectedBlock, Supplier<GuiBase> previousScreenCallback) {
+  GuiAddBlock(BlockState selectedBlock, Supplier<GuiBase> previousScreenCallback) {
     super(false);
     this.selectBlock = selectedBlock;
     this.previousScreenCallback = previousScreenCallback;
-    this.itemStack = new ItemStack(this.selectBlock, 1);
+    this.itemStack = new ItemStack(this.selectBlock.getBlock(), 1);
   }
 
   // FIXME: 28/06/2020 replace with matrix system instead of the tess
@@ -77,10 +77,6 @@ public class GuiAddBlock extends GuiBase {
                 b -> {
                   this.onClose();
 
-                  if (this.selectBlock.getTranslationKey() == null) {
-                    return;
-                  }
-
                   BlockGroup group =
                       Stores.BLOCKS.get().size() >= 1
                           ? Stores.BLOCKS.get().get(0)
@@ -89,17 +85,21 @@ public class GuiAddBlock extends GuiBase {
                       .getEntries()
                       .add(
                           new BlockEntry(
-                              this.selectBlock.getDefaultState(),
+                              this.selectBlock,
                               this.oreName.getText(),
                               new BasicColor(
                                   (int) (this.redSlider.getValue() * 255),
                                   (int) (this.greenSlider.getValue() * 255),
                                   (int) (this.blueSlider.getValue() * 255)),
                               group.getEntries().size() + 1,
-                              true,
+                              this.selectBlock == this.selectBlock.getBlock().getDefaultState(),
                               true));
 
-                  Stores.BLOCKS.get().add(group);
+                  if (Stores.BLOCKS.get().size() > 0) {
+                    Stores.BLOCKS.get().set(0, group);
+                  } else {
+                    Stores.BLOCKS.get().add(group);
+                  }
                   Stores.BLOCKS.write();
 
                   this.getMinecraft().openScreen(new GuiSelectionScreen());
@@ -153,7 +153,7 @@ public class GuiAddBlock extends GuiBase {
             20,
             LiteralText.EMPTY);
 
-    this.oreName.setText(this.selectBlock.getTranslationKey());
+    this.oreName.setText(this.selectBlock.getBlock().getName().getString());
     this.children.add(this.oreName);
     this.children.add(this.redSlider);
     this.children.add(this.greenSlider);
@@ -171,7 +171,7 @@ public class GuiAddBlock extends GuiBase {
     this.getFontRender()
         .drawWithShadow(
             stack,
-            this.selectBlock.getTranslationKey(),
+            this.selectBlock.getBlock().getName().getString(),
             this.getWidth() / 2f - 100,
             this.getHeight() / 2f - 90,
             0xffffff);
@@ -180,9 +180,9 @@ public class GuiAddBlock extends GuiBase {
     renderPreview(
         this.getWidth() / 2 - 100,
         this.getHeight() / 2 - 40,
-        (float) this.redSlider.getValue(),
-        (float) this.greenSlider.getValue(),
-        (float) this.blueSlider.getValue());
+        (float) this.redSlider.getValue() * 255,
+        (float) this.greenSlider.getValue() * 255,
+        (float) this.blueSlider.getValue() * 255);
 
     DiffuseLighting.enable();
     this.itemRenderer.renderInGuiWithOverrides(
@@ -213,18 +213,6 @@ public class GuiAddBlock extends GuiBase {
 
   @Override
   public boolean mouseReleased(double x, double y, int mouse) {
-    //    if (this.redSlider.dragging && !this.redSlider.isFocused()) {
-    //      this.redSlider.dragging = false;
-    //    }
-    //
-    //    if (this.greenSlider.dragging && !this.greenSlider.isFocused()) {
-    //      this.greenSlider.dragging = false;
-    //    }
-    //
-    //    if (this.blueSlider.dragging && !this.blueSlider.isFocused()) {
-    //      this.blueSlider.dragging = false;
-    //    }
-
     return super.mouseReleased(x, y, mouse);
   }
 

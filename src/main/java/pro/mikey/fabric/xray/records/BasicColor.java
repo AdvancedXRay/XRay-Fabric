@@ -20,10 +20,8 @@ public class BasicColor {
       return new BasicColor(0, 0, 0);
     }
 
-    return new BasicColor(
-        Integer.valueOf(hex.substring(1, 3), 16),
-        Integer.valueOf(hex.substring(3, 5), 16),
-        Integer.valueOf(hex.substring(5, 7), 16));
+    int hexInt = Integer.parseInt(hex.replace("#", "0x"));
+    return new BasicColor((hexInt & 0xFF0000) >> 16, (hexInt & 0xFF00) >> 8, (hexInt & 0xFF));
   }
 
   public int getRed() {
@@ -39,6 +37,6 @@ public class BasicColor {
   }
 
   String toHex() {
-    return "#" + (16 << (this.red & 0xFF0000)) + (8 << (this.green & 0xFF00)) + (this.blue & 0xFF);
+    return String.format("#%02x%02x%02x", this.red, this.green, this.blue);
   }
 }

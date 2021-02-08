@@ -137,7 +137,8 @@ public class GuiBlockList extends GuiBase {
       }
 
       this.client.player.closeScreen();
-      this.client.openScreen(new GuiAddBlock(entry.getBlock().getBlock(), GuiBlockList::new));
+      this.client.openScreen(
+          new GuiAddBlock(entry.getBlock().getBlock().getDefaultState(), GuiBlockList::new));
     }
 
     void updateEntries(List<BlockWithStack> blocks) {

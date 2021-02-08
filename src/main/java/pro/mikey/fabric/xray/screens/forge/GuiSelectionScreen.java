@@ -2,7 +2,6 @@ package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
@@ -125,7 +124,8 @@ public class GuiSelectionScreen extends GuiBase {
 
               this.client.openScreen(
                   new GuiAddBlock(
-                      ((BlockItem) handItem.getItem()).getBlock(), GuiSelectionScreen::new));
+                      ((BlockItem) handItem.getItem()).getBlock().getDefaultState(),
+                      GuiSelectionScreen::new));
             }));
     this.addButton(
         new SupportButtonInner(
@@ -149,12 +149,8 @@ public class GuiSelectionScreen extends GuiBase {
                   BlockState state =
                       this.client.world.getBlockState(((BlockHitResult) look).getBlockPos());
 
-                  ItemStack lookingStack = new ItemStack(state.getBlock());
-
                   player.closeScreen();
-                  this.client.openScreen(
-                      new GuiAddBlock(
-                          Block.getBlockFromItem(lookingStack.getItem()), GuiSelectionScreen::new));
+                  this.client.openScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
                 } else {
                   player.sendMessage(
                       new LiteralText("[XRay] " + I18n.translate("xray.message.nothing_infront")),
