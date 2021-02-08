@@ -55,9 +55,9 @@ public class GuiAddBlock extends GuiBase {
     RenderSystem.color4f(r / 255, g / 255, b / 255, 1);
     tessellate.begin(7, VertexFormats.POSITION);
     tessellate.vertex(x, y, 0.0D).next();
-    tessellate.vertex(x, y + 45, 0.0D).next();
-    tessellate.vertex(x + 202, y + 45, 0.0D).next();
-    tessellate.vertex(x + 202, y, 0.0D).next();
+    tessellate.vertex(x, y + 64, 0.0D).next();
+    tessellate.vertex(x + 100, y + 64, 0.0D).next();
+    tessellate.vertex(x + 100, y, 0.0D).next();
     tessellator.draw();
     RenderSystem.enableTexture();
     RenderSystem.disableBlend();
@@ -120,8 +120,8 @@ public class GuiAddBlock extends GuiBase {
         this.redSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 7,
-                202,
+                this.getHeight() / 2 - 40,
+                100,
                 20,
                 new TranslatableText("xray.color.red"),
                 0));
@@ -129,8 +129,8 @@ public class GuiAddBlock extends GuiBase {
         this.greenSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 30,
-                202,
+                this.getHeight() / 2 - 18,
+                100,
                 20,
                 new TranslatableText("xray.color.green"),
                 0));
@@ -138,8 +138,8 @@ public class GuiAddBlock extends GuiBase {
         this.blueSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 53,
-                202,
+                this.getHeight() / 2 + 4,
+                100,
                 20,
                 new TranslatableText("xray.color.blue"),
                 0));
@@ -177,12 +177,17 @@ public class GuiAddBlock extends GuiBase {
             0xffffff);
 
     this.oreName.render(stack, x, y, partialTicks);
+
     renderPreview(
-        this.getWidth() / 2 - 100,
+        this.getWidth() / 2 + 2,
         this.getHeight() / 2 - 40,
         (float) this.redSlider.getValue() * 255,
         (float) this.greenSlider.getValue() * 255,
         (float) this.blueSlider.getValue() * 255);
+
+    this.getFontRender()
+        .drawWithShadow(
+            stack, "Color", this.getWidth() / 2f + 10, this.getHeight() / 2f - 35, 0xffffff);
 
     DiffuseLighting.enable();
     this.itemRenderer.renderInGuiWithOverrides(
