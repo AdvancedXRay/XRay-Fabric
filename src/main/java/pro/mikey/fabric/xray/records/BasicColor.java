@@ -1,11 +1,13 @@
 package pro.mikey.fabric.xray.records;
 
+import java.awt.*;
+
 public class BasicColor {
   private final int red;
   private final int blue;
   private final int green;
 
-  public BasicColor(int red, int blue, int green) {
+  public BasicColor(int red, int green, int blue) {
     this.red = red;
     this.blue = blue;
     this.green = green;
@@ -20,8 +22,8 @@ public class BasicColor {
       return new BasicColor(0, 0, 0);
     }
 
-    int hexInt = Integer.parseInt(hex.replace("#", "0x"));
-    return new BasicColor((hexInt & 0xFF0000) >> 16, (hexInt & 0xFF00) >> 8, (hexInt & 0xFF));
+    Color color = Color.decode(hex);
+    return new BasicColor(color.getRed(), color.getGreen(), color.getBlue());
   }
 
   public int getRed() {
