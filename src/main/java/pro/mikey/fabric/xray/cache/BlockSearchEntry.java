@@ -21,7 +21,7 @@ public class BlockSearchEntry {
     this.isDefault = isDefault;
   }
 
-  static BlockState blockStateFromStringNBT(String nbt) {
+  public static BlockState blockStateFromStringNBT(String nbt) {
     CompoundTag tag;
     try {
       tag = StringNbtReader.parse(nbt);

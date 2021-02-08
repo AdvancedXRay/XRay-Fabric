@@ -1,7 +1,10 @@
 package pro.mikey.fabric.xray.storage;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import pro.mikey.fabric.xray.cache.BlockSearchCache;
+import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
 
 import java.lang.reflect.Type;
@@ -48,6 +51,14 @@ public class BlockStore extends Store<List<BlockGroup>> {
   @Override
   public List<BlockGroup> get() {
     return this.blockEntries;
+  }
+
+  @Override
+  public Gson getGson() {
+    return new GsonBuilder()
+        .registerTypeAdapter(BlockEntry.class, new BlockEntry.Serializer())
+        .setPrettyPrinting()
+        .create();
   }
 
   @Override

@@ -1,6 +1,5 @@
 package pro.mikey.fabric.xray.cache;
 
-import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockGroup;
 
 import java.util.HashSet;
@@ -24,12 +23,7 @@ public class BlockSearchCache {
             .flatMap(
                 e ->
                     e.getEntries().stream()
-                        .map(
-                            a ->
-                                new BlockSearchEntry(
-                                    BlockSearchEntry.blockStateFromStringNBT(a.getState()),
-                                    BasicColor.of(a.getHex()),
-                                    a.isDefault())))
+                        .map(a -> new BlockSearchEntry(a.getState(), a.getHex(), a.isDefault())))
             .collect(Collectors.toSet());
   }
 

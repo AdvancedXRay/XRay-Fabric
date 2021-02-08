@@ -14,7 +14,12 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import pro.mikey.fabric.xray.records.BasicColor;
+import pro.mikey.fabric.xray.records.BlockEntry;
+import pro.mikey.fabric.xray.records.BlockGroup;
+import pro.mikey.fabric.xray.storage.Stores;
 
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.function.Supplier;
 
@@ -76,23 +81,27 @@ public class GuiAddBlock extends GuiBase {
                     return;
                   }
 
-                  // Push the block to the render stack
-                  //                  Controller.getBlockStore()
-                  //                      .put(
-                  //                          new BlockData(
-                  //                              this.oreName.getText(),
-                  //                              this.selectBlock.getRegistryName().toString(),
-                  //                              (((int) (this.redSlider.getValue()) << 16)
-                  //                                  + ((int) (this.greenSlider.getValue()) << 8)
-                  //                                  + (int) (this.blueSlider.getValue())),
-                  //                              this.itemStack,
-                  //                              true,
-                  //                              Controller.getBlockStore().getStore().size() +
-                  // 1));
-                  //
-                  //                  ClientController.blockStore.write(
-                  //                      new
-                  // ArrayList<>(Controller.getBlockStore().getStore().values()));
+                  BlockGroup group =
+                      Stores.BLOCKS.get().size() >= 1
+                          ? Stores.BLOCKS.get().get(0)
+                          : new BlockGroup("default", new ArrayList<>(), 1, true);
+                  group
+                      .getEntries()
+                      .add(
+                          new BlockEntry(
+                              this.selectBlock.getDefaultState(),
+                              this.oreName.getText(),
+                              new BasicColor(
+                                  (int) (this.redSlider.getValue() * 255),
+                                  (int) (this.greenSlider.getValue() * 255),
+                                  (int) (this.blueSlider.getValue() * 255)),
+                              group.getEntries().size() + 1,
+                              true,
+                              true));
+
+                  Stores.BLOCKS.get().add(group);
+                  Stores.BLOCKS.write();
+
                   this.getMinecraft().openScreen(new GuiSelectionScreen());
                 }));
     this.addButton(
