@@ -74,7 +74,7 @@ public class GuiAddBlock extends GuiBase {
         this.changeDefaultState =
             new ButtonWidget(
                 this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 85,
+                this.getHeight() / 2 + 60,
                 202,
                 20,
                 new LiteralText(

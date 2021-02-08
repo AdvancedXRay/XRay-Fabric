@@ -33,8 +33,8 @@ public class GuiEdit extends GuiBase {
     this.addButton(
         this.changeDefaultState =
             new ButtonWidget(
-                this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 85,
+                this.getWidth() / 2 - 138,
+                this.getHeight() / 2 + 60,
                 202,
                 20,
                 new LiteralText(
@@ -97,6 +97,7 @@ public class GuiEdit extends GuiBase {
                         (int) (this.greenSlider.getValue() * 255),
                         (int) (this.blueSlider.getValue() * 255)));
                 entry.setState(this.block.getState());
+                entry.setDefault(this.lastState != null);
                 Stores.BLOCKS.get().get(0).getEntries().set(index, entry);
                 Stores.BLOCKS.write();
               } catch (Exception ex) {
