@@ -3,7 +3,6 @@ package pro.mikey.fabric.xray.screens.forge;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -22,6 +21,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
+import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.StateSettings;
 import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockEntry;
@@ -173,6 +173,7 @@ public class GuiSelectionScreen extends GuiBase {
                 "xray.tooltips.show_lava",
                 button -> {
                   Stores.SETTINGS.get().setShowLava(!Stores.SETTINGS.get().isShowLava());
+                  ScanController.runTask(true);
                   button.setMessage(
                       new TranslatableText(
                           "xray.input.show-lava", Stores.SETTINGS.get().isShowLava()));
@@ -289,7 +290,8 @@ public class GuiSelectionScreen extends GuiBase {
     Stores.SETTINGS.write();
     Stores.BLOCKS.write();
 
-    //    Controller.requestBlockFinder(true);
+    ScanController.runTask(true);
+
     super.onClose();
   }
 
@@ -381,11 +383,11 @@ public class GuiSelectionScreen extends GuiBase {
 
         TextRenderer font = this.parent.client.textRenderer;
 
-        font.draw(stack, blockData.getName(), left + 40, top + 7, 0xFFFFFF);
+        font.draw(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
         font.draw(
             stack,
             blockData.isActive() ? "Enabled" : "Disabled",
-            left + 40,
+            left + 35,
             top + 17,
             blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
@@ -393,7 +395,7 @@ public class GuiSelectionScreen extends GuiBase {
         this.parent
             .client
             .getItemRenderer()
-            .renderInGuiWithOverrides(new ItemStack(Blocks.DIRT), left + 15, top + 7);
+            .renderInGuiWithOverrides(blockData.getStack(), left + 10, top + 7);
         DiffuseLighting.disable();
 
         if (mouseX > left
@@ -408,10 +410,9 @@ public class GuiSelectionScreen extends GuiBase {
                   new TranslatableText("xray.tooltips.edit1"),
                   new TranslatableText("xray.tooltips.edit2")),
               left + 15,
-              (entryIdx == this.parent.children().size() - 1
+              (entryIdx == this.parent.children().size() - 1 && entryIdx != 0
                   ? (top - (entryHeight - 20))
-                  : (top + (entryHeight + 15))) // @mcp: func_231039_at__ = getEntries
-              );
+                  : (top + (entryHeight + 15))));
         }
 
         RenderSystem.enableAlphaTest();
@@ -419,11 +420,36 @@ public class GuiSelectionScreen extends GuiBase {
         RenderSystem.blendFunc(
             GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
         this.parent.client.getTextureManager().bindTexture(GuiSelectionScreen.CIRCLE);
+        RenderSystem.color4f(
+            blockData.getHex().getRed() / 255f,
+            blockData.getHex().getGreen() / 255f,
+            blockData.getHex().getBlue() / 255f,
+            .3f);
         ScrollingBlockList.this.drawTexture(
-            stack, (left + entryWidth) - 37, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14);
-
+            stack,
+            (left + entryWidth) - 27,
+            (int) (top + (entryHeight / 2f) - 9),
+            0,
+            0,
+            14,
+            14,
+            14,
+            14);
+        RenderSystem.color4f(
+            blockData.getHex().getRed() / 255f,
+            blockData.getHex().getGreen() / 255f,
+            blockData.getHex().getBlue() / 255f,
+            1);
         ScrollingBlockList.this.drawTexture(
-            stack, (left + entryWidth) - 35, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10);
+            stack,
+            (left + entryWidth) - 25,
+            (int) (top + (entryHeight / 2f) - 7),
+            0,
+            0,
+            10,
+            10,
+            10,
+            10);
         RenderSystem.disableAlphaTest();
         RenderSystem.disableBlend();
       }

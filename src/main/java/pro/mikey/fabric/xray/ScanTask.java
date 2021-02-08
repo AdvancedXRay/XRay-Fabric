@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.LavaFluid;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkSection;
@@ -96,6 +97,11 @@ public class ScanTask implements Runnable {
     BlockState state = world.getBlockState(pos);
     if (state.isAir()) {
       return null;
+    }
+
+    if (Stores.SETTINGS.get().isShowLava()
+        && state.getFluidState().getFluid() instanceof LavaFluid) {
+      return new BasicColor(210, 10, 10);
     }
 
     BlockState defaultState = state.getBlock().getDefaultState();

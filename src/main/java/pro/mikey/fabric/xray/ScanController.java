@@ -34,7 +34,7 @@ public class ScanController {
    * @param forceRerun if the task is required to re-run for instance, a block is broken in the
    *     world.
    */
-  static synchronized void runTask(boolean forceRerun) {
+  public static synchronized void runTask(boolean forceRerun) {
     MinecraftClient client = MinecraftClient.getInstance();
     if (client.player == null && client.world == null) {
       return;
