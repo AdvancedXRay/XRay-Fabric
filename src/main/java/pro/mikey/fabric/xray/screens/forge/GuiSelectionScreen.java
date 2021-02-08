@@ -30,6 +30,7 @@ import pro.mikey.fabric.xray.storage.Stores;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GuiSelectionScreen extends GuiBase {
   private static final Identifier CIRCLE = new Identifier(XRay.PREFIX_GUI + "circle.png");
@@ -44,15 +45,6 @@ public class GuiSelectionScreen extends GuiBase {
   public GuiSelectionScreen() {
     super(true);
     this.setSideTitle(I18n.translate("xray.single.tools"));
-
-    //    // Inject this hear as everything is loaded
-    //    if (ClientController.blockStore.created) {
-    //      List<BlockData.SerializableBlockData> blocks =
-    // ClientController.blockStore.populateDefault();
-    //      Controller.getBlockStore().setStore(BlockStore.getFromSimpleBlockList(blocks));
-    //
-    //      ClientController.blockStore.created = false;
-    //    }
 
     this.itemList =
         Stores.BLOCKS.get().size() >= 1
@@ -230,14 +222,12 @@ public class GuiSelectionScreen extends GuiBase {
       return;
     }
 
-    //    this.itemList =
-    //        this.originalList.stream()
-    //            .filter(
-    //                b ->
-    // b.getEntryName().toLowerCase().contains(this.search.getText().toLowerCase()))
-    //            .collect(Collectors.toCollection(ArrayList::new));
-    //
-    //    this.itemList.sort(Comparator.comparingInt(BlockData::getOrder));
+    this.itemList =
+        this.originalList.stream()
+            .filter(b -> b.getName().toLowerCase().contains(this.search.getText().toLowerCase()))
+            .collect(Collectors.toCollection(ArrayList::new));
+
+    this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
 
     this.scrollList.updateEntries(this.itemList);
     this.lastSearch = this.search.getText();
@@ -333,14 +323,18 @@ public class GuiSelectionScreen extends GuiBase {
 
       if (GuiSelectionScreen.hasShiftDown()) {
         this.client.player.closeScreen();
-        //        this.client.openScreen(new GuiEdit(entry.block));
+        this.client.openScreen(new GuiEdit(entry.block));
         return;
       }
 
-      //      entry.getBlock()
-      //      Controller.getBlockStore().toggleDrawing(entry.block);
-      //      ClientController.blockStore.write(
-      //          new ArrayList<>(Controller.getBlockStore().getStore().values()));
+      try {
+        int index = Stores.BLOCKS.get().get(0).getEntries().indexOf(entry.getBlock());
+        BlockEntry blockEntry = Stores.BLOCKS.get().get(0).getEntries().get(index);
+        blockEntry.setActive(!blockEntry.isActive());
+        Stores.BLOCKS.get().get(0).getEntries().set(index, blockEntry);
+        Stores.BLOCKS.write();
+      } catch (Exception e) {
+      }
     }
 
     void updateEntries(List<BlockEntry> blocks) {

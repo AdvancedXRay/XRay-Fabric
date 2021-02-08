@@ -12,6 +12,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
@@ -173,21 +174,20 @@ public class GuiBlockList extends GuiBase {
           float partialTicks) {
         TextRenderer font = this.parent.client.textRenderer;
 
-        String resource = this.block.getStack().getItem().getTranslationKey();
+        Identifier resource = Registry.BLOCK.getId(this.block.getBlock());
         font.draw(
             stack,
             this.block.getStack().getItem().getName().getString(),
-            left + 40,
+            left + 35,
             top + 7,
             Color.WHITE.getRGB());
-        font.draw(
-            stack, resource != null ? resource : "", left + 40, top + 17, Color.WHITE.getRGB());
+        font.draw(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
         DiffuseLighting.enable();
         this.parent
             .client
             .getItemRenderer()
-            .renderInGuiWithOverrides(this.block.getStack(), left + 15, top + 7);
+            .renderInGuiWithOverrides(this.block.getStack(), left + 10, top + 7);
         DiffuseLighting.disable();
       }
 

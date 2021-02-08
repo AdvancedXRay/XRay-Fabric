@@ -24,19 +24,22 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 public class GuiAddBlock extends GuiBase {
-  private final BlockState selectBlock;
   private final ItemStack itemStack;
   private final Supplier<GuiBase> previousScreenCallback;
+  private BlockState selectBlock;
   private TextFieldWidget oreName;
   private ButtonWidget addBtn;
   private RatioSliderWidget redSlider;
   private RatioSliderWidget greenSlider;
   private RatioSliderWidget blueSlider;
+  private ButtonWidget changeDefaultState;
+  private BlockState lastState;
   private boolean oreNameCleared = false;
 
   GuiAddBlock(BlockState selectedBlock, Supplier<GuiBase> previousScreenCallback) {
     super(false);
     this.selectBlock = selectedBlock;
+    this.lastState = null;
     this.previousScreenCallback = previousScreenCallback;
     this.itemStack = new ItemStack(this.selectBlock.getBlock(), 1);
   }
@@ -66,6 +69,28 @@ public class GuiAddBlock extends GuiBase {
   @Override
   public void init() {
     // Called when the gui should be (re)created
+    boolean isDefaultState = this.selectBlock == this.selectBlock.getBlock().getDefaultState();
+    this.addButton(
+        this.changeDefaultState =
+            new ButtonWidget(
+                this.getWidth() / 2 - 100,
+                this.getHeight() / 2 + 85,
+                202,
+                20,
+                new LiteralText(
+                    isDefaultState
+                        ? "Already scanning for all states"
+                        : "Scan for all block states"),
+                button -> {
+                  this.lastState = this.selectBlock;
+                  this.selectBlock = this.selectBlock.getBlock().getDefaultState();
+                  button.active = false;
+                }));
+
+    if (isDefaultState) {
+      this.changeDefaultState.active = false;
+    }
+
     this.addButton(
         this.addBtn =
             new ButtonWidget(
@@ -158,6 +183,7 @@ public class GuiAddBlock extends GuiBase {
     this.children.add(this.redSlider);
     this.children.add(this.greenSlider);
     this.children.add(this.blueSlider);
+    this.children.add(this.changeDefaultState);
   }
 
   @Override

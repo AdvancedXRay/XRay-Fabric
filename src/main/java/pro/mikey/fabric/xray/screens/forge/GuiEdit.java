@@ -1,12 +1,16 @@
 package pro.mikey.fabric.xray.screens.forge;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.render.DiffuseLighting;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
+import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
+import pro.mikey.fabric.xray.storage.Stores;
 
 public class GuiEdit extends GuiBase {
   private final BlockEntry block;
@@ -14,6 +18,8 @@ public class GuiEdit extends GuiBase {
   private RatioSliderWidget redSlider;
   private RatioSliderWidget greenSlider;
   private RatioSliderWidget blueSlider;
+  private ButtonWidget changeDefaultState;
+  private BlockState lastState;
 
   GuiEdit(BlockEntry block) {
     super(true); // Has a sidebar
@@ -25,6 +31,27 @@ public class GuiEdit extends GuiBase {
   @Override
   public void init() {
     this.addButton(
+        this.changeDefaultState =
+            new ButtonWidget(
+                this.getWidth() / 2 - 100,
+                this.getHeight() / 2 + 85,
+                202,
+                20,
+                new LiteralText(
+                    this.block.isDefault()
+                        ? "Already scanning for all states"
+                        : "Scan for all block states"),
+                button -> {
+                  this.lastState = this.block.getState();
+                  this.block.setState(this.block.getState().getBlock().getDefaultState());
+                  button.active = false;
+                }));
+
+    if (this.block.isDefault()) {
+      this.changeDefaultState.active = false;
+    }
+
+    this.addButton(
         new ButtonWidget(
             (this.getWidth() / 2) + 78,
             this.getHeight() / 2 - 60,
@@ -32,10 +59,11 @@ public class GuiEdit extends GuiBase {
             20,
             new TranslatableText("xray.single.delete"),
             b -> {
-              //              Controller.getBlockStore().remove(this.block.getBlockName());
-              //              ClientController.blockStore.write(
-              //                  new ArrayList<>(Controller.getBlockStore().getStore().values()));
-
+              try {
+                Stores.BLOCKS.get().get(0).getEntries().remove(this.block);
+                Stores.BLOCKS.write();
+              } catch (Exception e) {
+              }
               this.onClose();
               this.getMinecraft().openScreen(new GuiSelectionScreen());
             }));
@@ -59,34 +87,31 @@ public class GuiEdit extends GuiBase {
             20,
             new TranslatableText("xray.single.save"),
             b -> {
-              //              BlockData block =
-              //                  new BlockData(
-              //                      this.oreName.getText(),
-              //                      this.block.getBlockName(),
-              //                      (((int) (this.redSlider.getValue()) << 16)
-              //                          + ((int) (this.greenSlider.getValue()) << 8)
-              //                          + (int) (this.blueSlider.getValue())),
-              //                      this.block.getItemStack(),
-              //                      this.block.isDrawing(),
-              //                      this.block.getOrder());
-              //
-              //              Pair<BlockData, UUID> data =
-              //
-              // Controller.getBlockStore().getStoreByReference(block.getBlockName());
-              //              Controller.getBlockStore().getStore().remove(data.getValue());
-              //              Controller.getBlockStore().getStore().put(data.getValue(), block);
-              //
-              //              ClientController.blockStore.write(
-              //                  new ArrayList<>(Controller.getBlockStore().getStore().values()));
+              try {
+                int index = Stores.BLOCKS.get().get(0).getEntries().indexOf(this.block);
+                BlockEntry entry = Stores.BLOCKS.get().get(0).getEntries().get(index);
+                entry.setName(this.oreName.getText());
+                entry.setColor(
+                    new BasicColor(
+                        (int) (this.redSlider.getValue() * 255),
+                        (int) (this.greenSlider.getValue() * 255),
+                        (int) (this.blueSlider.getValue() * 255)));
+                entry.setState(this.block.getState());
+                Stores.BLOCKS.get().get(0).getEntries().set(index, entry);
+                Stores.BLOCKS.write();
+              } catch (Exception ex) {
+              } // lazy catching for basic failures
+
               this.onClose();
+              this.getMinecraft().openScreen(new GuiSelectionScreen());
             }));
 
     this.addButton(
         this.redSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 138,
-                this.getHeight() / 2 + 7,
-                202,
+                this.getHeight() / 2 - 40,
+                100,
                 20,
                 new TranslatableText("xray.color.red"),
                 0));
@@ -94,8 +119,8 @@ public class GuiEdit extends GuiBase {
         this.greenSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 138,
-                this.getHeight() / 2 + 30,
-                202,
+                this.getHeight() / 2 - 18,
+                100,
                 20,
                 new TranslatableText("xray.color.green"),
                 0));
@@ -103,8 +128,8 @@ public class GuiEdit extends GuiBase {
         this.blueSlider =
             new RatioSliderWidget(
                 this.getWidth() / 2 - 138,
-                this.getHeight() / 2 + 53,
-                202,
+                this.getHeight() / 2 + 4,
+                100,
                 20,
                 new TranslatableText("xray.color.blue"),
                 0));
@@ -122,6 +147,10 @@ public class GuiEdit extends GuiBase {
     this.children.add(this.redSlider);
     this.children.add(this.greenSlider);
     this.children.add(this.blueSlider);
+
+    this.redSlider.setValue(this.block.getHex().getRed() / 255f);
+    this.greenSlider.setValue(this.block.getHex().getGreen() / 255f);
+    this.blueSlider.setValue(this.block.getHex().getBlue() / 255f);
   }
 
   @Override
@@ -143,16 +172,16 @@ public class GuiEdit extends GuiBase {
     this.oreName.render(stack, x, y, partialTicks);
 
     GuiAddBlock.renderPreview(
-        this.getWidth() / 2 - 138,
+        this.getWidth() / 2 - 35,
         this.getHeight() / 2 - 40,
-        (float) this.redSlider.getValue(),
-        (float) this.greenSlider.getValue(),
-        (float) this.blueSlider.getValue());
+        (float) this.redSlider.getValue() * 255,
+        (float) this.greenSlider.getValue() * 255,
+        (float) this.blueSlider.getValue() * 255);
 
-    //    DiffuseLighting.enable();
-    //    this.itemRenderer.renderInGuiWithOverrides(
-    //        this.block.getItemStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
-    //    DiffuseLighting.disable();
+    DiffuseLighting.enable();
+    this.itemRenderer.renderInGuiWithOverrides(
+        this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+    DiffuseLighting.disable();
   }
 
   @Override
@@ -166,18 +195,6 @@ public class GuiEdit extends GuiBase {
 
   @Override
   public boolean mouseReleased(double x, double y, int mouse) {
-    //    if (this.redSlider.dragging && !this.redSlider.isFocused()) {
-    //      this.redSlider.dragging = false;
-    //    }
-    //
-    //    if (this.greenSlider.dragging && !this.greenSlider.isFocused()) {
-    //      this.greenSlider.dragging = false;
-    //    }
-    //
-    //    if (this.blueSlider.dragging && !this.blueSlider.isFocused()) {
-    //      this.blueSlider.dragging = false;
-    //    }
-
     return super.mouseReleased(x, y, mouse);
   }
 

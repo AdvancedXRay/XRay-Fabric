@@ -73,6 +73,9 @@ public class XRay implements ModInitializer {
 
       StateSettings stateSettings = Stores.SETTINGS.get();
       stateSettings.setActive(!stateSettings.isActive());
+
+      ScanController.runTask(true);
+
       mc.player.sendMessage(
           new TranslatableText(
                   "message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active"))

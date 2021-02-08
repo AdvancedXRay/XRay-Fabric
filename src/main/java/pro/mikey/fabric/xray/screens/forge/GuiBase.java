@@ -27,41 +27,6 @@ public abstract class GuiBase extends Screen {
     this.hasSide = hasSide;
   }
 
-  // this should be moved to some sort of utility package but fuck it :).
-  //  static void drawTexturedQuadFit(
-  //      double x, double y, double width, double height, int[] color, float alpha) {
-  //    Tessellator tessellator = Tessellator.getInstance();
-  //    BufferBuilder tessellate = tessellator.getBuffer();
-  //
-  //    RenderSystem.pushMatrix();
-  //    tessellate.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-  //
-  //    if (color != null) {
-  //      RenderSystem.color4f(
-  //          (float) color[0] / 255, (float) color[1] / 255, (float) color[2] / 255, alpha / 255);
-  //    }
-  //
-  //    tessellate.pos(x + 0, y + height, (double) 0).tex(0, 1).endVertex();
-  //    tessellate.pos(x + width, y + height, (double) 0).tex(1, 1).endVertex();
-  //    tessellate.pos(x + width, y + 0, (double) 0).tex(1, 0).endVertex();
-  //    tessellate.pos(x + 0, y + 0, (double) 0).tex(0, 0).endVertex();
-  //    tessellator.draw();
-  //
-  //    RenderSystem.popMatrix();
-  //  }
-
-  //  static void drawTexturedQuadFit(
-  //      double x, double y, double width, double height, int[] color) {
-  //    drawTexturedQuadFit(x, y, width, height, color, 255f);
-  //  }
-  //
-  //  private static void drawTexturedQuadFit(
-  //      double x, double y, double width, double height, int color) {
-  //    drawTexturedQuadFit(
-  //        x, y, width, height, new int[] {color >> 16 & 0xff, color >> 8 & 0xff, color & 0xff},
-  // 255f);
-  //  }
-
   abstract void renderExtra(MatrixStack stack, int x, int y, float partialTicks);
 
   @Override

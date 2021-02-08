@@ -1,7 +1,7 @@
 package pro.mikey.fabric.xray;
 
 public class StateSettings {
-  public static final int[] DISTANCE_STEPS = new int[] {2, 8, 16, 32, 64, 128, 256};
+  public static final int[] DISTANCE_STEPS = new int[] {2, 4, 8, 16, 32, 64, 128, 256};
   private boolean isActive;
   private boolean showLava;
   private int range;

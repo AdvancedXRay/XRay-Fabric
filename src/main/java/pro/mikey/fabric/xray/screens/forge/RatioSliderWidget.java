@@ -24,4 +24,9 @@ public class RatioSliderWidget extends SliderWidget {
   double getValue() {
     return this.value;
   }
+
+  void setValue(double value) {
+    this.value = Math.max(0, Math.min(1, value));
+    this.updateMessage();
+  }
 }

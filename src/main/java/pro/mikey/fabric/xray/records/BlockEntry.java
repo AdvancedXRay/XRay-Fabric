@@ -9,13 +9,13 @@ import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 import java.lang.reflect.Type;
 
 public class BlockEntry {
-  private final BlockState state;
-  private final ItemStack stack;
-  private final String name;
-  private final BasicColor color;
-  private final int order;
-  private final boolean isDefault;
-  private final boolean active;
+  private BlockState state;
+  private ItemStack stack;
+  private String name;
+  private BasicColor color;
+  private int order;
+  private boolean isDefault;
+  private boolean active;
 
   public BlockEntry(
       BlockState state,
@@ -37,8 +37,16 @@ public class BlockEntry {
     return this.state;
   }
 
+  public void setState(BlockState state) {
+    this.state = state;
+  }
+
   public String getName() {
     return this.name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public BasicColor getHex() {
@@ -49,16 +57,36 @@ public class BlockEntry {
     return this.order;
   }
 
+  public void setOrder(int order) {
+    this.order = order;
+  }
+
   public boolean isDefault() {
     return this.isDefault;
+  }
+
+  public void setDefault(boolean aDefault) {
+    this.isDefault = aDefault;
   }
 
   public boolean isActive() {
     return this.active;
   }
 
+  public void setActive(boolean active) {
+    this.active = active;
+  }
+
   public ItemStack getStack() {
     return this.stack;
+  }
+
+  public void setStack(ItemStack stack) {
+    this.stack = stack;
+  }
+
+  public void setColor(BasicColor color) {
+    this.color = color;
   }
 
   public static class Serializer
