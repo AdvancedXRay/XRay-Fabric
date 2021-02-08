@@ -40,25 +40,31 @@ public abstract class Store<T> {
     } catch (FileNotFoundException ignored) {
       // Write a blank version of the file
       if (new File(CONFIG_PATH).mkdirs()) {
-        this.write();
+        this.write(true);
       }
     }
 
-    return null;
+    return this.providedDefault();
   }
 
   public void write() {
+    this.write(false);
+  }
+
+  private void write(Boolean firstWrite) {
     Gson gson = this.getGson();
 
     try {
       try (FileWriter writer = new FileWriter(this.file)) {
-        gson.toJson(this.get(), writer);
+        gson.toJson(firstWrite ? this.providedDefault() : this.get(), writer);
         writer.flush();
       }
     } catch (IOException | JsonIOException e) {
       XRay.LOGGER.catching(e);
     }
   }
+
+  public abstract T providedDefault();
 
   public abstract T get();
 

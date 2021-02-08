@@ -14,17 +14,12 @@ import java.util.List;
 public class BlockStore extends Store<List<BlockGroup>> {
   private static BlockStore instance;
   private final BlockSearchCache cache = new BlockSearchCache();
-  private List<BlockGroup> blockEntries = new ArrayList<>();
+  private final List<BlockGroup> blockEntries;
 
   private BlockStore() {
     super("blocks");
 
-    List<BlockGroup> entries = this.read();
-    if (entries == null) {
-      return;
-    }
-
-    this.blockEntries = entries;
+    this.blockEntries = this.read();
     this.updateCache(this.blockEntries); // ensure the cache is up to date
   }
 
@@ -59,6 +54,11 @@ public class BlockStore extends Store<List<BlockGroup>> {
         .registerTypeAdapter(BlockEntry.class, new BlockEntry.Serializer())
         .setPrettyPrinting()
         .create();
+  }
+
+  @Override
+  public List<BlockGroup> providedDefault() {
+    return new ArrayList<>();
   }
 
   @Override

@@ -126,6 +126,7 @@ public class GuiAddBlock extends GuiBase {
                     Stores.BLOCKS.get().add(group);
                   }
                   Stores.BLOCKS.write();
+                  Stores.BLOCKS.updateCache();
 
                   this.getMinecraft().openScreen(new GuiSelectionScreen());
                 }));

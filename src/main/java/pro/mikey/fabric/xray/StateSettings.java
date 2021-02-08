@@ -7,8 +7,7 @@ public class StateSettings {
   private int range;
   private boolean showOverlay;
 
-  // Singleton
-  private StateSettings() {
+  public StateSettings() {
     this.isActive = false;
     this.showLava = false;
     this.showOverlay = true;

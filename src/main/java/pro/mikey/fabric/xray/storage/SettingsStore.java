@@ -6,16 +6,10 @@ import java.lang.reflect.Type;
 
 public class SettingsStore extends Store<StateSettings> {
   private static SettingsStore instance;
-  private StateSettings settings;
+  private final StateSettings settings;
 
   private SettingsStore() {
     super("settings");
-
-    StateSettings settings = this.read();
-    if (settings == null) {
-      return;
-    }
-
     this.settings = this.read();
   }
 
@@ -25,6 +19,11 @@ public class SettingsStore extends Store<StateSettings> {
     }
 
     return instance;
+  }
+
+  @Override
+  public StateSettings providedDefault() {
+    return new StateSettings();
   }
 
   @Override

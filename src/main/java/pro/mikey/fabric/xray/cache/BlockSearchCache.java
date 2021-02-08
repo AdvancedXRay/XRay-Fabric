@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray.cache;
 
+import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
 
 import java.util.HashSet;
@@ -23,6 +24,7 @@ public class BlockSearchCache {
             .flatMap(
                 e ->
                     e.getEntries().stream()
+                        .filter(BlockEntry::isActive)
                         .map(a -> new BlockSearchEntry(a.getState(), a.getHex(), a.isDefault())))
             .collect(Collectors.toSet());
   }

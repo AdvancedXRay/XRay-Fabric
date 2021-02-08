@@ -62,6 +62,7 @@ public class GuiEdit extends GuiBase {
               try {
                 Stores.BLOCKS.get().get(0).getEntries().remove(this.block);
                 Stores.BLOCKS.write();
+                Stores.BLOCKS.updateCache();
               } catch (Exception e) {
               }
               this.onClose();
@@ -100,6 +101,7 @@ public class GuiEdit extends GuiBase {
                 entry.setDefault(this.lastState != null);
                 Stores.BLOCKS.get().get(0).getEntries().set(index, entry);
                 Stores.BLOCKS.write();
+                Stores.BLOCKS.updateCache();
               } catch (Exception ex) {
               } // lazy catching for basic failures
 

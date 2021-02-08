@@ -279,6 +279,7 @@ public class GuiSelectionScreen extends GuiBase {
   public void onClose() {
     Stores.SETTINGS.write();
     Stores.BLOCKS.write();
+    Stores.BLOCKS.updateCache();
 
     ScanController.runTask(true);
 
@@ -333,6 +334,7 @@ public class GuiSelectionScreen extends GuiBase {
         blockEntry.setActive(!blockEntry.isActive());
         Stores.BLOCKS.get().get(0).getEntries().set(index, blockEntry);
         Stores.BLOCKS.write();
+        Stores.BLOCKS.updateCache();
       } catch (Exception e) {
       }
     }

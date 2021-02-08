@@ -33,9 +33,12 @@ public class XRay implements ModInitializer {
   public void onInitialize() {
     LOGGER.info("XRay mod has been initialized");
 
+    Stores.load();
+
     ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
     ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
     HudRenderCallback.EVENT.register(GuiOverlay::RenderGameOverlayEvent);
+
     KeyBindingHelper.registerKeyBinding(this.xrayButton);
     KeyBindingHelper.registerKeyBinding(this.guiButton);
   }
