@@ -2,6 +2,8 @@
 
 # Advanced XRay (Fabric Edition)
 
+[![Downloads](http://cf.way2muchnoise.eu/full_444663_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
+[![Versions Supported](http://cf.way2muchnoise.eu/versions/444663.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 ![Build and Package](https://github.com/MichaelHillcox/XRay-Mod/workflows/Build%20and%20Package/badge.svg)
 [![GitHub license](https://img.shields.io/github/license/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/stargazers)
