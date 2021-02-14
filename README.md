@@ -2,6 +2,8 @@
 
 # Advanced XRay (Fabric Edition)
 
+[![Downloads](http://cf.way2muchnoise.eu/full_444663_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
+[![Versions Supported](http://cf.way2muchnoise.eu/versions/444663.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 ![Build and Package](https://github.com/MichaelHillcox/XRay-Mod/workflows/Build%20and%20Package/badge.svg)
 [![GitHub license](https://img.shields.io/github/license/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/blob/main/LICENSE)
 [![GitHub stars](https://img.shields.io/github/stars/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/stargazers)
@@ -14,7 +16,9 @@
 
 Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/MichaelHillcox/XRay-Mod/) which is typically the more up-to-date version of the mod.
 
-Looking for the Forge version? Click the button below :tada:
+[![Discord invite link](.github/assets/discord-join-badge.svg)](https://discord.gg/yYNuqJxucJ)
+
+##### Looking for the Forge version? Click the button below :tada:
 
 <a href="https://github.com/michaelhillcox/xray-mod"><img src=".github/assets/xray-forge-badge.svg" alt="drawing" width="265"/>
 </a>
