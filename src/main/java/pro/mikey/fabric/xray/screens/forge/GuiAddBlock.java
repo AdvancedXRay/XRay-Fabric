@@ -5,10 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
@@ -56,7 +53,7 @@ public class GuiAddBlock extends GuiBase {
         GlStateManager.SrcFactor.ONE,
         GlStateManager.DstFactor.ZERO);
     RenderSystem.color4f(r / 255, g / 255, b / 255, 1);
-    tessellate.begin(7, VertexFormats.POSITION);
+    tessellate.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION);
     tessellate.vertex(x, y, 0.0D).next();
     tessellate.vertex(x, y + 64, 0.0D).next();
     tessellate.vertex(x + 100, y + 64, 0.0D).next();

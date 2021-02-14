@@ -57,8 +57,8 @@ public class ScanTask implements Runnable {
 
     final Set<BlockPosWithColor> renderQueue = new HashSet<>();
 
-    int cX = player.chunkX;
-    int cZ = player.chunkZ;
+    int cX = player.getChunkPos().x;
+    int cZ = player.getChunkPos().z;
 
     int range = StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()] / 2;
 
@@ -76,7 +76,7 @@ public class ScanTask implements Runnable {
 
         for (int k = chunkStartX; k < chunkStartX + 16; k++) {
           for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-            for (int m = 0; m < height + (1 << 4); m++) {
+            for (int m = world.getBottomY(); m < height + (1 << 4); m++) {
               BlockPos pos = new BlockPos(k, m, l);
               BasicColor validBlock = this.isValidBlock(pos, world, blocks);
               if (validBlock != null) {

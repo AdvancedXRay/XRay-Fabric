@@ -22,9 +22,7 @@ public class ScanController {
       return false;
     }
 
-    return playerLastChunk == null
-        || playerLastChunk.x != player.chunkX
-        || playerLastChunk.z != player.chunkZ;
+    return playerLastChunk == null || !playerLastChunk.equals(player.getChunkPos());
   }
 
   /**
@@ -45,7 +43,7 @@ public class ScanController {
     }
 
     // Update the players last chunk to eval against above.
-    playerLastChunk = new ChunkPos(client.player.chunkX, client.player.chunkZ);
+    playerLastChunk = client.player.getChunkPos();
     Util.getMainWorkerExecutor().execute(new ScanTask());
   }
 }
