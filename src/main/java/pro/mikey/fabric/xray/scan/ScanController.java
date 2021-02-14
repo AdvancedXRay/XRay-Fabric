@@ -91,6 +91,6 @@ public class ScanController {
       }
     }
 
-    Set<ChunkPos> toAdd = new HashSet<>()
+    //    Set<ChunkPos> toAdd = new HashSet<>()
   }
 }
