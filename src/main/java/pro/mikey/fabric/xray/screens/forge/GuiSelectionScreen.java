@@ -109,7 +109,8 @@ public class GuiSelectionScreen extends GuiBase {
                 this.client.player.sendMessage(
                     new LiteralText(
                         "[XRay] "
-                            + I18n.translate("xray.message.invalid_hand", handItem.getName())),
+                            + I18n.translate(
+                                "xray.message.invalid_hand", handItem.getName().getString())),
                     false);
                 return;
               }

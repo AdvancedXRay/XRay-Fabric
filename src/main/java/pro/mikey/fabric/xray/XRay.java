@@ -27,8 +27,6 @@ public class XRay implements ModInitializer {
   private final KeyBinding guiButton =
       new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
 
-  private int keyCoolDown = 0;
-
   @Override
   public void onInitialize() {
     LOGGER.info("XRay mod has been initialized");
@@ -61,17 +59,11 @@ public class XRay implements ModInitializer {
     // Try and run the task :D
     ScanController.runTask(false);
 
-    // Handle cooldown for the keybinding to stop it spamming
-    if (this.keyCoolDown > 0) {
-      this.keyCoolDown--;
-      return;
-    }
-
-    if (this.guiButton.isPressed()) {
+    while (this.guiButton.wasPressed()) {
       mc.openScreen(new GuiSelectionScreen());
     }
 
-    if (this.xrayButton.isPressed()) {
+    while (this.xrayButton.wasPressed()) {
       Stores.BLOCKS.updateCache();
 
       StateSettings stateSettings = Stores.SETTINGS.get();
@@ -84,8 +76,6 @@ public class XRay implements ModInitializer {
                   "message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active"))
               .formatted(stateSettings.isActive() ? Formatting.GREEN : Formatting.RED),
           true);
-
-      this.keyCoolDown = 5;
     }
   }
 }
