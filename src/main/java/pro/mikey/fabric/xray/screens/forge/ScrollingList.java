@@ -21,8 +21,8 @@ public class ScrollingList<E extends EntryListWidget.Entry<E>> extends EntryList
         (y - (height / 2)) + height,
         slotHeightIn);
     this.setLeftPos(x - (width / 2));
-    this.method_31322(false);
-    this.method_31323(false); // removes background
+    this.setRenderHeader(false, 0);
+    //    this.method_31323(false); // removes background
   }
 
   @Override
