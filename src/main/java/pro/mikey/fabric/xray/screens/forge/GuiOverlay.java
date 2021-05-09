@@ -10,20 +10,20 @@ import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.storage.Stores;
 
 public class GuiOverlay {
-  private static final Identifier circle = new Identifier(XRay.PREFIX_GUI + "circle.png");
+    private static final Identifier circle = new Identifier(XRay.PREFIX_GUI + "circle.png");
 
-  public static void RenderGameOverlayEvent(MatrixStack matrixStack, float delta) {
-    // Draw Indicator
-    if (!Stores.SETTINGS.get().isActive() || !Stores.SETTINGS.get().showOverlay()) {
-      return;
+    public static void RenderGameOverlayEvent(MatrixStack matrixStack, float delta) {
+        // Draw Indicator
+        if (!Stores.SETTINGS.get().isActive() || !Stores.SETTINGS.get().showOverlay()) {
+            return;
+        }
+
+        RenderSystem.setShaderColor(0, 1f, 0, 1f);
+        RenderSystem.setShaderTexture(0, circle);
+        Screen.drawTexture(matrixStack, 5, 5, 0f, 0f, 5, 5, 5, 5);
+
+        MinecraftClient.getInstance()
+            .textRenderer
+            .drawWithShadow(matrixStack, I18n.translate("xray.overlay"), 15, 4, 0xffffffff);
     }
-
-    RenderSystem.color3f(0, 255, 0);
-    MinecraftClient.getInstance().getTextureManager().bindTexture(circle);
-    Screen.drawTexture(matrixStack, 5, 5, 0f, 0f, 5, 5, 5, 5);
-
-    MinecraftClient.getInstance()
-        .textRenderer
-        .drawWithShadow(matrixStack, I18n.translate("xray.overlay"), 15, 4, 0xffffffff);
-  }
 }
