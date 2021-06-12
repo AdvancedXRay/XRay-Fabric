@@ -1,18 +1,16 @@
 plugins {
-    id 'fabric-loom' version '0.5-SNAPSHOT'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
     id 'maven-publish'
+    id "com.matthewprenger.cursegradle" version "1.4.0" apply false
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
+def ENV = System.getenv();
 archivesBaseName = "${project.archives_base_name}-${project.minecraft_version}"
-version = project.mod_version
+version = "${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
 group = project.maven_group
-
-if (System.getenv('BUILD_NUMBER') != null) {
-    version += "." + System.getenv('BUILD_NUMBER')
-}
 
 dependencies {
     // To change the versions see the gradle.properties file
@@ -25,6 +23,9 @@ dependencies {
 
     // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
     // You may need to force-disable transitiveness on them.
+}
+
+minecraft {
 }
 
 processResources {
@@ -69,9 +70,6 @@ publishing {
             artifact(remapJar) {
                 builtBy remapJar
             }
-            artifact(sourcesJar) {
-                builtBy remapSourcesJar
-            }
 
             pom.withXml {
                 def node = asNode()
@@ -82,7 +80,34 @@ publishing {
     }
     repositories {
         maven {
-            url "file://" + System.getenv("local_maven")
+            url "https://maven.saps.dev/releases"
+            credentials {
+                username "mikeymods"
+                password "${ENV.SAPS_TOKEN}"
+            }
+        }
+    }
+}
+
+if (ENV.CURSE_DEPLOY_TOKEN) {
+    curseforge {
+        apiKey = ENV.CURSE_DEPLOY_TOKEN
+        project {
+            id = 444663
+            releaseType = "Release"
+            addGameVersion "Fabric"
+            addGameVersion "1.17"
+            mainArtifact(remapJar.archivePath)
+            relations {
+                requiredDependency 'architectury-fabric'
+                requiredDependency 'fabric-api'
+                requiredDependency 'ftb-teams-fabric'
+                requiredDependency 'ftb-library-fabric'
+                requiredDependency 'item-filters-fabric'
+                optionalDependency 'kubejs-fabric'
+            }
+            changelog = file(project.rootDir + "/CHANGELOG.md").text
+            changelogType = 'markdown'
         }
     }
 }

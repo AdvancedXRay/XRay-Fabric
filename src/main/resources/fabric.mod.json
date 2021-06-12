@@ -20,7 +20,7 @@
     ]
   },
   "mixins": [
-    "xray.mixins.json"
+    "advanced-xray-fabric.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.7.4",
