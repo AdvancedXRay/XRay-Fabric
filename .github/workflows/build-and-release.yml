@@ -39,7 +39,7 @@ jobs:
           CURSEFORGE_KEY: ${{ secrets.CURSE_DEPLOY_TOKEN }}
         run: |
           chmod +x ./gradlew
-          ./gradlew build curseforgePublish --stacktrace --no-daemon
+          ./gradlew build curseforge --stacktrace --no-daemon
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
