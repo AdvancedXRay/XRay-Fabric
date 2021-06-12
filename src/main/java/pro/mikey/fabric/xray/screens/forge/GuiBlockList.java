@@ -31,44 +31,44 @@ public class GuiBlockList extends GuiBase {
         super(false);
 
         this.blocks =
-            Registry.ITEM.getEntries().stream()
-                .map(Map.Entry::getValue)
-                .filter(item -> item instanceof BlockItem && item != Items.AIR)
-                .map(item -> new BlockWithStack(Block.getBlockFromItem(item), new ItemStack(item)))
-                .collect(Collectors.toList());
+                Registry.ITEM.getEntries().stream()
+                        .map(Map.Entry::getValue)
+                        .filter(item -> item instanceof BlockItem && item != Items.AIR)
+                        .map(item -> new BlockWithStack(Block.getBlockFromItem(item), new ItemStack(item)))
+                        .collect(Collectors.toList());
     }
 
     @Override
     public void init() {
         this.blockList =
-            new ScrollingBlockList(
-                (this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks);
-        this.children.add(this.blockList);
+                new ScrollingBlockList(
+                        (this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks);
+        this.addDrawableChild(this.blockList);
 
         this.search =
-            new TextFieldWidget(
-                this.getFontRender(),
-                this.getWidth() / 2 - 100,
-                this.getHeight() / 2 + 85,
-                140,
-                18,
-                LiteralText.EMPTY
-            );
+                new TextFieldWidget(
+                        this.getFontRender(),
+                        this.getWidth() / 2 - 100,
+                        this.getHeight() / 2 + 85,
+                        140,
+                        18,
+                        LiteralText.EMPTY
+                );
         this.search.changeFocus(true);
         this.setFocused(this.search);
 
-        this.addButton(
-            new ButtonWidget(
-                this.getWidth() / 2 + 43,
-                this.getHeight() / 2 + 84,
-                60,
-                20,
-                new TranslatableText("xray.single.cancel"),
-                b -> {
-                    this.onClose();
-                    this.getMinecraft().openScreen(new GuiSelectionScreen());
-                }
-            ));
+        this.addDrawableChild(
+                new ButtonWidget(
+                        this.getWidth() / 2 + 43,
+                        this.getHeight() / 2 + 84,
+                        60,
+                        20,
+                        new TranslatableText("xray.single.cancel"),
+                        b -> {
+                            this.onClose();
+                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                        }
+                ));
     }
 
     @Override
@@ -87,17 +87,17 @@ public class GuiBlockList extends GuiBase {
         }
 
         this.blockList.updateEntries(
-            this.search.getText().length() == 0
-                ? this.blocks
-                : this.blocks.stream()
-                    .filter(
-                        e ->
-                            e.getStack()
-                                .getName()
-                                .getString()
-                                .toLowerCase()
-                                .contains(this.search.getText().toLowerCase()))
-                    .collect(Collectors.toList()));
+                this.search.getText().length() == 0
+                        ? this.blocks
+                        : this.blocks.stream()
+                        .filter(
+                                e ->
+                                        e.getStack()
+                                                .getName()
+                                                .getString()
+                                                .toLowerCase()
+                                                .contains(this.search.getText().toLowerCase()))
+                        .collect(Collectors.toList()));
 
         this.lastSearched = this.search.getText();
         this.blockList.setScrollAmount(0);
@@ -120,7 +120,7 @@ public class GuiBlockList extends GuiBase {
 
     @Override
     public boolean mouseScrolled(
-        double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
+            double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
         this.blockList.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
         return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
     }
@@ -141,7 +141,7 @@ public class GuiBlockList extends GuiBase {
 
             this.client.player.closeScreen();
             this.client.openScreen(
-                new GuiAddBlock(entry.getBlock().getBlock().getDefaultState(), GuiBlockList::new));
+                    new GuiAddBlock(entry.getBlock().getBlock().getDefaultState(), GuiBlockList::new));
         }
 
         void updateEntries(List<BlockWithStack> blocks) {
@@ -163,40 +163,30 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public void render(
-                MatrixStack stack,
-                int entryIdx,
-                int top,
-                int left,
-                int entryWidth,
-                int entryHeight,
-                int mouseX,
-                int mouseY,
-                boolean p_194999_5_,
-                float partialTicks) {
+            public void render(MatrixStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
                 TextRenderer font = this.parent.client.textRenderer;
 
                 Identifier resource = Registry.BLOCK.getId(this.block.getBlock());
-                font.draw(
-                    stack,
-                    this.block.getStack().getItem().getName().getString(),
-                    left + 35,
-                    top + 7,
-                    Color.WHITE.getRGB()
+                font.drawWithShadow(
+                        stack,
+                        this.block.getStack().getItem().getName().getString(),
+                        left + 35,
+                        top + 7,
+                        Color.WHITE.getRGB()
                 );
-                font.draw(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
+                font.drawWithShadow(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
                 DiffuseLighting.enableGuiDepthLighting();
                 this.parent
-                    .client
-                    .getItemRenderer()
-                    .renderInGuiWithOverrides(this.block.getStack(), left + 10, top + 7);
+                        .client
+                        .getItemRenderer()
+                        .renderInGuiWithOverrides(this.block.getStack(), left + 10, top + 7);
                 DiffuseLighting.disableGuiDepthLighting();
             }
 
             @Override
             public boolean mouseClicked(
-                double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
+                    double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
                 this.parent.setSelected(this);
                 return false;
             }

@@ -47,9 +47,9 @@ public class GuiSelectionScreen extends GuiBase {
         this.setSideTitle(I18n.translate("xray.single.tools"));
 
         this.itemList =
-            Stores.BLOCKS.get().size() >= 1
-                ? Stores.BLOCKS.get().get(0).getEntries()
-                : new ArrayList<>();
+                Stores.BLOCKS.get().size() >= 1
+                        ? Stores.BLOCKS.get().get(0).getEntries()
+                        : new ArrayList<>();
         this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
 
         this.originalList = this.itemList;
@@ -62,166 +62,166 @@ public class GuiSelectionScreen extends GuiBase {
         }
 
         this.render = this.itemRenderer;
-        this.buttons.clear();
+//        this.buttons.clear();
 
         this.scrollList =
-            new ScrollingBlockList(
-                (this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
-        this.children.add(this.scrollList);
+                new ScrollingBlockList(
+                        (this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
+        this.addDrawableChild(this.scrollList);
 
         this.search =
-            new TextFieldWidget(
-                this.getFontRender(),
-                this.getWidth() / 2 - 137,
-                this.getHeight() / 2 - 105,
-                202,
-                18,
-                LiteralText.EMPTY
-            );
+                new TextFieldWidget(
+                        this.getFontRender(),
+                        this.getWidth() / 2 - 137,
+                        this.getHeight() / 2 - 105,
+                        202,
+                        18,
+                        LiteralText.EMPTY
+                );
         this.search.setFocusUnlocked(true);
 
         // side bar buttons
-        this.addButton(
-            new SupportButtonInner(
-                (this.getWidth() / 2) + 79,
-                this.getHeight() / 2 - 60,
-                120,
-                20,
-                I18n.translate("xray.input.add"),
-                "xray.tooltips.add_block",
-                button -> {
-                    this.client.player.closeScreen();
-                    this.client.openScreen(new GuiBlockList());
-                }
-            ));
-        this.addButton(
-            new SupportButtonInner(
-                this.getWidth() / 2 + 79,
-                this.getHeight() / 2 - 38,
-                120,
-                20,
-                I18n.translate("xray.input.add_hand"),
-                "xray.tooltips.add_block_in_hand",
-                button -> {
-                    this.client.player.closeScreen();
-                    ItemStack handItem = this.client.player.getStackInHand(Hand.MAIN_HAND);
-
-                    // Check if the hand item is a block or not
-                    if (!(handItem.getItem() instanceof BlockItem)) {
-                        this.client.player.sendMessage(
-                            new LiteralText(
-                                "[XRay] "
-                                    + I18n.translate(
-                                    "xray.message.invalid_hand", handItem.getName().getString())),
-                            false
-                        );
-                        return;
-                    }
-
-                    this.client.openScreen(
-                        new GuiAddBlock(
-                            ((BlockItem) handItem.getItem()).getBlock().getDefaultState(),
-                            GuiSelectionScreen::new
-                        ));
-                }
-            ));
-        this.addButton(
-            new SupportButtonInner(
-                this.getWidth() / 2 + 79,
-                this.getHeight() / 2 - 16,
-                120,
-                20,
-                I18n.translate("xray.input.add_look"),
-                "xray.tooltips.add_block_looking_at",
-                button -> {
-                    ClientPlayerEntity player = this.client.player;
-                    if (this.client.world == null || player == null) {
-                        return;
-                    }
-
-                    this.onClose();
-                    try {
-                        HitResult look = player.raycast(100, 1f, false);
-
-                        if (look.getType() == BlockHitResult.Type.BLOCK) {
-                            BlockState state =
-                                this.client.world.getBlockState(((BlockHitResult) look).getBlockPos());
-
-                            player.closeScreen();
-                            this.client.openScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
-                        } else {
-                            player.sendMessage(
-                                new LiteralText("[XRay] " + I18n.translate("xray.message.nothing_infront")),
-                                false
-                            );
+        this.addDrawableChild(
+                new SupportButtonInner(
+                        (this.getWidth() / 2) + 79,
+                        this.getHeight() / 2 - 60,
+                        120,
+                        20,
+                        I18n.translate("xray.input.add"),
+                        "xray.tooltips.add_block",
+                        button -> {
+                            this.client.player.closeScreen();
+                            this.client.openScreen(new GuiBlockList());
                         }
-                    } catch (NullPointerException ex) {
-                        player.sendMessage(
-                            new LiteralText("[XRay] " + I18n.translate("xray.message.thats_odd")), false);
-                    }
-                }
-            ));
-
-        this.addButton(
-            this.distButtons =
+                ));
+        this.addDrawableChild(
                 new SupportButtonInner(
-                    (this.getWidth() / 2) + 79,
-                    this.getHeight() / 2 + 6,
-                    120,
-                    20,
-                    I18n.translate("xray.input.show-lava", Stores.SETTINGS.get().isShowLava()),
-                    "xray.tooltips.show_lava",
-                    button -> {
-                        Stores.SETTINGS.get().setShowLava(!Stores.SETTINGS.get().isShowLava());
-                        ScanController.runTask(true);
-                        button.setMessage(
-                            new TranslatableText(
-                                "xray.input.show-lava", Stores.SETTINGS.get().isShowLava()));
-                    }
+                        this.getWidth() / 2 + 79,
+                        this.getHeight() / 2 - 38,
+                        120,
+                        20,
+                        I18n.translate("xray.input.add_hand"),
+                        "xray.tooltips.add_block_in_hand",
+                        button -> {
+                            this.client.player.closeScreen();
+                            ItemStack handItem = this.client.player.getStackInHand(Hand.MAIN_HAND);
+
+                            // Check if the hand item is a block or not
+                            if (!(handItem.getItem() instanceof BlockItem)) {
+                                this.client.player.sendMessage(
+                                        new LiteralText(
+                                                "[XRay] "
+                                                        + I18n.translate(
+                                                        "xray.message.invalid_hand", handItem.getName().getString())),
+                                        false
+                                );
+                                return;
+                            }
+
+                            this.client.openScreen(
+                                    new GuiAddBlock(
+                                            ((BlockItem) handItem.getItem()).getBlock().getDefaultState(),
+                                            GuiSelectionScreen::new
+                                    ));
+                        }
+                ));
+        this.addDrawableChild(
+                new SupportButtonInner(
+                        this.getWidth() / 2 + 79,
+                        this.getHeight() / 2 - 16,
+                        120,
+                        20,
+                        I18n.translate("xray.input.add_look"),
+                        "xray.tooltips.add_block_looking_at",
+                        button -> {
+                            ClientPlayerEntity player = this.client.player;
+                            if (this.client.world == null || player == null) {
+                                return;
+                            }
+
+                            this.onClose();
+                            try {
+                                HitResult look = player.raycast(100, 1f, false);
+
+                                if (look.getType() == BlockHitResult.Type.BLOCK) {
+                                    BlockState state =
+                                            this.client.world.getBlockState(((BlockHitResult) look).getBlockPos());
+
+                                    player.closeScreen();
+                                    this.client.openScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
+                                } else {
+                                    player.sendMessage(
+                                            new LiteralText("[XRay] " + I18n.translate("xray.message.nothing_infront")),
+                                            false
+                                    );
+                                }
+                            } catch (NullPointerException ex) {
+                                player.sendMessage(
+                                        new LiteralText("[XRay] " + I18n.translate("xray.message.thats_odd")), false);
+                            }
+                        }
                 ));
 
-        this.addButton(
-            this.distButtons =
-                new SupportButtonInner(
-                    (this.getWidth() / 2) + 79,
-                    this.getHeight() / 2 + 36,
-                    120,
-                    20,
-                    I18n.translate(
-                        "xray.input.distance",
-                        StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
-                    ),
-                    "xray.tooltips.distance",
-                    button -> {
-                        Stores.SETTINGS.get().increaseRange();
-                        button.setMessage(
-                            new TranslatableText(
-                                "xray.input.distance",
-                                StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
-                            ));
-                    }
+        this.addDrawableChild(
+                this.distButtons =
+                        new SupportButtonInner(
+                                (this.getWidth() / 2) + 79,
+                                this.getHeight() / 2 + 6,
+                                120,
+                                20,
+                                I18n.translate("xray.input.show-lava", Stores.SETTINGS.get().isShowLava()),
+                                "xray.tooltips.show_lava",
+                                button -> {
+                                    Stores.SETTINGS.get().setShowLava(!Stores.SETTINGS.get().isShowLava());
+                                    ScanController.runTask(true);
+                                    button.setMessage(
+                                            new TranslatableText(
+                                                    "xray.input.show-lava", Stores.SETTINGS.get().isShowLava()));
+                                }
+                        ));
+
+        this.addDrawableChild(
+                this.distButtons =
+                        new SupportButtonInner(
+                                (this.getWidth() / 2) + 79,
+                                this.getHeight() / 2 + 36,
+                                120,
+                                20,
+                                I18n.translate(
+                                        "xray.input.distance",
+                                        StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
+                                ),
+                                "xray.tooltips.distance",
+                                button -> {
+                                    Stores.SETTINGS.get().increaseRange();
+                                    button.setMessage(
+                                            new TranslatableText(
+                                                    "xray.input.distance",
+                                                    StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
+                                            ));
+                                }
+                        ));
+        this.addDrawableChild(
+                new ButtonWidget(
+                        this.getWidth() / 2 + 79,
+                        this.getHeight() / 2 + 58,
+                        60,
+                        20,
+                        new TranslatableText("xray.single.help"),
+                        button -> {
+                            this.client.player.closeScreen();
+                            this.client.openScreen(new GuiHelp());
+                        }
                 ));
-        this.addButton(
-            new ButtonWidget(
-                this.getWidth() / 2 + 79,
-                this.getHeight() / 2 + 58,
-                60,
-                20,
-                new TranslatableText("xray.single.help"),
-                button -> {
-                    this.client.player.closeScreen();
-                    this.client.openScreen(new GuiHelp());
-                }
-            ));
-        this.addButton(
-            new ButtonWidget(
-                (this.getWidth() / 2 + 79) + 62,
-                this.getHeight() / 2 + 58,
-                59,
-                20,
-                new TranslatableText("xray.single.close"),
-                button -> this.onClose()
-            ));
+        this.addDrawableChild(
+                new ButtonWidget(
+                        (this.getWidth() / 2 + 79) + 62,
+                        this.getHeight() / 2 + 58,
+                        59,
+                        20,
+                        new TranslatableText("xray.single.close"),
+                        button -> this.onClose()
+                ));
     }
 
     private void updateSearch() {
@@ -237,9 +237,9 @@ public class GuiSelectionScreen extends GuiBase {
         }
 
         this.itemList =
-            this.originalList.stream()
-                .filter(b -> b.getName().toLowerCase().contains(this.search.getText().toLowerCase()))
-                .collect(Collectors.toCollection(ArrayList::new));
+                this.originalList.stream()
+                        .filter(b -> b.getName().toLowerCase().contains(this.search.getText().toLowerCase()))
+                        .collect(Collectors.toCollection(ArrayList::new));
 
         this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
 
@@ -265,10 +265,10 @@ public class GuiSelectionScreen extends GuiBase {
             Stores.SETTINGS.get().decreaseRange();
 
             this.distButtons.setMessage(
-                new TranslatableText(
-                    "xray.input.distance",
-                    StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
-                ));
+                    new TranslatableText(
+                            "xray.input.distance",
+                            StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()]
+                    ));
             this.distButtons.playDownSound(this.client.getSoundManager());
         }
 
@@ -282,11 +282,11 @@ public class GuiSelectionScreen extends GuiBase {
 
         if (!this.search.isFocused() && this.search.getText().equals("")) {
             this.client.textRenderer.drawWithShadow(
-                stack,
-                I18n.translate("xray.single.search"),
-                (float) this.getWidth() / 2 - 130,
-                (float) this.getHeight() / 2 - 101,
-                Color.GRAY.getRGB()
+                    stack,
+                    I18n.translate("xray.single.search"),
+                    (float) this.getWidth() / 2 - 130,
+                    (float) this.getHeight() / 2 - 101,
+                    Color.GRAY.getRGB()
             );
         }
     }
@@ -304,21 +304,21 @@ public class GuiSelectionScreen extends GuiBase {
 
     static final class SupportButtonInner extends SupportButton {
         SupportButtonInner(
-            int widthIn,
-            int heightIn,
-            int width,
-            int height,
-            String text,
-            String i18nKey,
-            PressAction onPress) {
+                int widthIn,
+                int heightIn,
+                int width,
+                int height,
+                String text,
+                String i18nKey,
+                PressAction onPress) {
             super(
-                widthIn,
-                heightIn,
-                width,
-                height,
-                new LiteralText(text),
-                new TranslatableText(i18nKey),
-                onPress
+                    widthIn,
+                    heightIn,
+                    width,
+                    height,
+                    new LiteralText(text),
+                    new TranslatableText(i18nKey),
+                    onPress
             );
         }
     }
@@ -328,7 +328,7 @@ public class GuiSelectionScreen extends GuiBase {
         GuiSelectionScreen parent;
 
         ScrollingBlockList(
-            int x, int y, int width, int height, List<BlockEntry> blocks, GuiSelectionScreen parent) {
+                int x, int y, int width, int height, List<BlockEntry> blocks, GuiSelectionScreen parent) {
             super(x, y, width, height, SLOT_HEIGHT);
             this.updateEntries(blocks);
             this.parent = parent;
@@ -359,7 +359,7 @@ public class GuiSelectionScreen extends GuiBase {
         void updateEntries(List<BlockEntry> blocks) {
             this.clearEntries();
             blocks.forEach(
-                block -> this.addEntry(new BlockSlot(block, this))); // @mcp: func_230513_b_ = addEntry
+                    block -> this.addEntry(new BlockSlot(block, this))); // @mcp: func_230513_b_ = addEntry
         }
 
         @Override
@@ -382,99 +382,97 @@ public class GuiSelectionScreen extends GuiBase {
 
             @Override
             public void render(
-                MatrixStack stack,
-                int entryIdx,
-                int top,
-                int left,
-                int entryWidth,
-                int entryHeight,
-                int mouseX,
-                int mouseY,
-                boolean p_194999_5_,
-                float partialTicks) {
+                    MatrixStack stack,
+                    int entryIdx,
+                    int top,
+                    int left,
+                    int entryWidth,
+                    int entryHeight,
+                    int mouseX,
+                    int mouseY,
+                    boolean p_194999_5_,
+                    float partialTicks) {
                 BlockEntry blockData = this.block;
 
                 TextRenderer font = this.parent.client.textRenderer;
 
-                font.draw(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
-                font.draw(
-                    stack,
-                    blockData.isActive()
-                        ? "Enabled"
-                        : "Disabled",
-                    left + 35,
-                    top + 17,
-                    blockData.isActive()
-                        ? Color.GREEN.getRGB()
-                        : Color.RED.getRGB()
+                font.drawWithShadow(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
+                font.drawWithShadow(
+                        stack,
+                        blockData.isActive()
+                                ? "Enabled"
+                                : "Disabled",
+                        left + 35,
+                        top + 17,
+                        blockData.isActive()
+                                ? Color.GREEN.getRGB()
+                                : Color.RED.getRGB()
                 );
 
                 DiffuseLighting.enableGuiDepthLighting();
                 this.parent
-                    .client
-                    .getItemRenderer()
-                    .renderInGuiWithOverrides(blockData.getStack(), left + 10, top + 7);
+                        .client
+                        .getItemRenderer()
+                        .renderInGuiWithOverrides(blockData.getStack(), left + 10, top + 7);
                 DiffuseLighting.disableGuiDepthLighting();
 
                 if (mouseX > left
-                    && mouseX < (left + entryWidth)
-                    && mouseY > top
-                    && mouseY < (top + entryHeight)
-                    && mouseY < (this.parent.top + this.parent.height)
-                    && mouseY > this.parent.top) {
+                        && mouseX < (left + entryWidth)
+                        && mouseY > top
+                        && mouseY < (top + entryHeight)
+                        && mouseY < (this.parent.top + this.parent.height)
+                        && mouseY > this.parent.top) {
                     this.parent.parent.renderTooltip(
-                        stack,
-                        Arrays.asList(
-                            new TranslatableText("xray.tooltips.edit1"),
-                            new TranslatableText("xray.tooltips.edit2")
-                        ),
-                        left + 15,
-                        (entryIdx == this.parent.children().size() - 1 && entryIdx != 0
-                            ? (top - (entryHeight - 20))
-                            : (top + (entryHeight + 15)))
+                            stack,
+                            Arrays.asList(
+                                    new TranslatableText("xray.tooltips.edit1"),
+                                    new TranslatableText("xray.tooltips.edit2")
+                            ),
+                            left + 15,
+                            (entryIdx == this.parent.children().size() - 1 && entryIdx != 0
+                                    ? (top - (entryHeight - 20))
+                                    : (top + (entryHeight + 15)))
                     );
                 }
 
-                //                RenderSystem.enableAlphaTest();
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(
-                    GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
+                        GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA);
                 RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
                 RenderSystem.setShaderColor(
-                    blockData.getHex().getRed() / 255f,
-                    blockData.getHex().getGreen() / 255f,
-                    blockData.getHex().getBlue() / 255f,
-                    .3f
+                        0,
+                        0,
+                        0,
+                        .5f
                 );
                 drawTexture(
-                    stack,
-                    (left + entryWidth) - 27,
-                    (int) (top + (entryHeight / 2f) - 9),
-                    0,
-                    0,
-                    14,
-                    14,
-                    14,
-                    14
+                        stack,
+                        (left + entryWidth) - 27,
+                        (int) (top + (entryHeight / 2f) - 9),
+                        0,
+                        0,
+                        14,
+                        14,
+                        14,
+                        14
                 );
                 RenderSystem.setShaderColor(
-                    blockData.getHex().getRed() / 255f,
-                    blockData.getHex().getGreen() / 255f,
-                    blockData.getHex().getBlue() / 255f,
-                    1
+                        blockData.getHex().getRed() / 255f,
+                        blockData.getHex().getGreen() / 255f,
+                        blockData.getHex().getBlue() / 255f,
+                        1
                 );
                 drawTexture(
-                    stack,
-                    (left + entryWidth) - 25,
-                    (int) (top + (entryHeight / 2f) - 7),
-                    0,
-                    0,
-                    10,
-                    10,
-                    10,
-                    10
+                        stack,
+                        (left + entryWidth) - 25,
+                        (int) (top + (entryHeight / 2f) - 7),
+                        0,
+                        0,
+                        10,
+                        10,
+                        10,
+                        10
                 );
-                //                RenderSystem.disableAlphaTest();
                 RenderSystem.disableBlend();
             }
 
