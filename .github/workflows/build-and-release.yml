@@ -18,22 +18,31 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+            
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 30 # Gets the last 30 commits so the changelog might work
+          
       - uses: actions/setup-java@v2
         with:
           distribution: 'adopt'
           java-version: '16'
+          
       - name: Build with Gradle
         env:
           SAPS_TOKEN: ${{ secrets.SAPS_TOKEN }}
         run: |
           chmod +x ./gradlew
           ./gradlew build publish --stacktrace --no-daemon
+          
       - name: Release to CurseForge
         env:
           CURSEFORGE_KEY: ${{ secrets.CURSE_DEPLOY_TOKEN }}
         run: |
           chmod +x ./gradlew
           ./gradlew build curseforgePublish --stacktrace --no-daemon
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          files: |
+            build/libs/*.jar
