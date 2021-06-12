@@ -24,7 +24,6 @@ jobs:
 
       - uses: actions/setup-java@v2
         with:
-          distribution: 'adopt'
           java-version: '16'
 
       - name: Build with Gradle
@@ -36,7 +35,7 @@ jobs:
 
       - name: Release to CurseForge
         env:
-          CURSEFORGE_KEY: ${{ secrets.CURSE_DEPLOY_TOKEN }}
+          CURSE_DEPLOY_TOKEN: ${{ secrets.CURSE_DEPLOY_TOKEN }}
         run: |
           chmod +x ./gradlew
           ./gradlew build curseforge --stacktrace --no-daemon
