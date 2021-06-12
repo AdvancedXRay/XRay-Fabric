@@ -101,7 +101,7 @@ if (ENV.CURSE_DEPLOY_TOKEN) {
             relations {
                 requiredDependency 'fabric-api'
             }
-            changelog = ""
+            changelog = file(project.rootDir + "/CHANGELOG.md").text
             changelogType = 'markdown'
         }
     }
