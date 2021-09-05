@@ -1,0 +1,8 @@
+{
+  "category.xray": "Advanced XRay",
+  "keybinding.enable_xray": "Ativar raio X",
+  "keybinding.open_gui": "Abrir menu",
+
+  "message.xray_active": "Raio X ativado",
+  "message.xray_deactivate": "Raio X desativado"
+}
