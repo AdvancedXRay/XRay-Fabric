@@ -66,7 +66,7 @@ public class GuiBlockList extends GuiBase {
                         new TranslatableText("xray.single.cancel"),
                         b -> {
                             this.onClose();
-                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                            this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }
                 ));
     }
@@ -140,7 +140,7 @@ public class GuiBlockList extends GuiBase {
             }
 
             this.client.player.closeScreen();
-            this.client.openScreen(
+            this.client.setScreen(
                     new GuiAddBlock(entry.getBlock().getBlock().getDefaultState(), GuiBlockList::new));
         }
 

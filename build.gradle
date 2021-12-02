@@ -1,11 +1,11 @@
 plugins {
-    id 'fabric-loom' version '0.8-SNAPSHOT'
+    id 'fabric-loom' version '0.10-SNAPSHOT'
     id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
 }
 
-sourceCompatibility = JavaVersion.VERSION_16
-targetCompatibility = JavaVersion.VERSION_16
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 def ENV = System.getenv();
 archivesBaseName = "${project.archives_base_name}-${project.minecraft_version}"
@@ -13,19 +13,11 @@ version = "${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
 group = project.maven_group
 
 dependencies {
-    // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-
-    // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-
-    // PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
-    // You may need to force-disable transitiveness on them.
-}
-
-minecraft {
 }
 
 processResources {
@@ -36,16 +28,9 @@ processResources {
     }
 }
 
-// ensure that the encoding is set to UTF-8, no matter what the system default is
-// this fixes some edge cases with special characters not displaying correctly
-// see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding = "UTF-8"
-
-    def targetVersion = 8
-    if (JavaVersion.current().isJava9Compatible()) {
-        it.options.release = targetVersion
-    }
+    it.options.release = 17
 }
 
 java {
@@ -66,16 +51,6 @@ publishing {
             artifactId project.archivesBaseName
             version project.version
             from components.java
-
-            artifact(remapJar) {
-                builtBy remapJar
-            }
-
-            pom.withXml {
-                def node = asNode()
-                if (node.dependencies.size() > 0)
-                    node.remove(node.dependencies)
-            }
         }
     }
     repositories {
@@ -96,8 +71,8 @@ if (ENV.CURSE_DEPLOY_TOKEN) {
             id = "444663"
             releaseType = "release"
             addGameVersion "Fabric"
-            addGameVersion "1.17"
-            mainArtifact(remapJar.archivePath)
+            addGameVersion "$project.minecraft_version"
+            mainArtifact(remapJar)
             relations {
                 requiredDependency 'fabric-api'
             }

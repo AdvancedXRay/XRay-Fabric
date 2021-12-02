@@ -35,7 +35,7 @@ public class GuiHelp extends GuiBase {
                         new TranslatableText("xray.single.close"),
                         b -> {
                             this.onClose();
-                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                            this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }));
     }
 

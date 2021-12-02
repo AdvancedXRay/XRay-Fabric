@@ -69,7 +69,7 @@ public class XRay implements ModInitializer {
         ScanController.runTask(false);
 
         while (this.guiButton.wasPressed()) {
-            mc.openScreen(new GuiSelectionScreen());
+            mc.setScreen(new GuiSelectionScreen());
         }
 
         while (this.xrayButton.wasPressed()) {

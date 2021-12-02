@@ -104,7 +104,7 @@ public class GuiAddBlock extends GuiBase {
                                     Stores.BLOCKS.write();
                                     Stores.BLOCKS.updateCache();
 
-                                    this.getMinecraft().openScreen(new GuiSelectionScreen());
+                                    this.getMinecraft().setScreen(new GuiSelectionScreen());
                                 }
                         ));
         this.addDrawableChild(
@@ -116,7 +116,7 @@ public class GuiAddBlock extends GuiBase {
                         new TranslatableText("xray.single.cancel"),
                         b -> {
                             this.onClose();
-                            this.getMinecraft().openScreen(this.previousScreenCallback.get());
+                            this.getMinecraft().setScreen(this.previousScreenCallback.get());
                         }
                 ));
 

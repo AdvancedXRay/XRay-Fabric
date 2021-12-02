@@ -91,7 +91,7 @@ public class GuiSelectionScreen extends GuiBase {
                         "xray.tooltips.add_block",
                         button -> {
                             this.client.player.closeScreen();
-                            this.client.openScreen(new GuiBlockList());
+                            this.client.setScreen(new GuiBlockList());
                         }
                 ));
         this.addDrawableChild(
@@ -118,7 +118,7 @@ public class GuiSelectionScreen extends GuiBase {
                                 return;
                             }
 
-                            this.client.openScreen(
+                            this.client.setScreen(
                                     new GuiAddBlock(
                                             ((BlockItem) handItem.getItem()).getBlock().getDefaultState(),
                                             GuiSelectionScreen::new
@@ -148,7 +148,7 @@ public class GuiSelectionScreen extends GuiBase {
                                             this.client.world.getBlockState(((BlockHitResult) look).getBlockPos());
 
                                     player.closeScreen();
-                                    this.client.openScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
+                                    this.client.setScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
                                 } else {
                                     player.sendMessage(
                                             new LiteralText("[XRay] " + I18n.translate("xray.message.nothing_infront")),
@@ -210,7 +210,7 @@ public class GuiSelectionScreen extends GuiBase {
                         new TranslatableText("xray.single.help"),
                         button -> {
                             this.client.player.closeScreen();
-                            this.client.openScreen(new GuiHelp());
+                            this.client.setScreen(new GuiHelp());
                         }
                 ));
         this.addDrawableChild(
@@ -341,7 +341,7 @@ public class GuiSelectionScreen extends GuiBase {
 
             if (GuiSelectionScreen.hasShiftDown()) {
                 this.client.player.closeScreen();
-                this.client.openScreen(new GuiEdit(entry.block));
+                this.client.setScreen(new GuiEdit(entry.block));
                 return;
             }
 

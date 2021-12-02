@@ -67,7 +67,7 @@ public class GuiEdit extends GuiBase {
                             } catch (Exception e) {
                             }
                             this.onClose();
-                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                            this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }
                 ));
 
@@ -80,7 +80,7 @@ public class GuiEdit extends GuiBase {
                         new TranslatableText("xray.single.cancel"),
                         b -> {
                             this.onClose();
-                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                            this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }
                 ));
         this.addDrawableChild(
@@ -110,7 +110,7 @@ public class GuiEdit extends GuiBase {
                             } // lazy catching for basic failures
 
                             this.onClose();
-                            this.getMinecraft().openScreen(new GuiSelectionScreen());
+                            this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }
                 ));
 
