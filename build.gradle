@@ -1,7 +1,7 @@
 plugins {
     id 'fabric-loom' version '0.10-SNAPSHOT'
-    id 'maven-publish'
     id "com.matthewprenger.cursegradle" version "1.4.0"
+    id 'maven-publish'
 }
 
 sourceCompatibility = JavaVersion.VERSION_17
@@ -64,20 +64,18 @@ publishing {
     }
 }
 
+
 if (ENV.CURSE_DEPLOY_TOKEN) {
     curseforge {
-        apiKey = "${ENV.CURSE_DEPLOY_TOKEN}"
+        apiKey = ENV.CURSE_DEPLOY_TOKEN
         project {
             id = "444663"
             releaseType = "release"
             addGameVersion "Fabric"
-            addGameVersion "$project.minecraft_version"
-            mainArtifact(remapJar)
-            relations {
-                requiredDependency 'fabric-api'
-            }
-            changelog = file(project.rootDir + "/CHANGELOG.md").text
+            addGameVersion "$minecraft_version"
+            changelog = "See [Commit history](https://github.com/MichaelHillcox/XRay-Fabric/commits/main)"
             changelogType = 'markdown'
+            mainArtifact(remapJar)
         }
     }
 }
