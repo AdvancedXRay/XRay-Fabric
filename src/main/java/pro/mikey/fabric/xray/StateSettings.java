@@ -1,61 +1,70 @@
 package pro.mikey.fabric.xray;
 
+import net.minecraft.util.math.MathHelper;
+import pro.mikey.fabric.xray.storage.Stores;
+
 public class StateSettings {
-  public static final int[] DISTANCE_STEPS = new int[] {2, 4, 8, 16, 32, 64, 128, 256};
-  private boolean isActive;
-  private boolean showLava;
-  private int range;
-  private boolean showOverlay;
+    private static final int maxStepsToScan = 5;
 
-  public StateSettings() {
-    this.isActive = false;
-    this.showLava = false;
-    this.showOverlay = true;
-    this.range = 3;
-  }
+    private transient boolean isActive;
+    private boolean showLava;
+    private int range;
+    private boolean showOverlay;
 
-  public boolean isActive() {
-    return this.isActive;
-  }
-
-  void setActive(boolean active) {
-    this.isActive = active;
-  }
-
-  public boolean isShowLava() {
-    return this.showLava;
-  }
-
-  public void setShowLava(boolean showLava) {
-    this.showLava = showLava;
-  }
-
-  // Fail softly if the index is out of bounds
-  public int getRange() {
-    return Math.max(0, Math.min(DISTANCE_STEPS.length - 1, this.range));
-  }
-
-  public void increaseRange() {
-    if (this.range < DISTANCE_STEPS.length - 1) {
-      this.range += 1;
-    } else {
-      this.range = 0;
+    public StateSettings() {
+        this.isActive = false;
+        this.showLava = false;
+        this.showOverlay = true;
+        this.range = 3;
     }
-  }
 
-  public void decreaseRange() {
-    if (this.range > 0) {
-      this.range -= 1;
-    } else {
-      this.range = DISTANCE_STEPS.length - 1;
+    public boolean isActive() {
+        return this.isActive;
     }
-  }
 
-  public boolean showOverlay() {
-    return this.showOverlay;
-  }
+    void setActive(boolean active) {
+        this.isActive = active;
+    }
 
-  public void setShowOverlay(boolean showOverlay) {
-    this.showOverlay = showOverlay;
-  }
+    public boolean isShowLava() {
+        return this.showLava;
+    }
+
+    public void setShowLava(boolean showLava) {
+        this.showLava = showLava;
+    }
+
+    public static int getRadius() {
+        return MathHelper.clamp(Stores.SETTINGS.get().range, 0, maxStepsToScan) * 3;
+    }
+
+    public static int getHalfRange() {
+        return Math.max(0, getRadius() / 2);
+    }
+
+    public static int getVisualRadius() {
+        return Math.max(1, getRadius());
+    }
+
+    public void increaseRange() {
+        if (Stores.SETTINGS.get().range < maxStepsToScan)
+            Stores.SETTINGS.get().range = Stores.SETTINGS.get().range + 1;
+        else
+            Stores.SETTINGS.get().range = 0;
+    }
+
+    public void decreaseRange() {
+        if (Stores.SETTINGS.get().range > 0)
+            Stores.SETTINGS.get().range = Stores.SETTINGS.get().range - 1;
+        else
+            Stores.SETTINGS.get().range = maxStepsToScan;
+    }
+
+    public boolean showOverlay() {
+        return this.showOverlay;
+    }
+
+    public void setShowOverlay(boolean showOverlay) {
+        this.showOverlay = showOverlay;
+    }
 }

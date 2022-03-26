@@ -23,7 +23,7 @@ public class BlockSearchCache {
         blockEntries.stream()
             .flatMap(
                 e ->
-                    e.getEntries().stream()
+                    e.entries().stream()
                         .filter(BlockEntry::isActive)
                         .map(a -> new BlockSearchEntry(a.getState(), a.getHex(), a.isDefault())))
             .collect(Collectors.toSet());

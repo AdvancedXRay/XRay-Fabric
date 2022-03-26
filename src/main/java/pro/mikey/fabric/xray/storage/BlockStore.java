@@ -12,57 +12,58 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BlockStore extends Store<List<BlockGroup>> {
-  private static BlockStore instance;
-  private final BlockSearchCache cache = new BlockSearchCache();
-  private final List<BlockGroup> blockEntries;
+    private static BlockStore instance;
+    private final BlockSearchCache cache = new BlockSearchCache();
+    private final List<BlockGroup> blockEntries;
 
-  private BlockStore() {
-    super("blocks");
+    private BlockStore() {
+        super("blocks");
 
-    this.blockEntries = this.read();
-    this.updateCache(this.blockEntries); // ensure the cache is up to date
-  }
-
-  static BlockStore getInstance() {
-    if (instance == null) {
-      instance = new BlockStore();
+        this.blockEntries = this.read();
+        this.updateCache(this.blockEntries); // ensure the cache is up to date
     }
 
-    return instance;
-  }
+    static BlockStore getInstance() {
+        if (instance == null) {
+            instance = new BlockStore();
+        }
 
-  public void updateCache() {
-    this.updateCache(this.get());
-  }
+        return instance;
+    }
 
-  private void updateCache(List<BlockGroup> data) {
-    this.cache.processGroupedList(data);
-  }
+    public void updateCache() {
+        this.updateCache(this.get());
+    }
 
-  public BlockSearchCache getCache() {
-    return this.cache;
-  }
+    private void updateCache(List<BlockGroup> data) {
+        this.cache.processGroupedList(data);
+    }
 
-  @Override
-  public List<BlockGroup> get() {
-    return this.blockEntries;
-  }
+    public BlockSearchCache getCache() {
+        return this.cache;
+    }
 
-  @Override
-  public Gson getGson() {
-    return new GsonBuilder()
-        .registerTypeAdapter(BlockEntry.class, new BlockEntry.Serializer())
-        .setPrettyPrinting()
-        .create();
-  }
+    @Override
+    public List<BlockGroup> get() {
+        return this.blockEntries;
+    }
 
-  @Override
-  public List<BlockGroup> providedDefault() {
-    return new ArrayList<>();
-  }
+    @Override
+    public Gson getGson() {
+        return new GsonBuilder()
+                .registerTypeAdapter(BlockEntry.class, new BlockEntry.Serializer())
+                .setPrettyPrinting()
+                .create();
+    }
 
-  @Override
-  Type getType() {
-    return new TypeToken<List<BlockGroup>>() {}.getType();
-  }
+    @Override
+    public List<BlockGroup> providedDefault() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    Type getType() {
+        return new TypeToken<List<BlockGroup>>() {
+        }.getType();
+    }
 }

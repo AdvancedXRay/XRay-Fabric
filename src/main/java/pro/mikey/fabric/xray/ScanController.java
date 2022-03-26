@@ -26,12 +26,15 @@ public class ScanController {
      * No point even running if the player is still in the same chunk.
      */
     private static boolean playerLocationChanged() {
-        ClientPlayerEntity player = MinecraftClient.getInstance().player;
-        if (player == null) {
+        if (MinecraftClient.getInstance().player == null)
             return false;
-        }
 
-        return playerLastChunk == null || !playerLastChunk.equals(player.getChunkPos());
+        ChunkPos plyChunkPos = MinecraftClient.getInstance().player.getChunkPos();
+        int range = StateSettings.getHalfRange();
+
+        return playerLastChunk == null ||
+                plyChunkPos.x > playerLastChunk.x + range || plyChunkPos.x < playerLastChunk.x - range ||
+                plyChunkPos.z > playerLastChunk.z + range || plyChunkPos.z < playerLastChunk.z - range;
     }
 
     /**
@@ -59,7 +62,7 @@ public class ScanController {
     public static void blockBroken(World world, PlayerEntity playerEntity, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
         if (!Stores.SETTINGS.get().isActive()) return;
 
-        if (renderQueue.stream().anyMatch(e -> e.getPos().equals(blockPos))) {
+        if (renderQueue.stream().anyMatch(e -> e.pos().equals(blockPos))) {
             runTask(true);
         }
     }

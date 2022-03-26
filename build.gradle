@@ -8,8 +8,8 @@ sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 def ENV = System.getenv();
-archivesBaseName = "${project.archives_base_name}-${project.minecraft_version}"
-version = "${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
+archivesBaseName = "${project.archives_base_name}"
+version = "${project.minecraft_version}-${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
 group = project.maven_group
 
 dependencies {
@@ -29,7 +29,6 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    it.options.encoding = "UTF-8"
     it.options.release = 17
 }
 
@@ -73,7 +72,7 @@ if (ENV.CURSE_DEPLOY_TOKEN) {
             releaseType = "release"
             addGameVersion "Fabric"
             addGameVersion "$minecraft_version"
-            changelog = "See [Commit history](https://github.com/MichaelHillcox/XRay-Fabric/commits/main)"
+            changelog = file('CHANGELOG.md')
             changelogType = 'markdown'
             mainArtifact(remapJar)
         }

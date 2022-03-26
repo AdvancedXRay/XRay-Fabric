@@ -11,11 +11,15 @@ import org.jetbrains.annotations.Nullable;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
+import pro.mikey.fabric.xray.render.RenderOutlines;
 import pro.mikey.fabric.xray.storage.Stores;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScanTask implements Runnable {
+    private static AtomicBoolean isScanning = new AtomicBoolean(false);
+
     ScanTask() {
     }
 
@@ -29,29 +33,31 @@ public class ScanTask implements Runnable {
             return null;
         }
 
-        if (Stores.SETTINGS.get().isShowLava()
-                && state.getFluidState().getFluid() instanceof LavaFluid) {
+        if (Stores.SETTINGS.get().isShowLava() && state.getFluidState().getFluid() instanceof LavaFluid) {
             return new BasicColor(210, 10, 10);
         }
 
         BlockState defaultState = state.getBlock().getDefaultState();
 
-        Optional<BlockSearchEntry> contains =
-                blocks.stream()
-                        .filter(
-                                localState ->
-                                        localState.isDefault() && defaultState == localState.getState()
-                                                || !localState.isDefault() && state == localState.getState())
-                        .findFirst();
-
-        return contains.map(BlockSearchEntry::getColor).orElse(null);
+        return blocks.stream()
+                .filter(localState -> localState.isDefault() && defaultState == localState.getState() || !localState.isDefault() && state == localState.getState())
+                .findFirst()
+                .map(BlockSearchEntry::getColor)
+                .orElse(null);
     }
 
     @Override
     public void run() {
+        if (isScanning.get()) {
+            return;
+        }
+
+        isScanning.set(true);
         Set<BlockPosWithColor> c = this.collectBlocks();
         ScanController.renderQueue.clear();
         ScanController.renderQueue.addAll(c);
+        isScanning.set(false);
+        RenderOutlines.requestedRefresh.set(true);
     }
 
     /**
@@ -67,7 +73,7 @@ public class ScanTask implements Runnable {
         Set<BlockSearchEntry> blocks = Stores.BLOCKS.getCache().get();
 
         // If we're not looking for blocks, don't run.
-        if (blocks.isEmpty()) {
+        if (blocks.isEmpty() && !Stores.SETTINGS.get().isShowLava()) {
             if (!ScanController.renderQueue.isEmpty()) {
                 ScanController.renderQueue.clear();
             }
@@ -89,19 +95,18 @@ public class ScanTask implements Runnable {
         int cX = player.getChunkPos().x;
         int cZ = player.getChunkPos().z;
 
-        int range = StateSettings.DISTANCE_STEPS[Stores.SETTINGS.get().getRange()] / 2;
+        int range = StateSettings.getHalfRange();
 
         for (int i = cX - range; i <= cX + range; i++) {
             int chunkStartX = i << 4;
             for (int j = cZ - range; j <= cZ + range; j++) {
                 int chunkStartZ = j << 4;
 
-                int height =
-                        Arrays.stream(world.getChunk(i, j).getSectionArray())
-                                .filter(Objects::nonNull)
-                                .mapToInt(ChunkSection::getYOffset)
-                                .max()
-                                .orElse(0);
+                int height = Arrays.stream(world.getChunk(i, j).getSectionArray())
+                        .filter(Objects::nonNull)
+                        .mapToInt(ChunkSection::getYOffset)
+                        .max()
+                        .orElse(0);
 
                 for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {

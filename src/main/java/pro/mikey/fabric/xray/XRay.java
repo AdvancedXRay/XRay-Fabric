@@ -7,17 +7,31 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.item.Item;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.ItemTags;
+import net.minecraft.tag.TagKey;
 import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.util.registry.RegistryEntryList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
+import pro.mikey.fabric.xray.records.BasicColor;
+import pro.mikey.fabric.xray.records.BlockEntry;
+import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.render.RenderOutlines;
 import pro.mikey.fabric.xray.screens.forge.GuiOverlay;
 import pro.mikey.fabric.xray.screens.forge.GuiSelectionScreen;
 import pro.mikey.fabric.xray.storage.Stores;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class XRay implements ModInitializer {
 
@@ -25,10 +39,9 @@ public class XRay implements ModInitializer {
     public static final String PREFIX_GUI = String.format("%s:textures/gui/", MOD_ID);
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-    private final KeyBinding xrayButton =
-            new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
-    private final KeyBinding guiButton =
-            new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
+    private final KeyBinding xrayButton = new KeyBinding("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
+
+    private final KeyBinding guiButton = new KeyBinding("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
 
     @Override
     public void onInitialize() {
@@ -42,7 +55,6 @@ public class XRay implements ModInitializer {
 
         WorldRenderEvents.LAST.register(RenderOutlines::render);
         PlayerBlockBreakEvents.AFTER.register(ScanController::blockBroken);
-//        Interaction
 
         KeyBindingHelper.registerKeyBinding(this.xrayButton);
         KeyBindingHelper.registerKeyBinding(this.guiButton);
@@ -80,16 +92,7 @@ public class XRay implements ModInitializer {
 
             ScanController.runTask(true);
 
-            mc.player.sendMessage(
-                    new TranslatableText(
-                            "message.xray_" + (!stateSettings.isActive()
-                                    ? "deactivate"
-                                    : "active"))
-                            .formatted(stateSettings.isActive()
-                                    ? Formatting.GREEN
-                                    : Formatting.RED),
-                    true
-            );
+            mc.player.sendMessage(new TranslatableText("message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active")).formatted(stateSettings.isActive() ? Formatting.GREEN : Formatting.RED), true);
         }
     }
 }
