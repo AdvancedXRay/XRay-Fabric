@@ -3,11 +3,11 @@ package pro.mikey.fabric.xray.cache;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.StringNbtReader;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.nbt.TagParser;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 
 public class BlockSearchEntry {
@@ -22,19 +22,19 @@ public class BlockSearchEntry {
     }
 
     public static BlockState blockStateFromStringNBT(String nbt) {
-        NbtCompound tag;
+        CompoundTag tag;
         try {
-            tag = StringNbtReader.parse(nbt);
+            tag = TagParser.parseTag(nbt);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
-            return Blocks.AIR.getDefaultState();
+            return Blocks.AIR.defaultBlockState();
         }
 
-        return NbtHelper.toBlockState(tag);
+        return NbtUtils.readBlockState(tag);
     }
 
     public static String blockStateToStringNBT(BlockState state) {
-        return NbtHelper.fromBlockState(state).toString();
+        return NbtUtils.writeBlockState(state).toString();
     }
 
     public BlockState getState() {

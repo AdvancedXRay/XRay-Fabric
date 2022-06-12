@@ -1,6 +1,6 @@
 package pro.mikey.fabric.xray.records;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public record BlockPosWithColor(
         BlockPos pos,

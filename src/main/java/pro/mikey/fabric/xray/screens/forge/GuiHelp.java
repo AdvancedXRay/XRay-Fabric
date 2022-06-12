@@ -1,10 +1,10 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -26,26 +26,26 @@ public class GuiHelp extends GuiBase {
         this.areas.add(new LinedText("xray.message.help.gui"));
         this.areas.add(new LinedText("xray.message.help.warning"));
 
-        this.addDrawableChild(
-                new ButtonWidget(
+        this.addRenderableWidget(
+                new Button(
                         (this.getWidth() / 2) - 100,
                         (this.getHeight() / 2) + 80,
                         200,
                         20,
-                        new TranslatableText("xray.single.close"),
+                        Component.translatable("xray.single.close"),
                         b -> {
                             this.getMinecraft().setScreen(new GuiSelectionScreen());
                         }));
     }
 
     @Override
-    public void renderExtra(MatrixStack stack, int x, int y, float partialTicks) {
+    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
         float lineY = (this.getHeight() / 2f) - 85;
         for (LinedText linedText : this.areas) {
             for (String line : linedText.getLines()) {
                 lineY += 12;
                 this.getFontRender()
-                        .drawWithShadow(stack, line, (this.getWidth() / 2f) - 176, lineY, Color.WHITE.getRGB());
+                        .drawShadow(stack, line, (this.getWidth() / 2f) - 176, lineY, Color.WHITE.getRGB());
             }
             lineY += 10;
         }
@@ -57,20 +57,20 @@ public class GuiHelp extends GuiBase {
     }
 
     @Override
-    public Identifier getBackground() {
+    public ResourceLocation getBackground() {
         return BG_LARGE;
     }
 
     @Override
     public String title() {
-        return I18n.translate("xray.single.help");
+        return I18n.get("xray.single.help");
     }
 
     private static class LinedText {
         private final String[] lines;
 
         LinedText(String key) {
-            this.lines = I18n.translate(key).split("\\R");
+            this.lines = I18n.get(key).split("\\R");
         }
 
         String[] getLines() {

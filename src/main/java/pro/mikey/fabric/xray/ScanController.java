@@ -1,18 +1,18 @@
 package pro.mikey.fabric.xray;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -26,10 +26,10 @@ public class ScanController {
      * No point even running if the player is still in the same chunk.
      */
     private static boolean playerLocationChanged() {
-        if (MinecraftClient.getInstance().player == null)
+        if (Minecraft.getInstance().player == null)
             return false;
 
-        ChunkPos plyChunkPos = MinecraftClient.getInstance().player.getChunkPos();
+        ChunkPos plyChunkPos = Minecraft.getInstance().player.chunkPosition();
         int range = StateSettings.getHalfRange();
 
         return playerLastChunk == null ||
@@ -45,33 +45,33 @@ public class ScanController {
      *                   world.
      */
     public static synchronized void runTask(boolean forceRerun) {
-        MinecraftClient client = MinecraftClient.getInstance();
-        if (client.player == null && client.world == null) {
+        Minecraft client = Minecraft.getInstance();
+        if (client.player == null && client.level == null) {
             return;
         }
 
-        if (!Stores.SETTINGS.get().isActive() || (!forceRerun && !playerLocationChanged())) {
+        if (!SettingsStore.getInstance().get().isActive() || (!forceRerun && !playerLocationChanged())) {
             return;
         }
 
         // Update the players last chunk to eval against above.
-        playerLastChunk = client.player.getChunkPos();
-        Util.getMainWorkerExecutor().execute(new ScanTask());
+        playerLastChunk = client.player.chunkPosition();
+        Util.backgroundExecutor().execute(new ScanTask());
     }
 
-    public static void blockBroken(World world, PlayerEntity playerEntity, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-        if (!Stores.SETTINGS.get().isActive()) return;
+    public static void blockBroken(Level world, Player playerEntity, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
+        if (!SettingsStore.getInstance().get().isActive()) return;
 
         if (renderQueue.stream().anyMatch(e -> e.pos().equals(blockPos))) {
             runTask(true);
         }
     }
 
-    public static void blockPlaced(ItemPlacementContext context) {
-        if (!Stores.SETTINGS.get().isActive()) return;
+    public static void blockPlaced(BlockPlaceContext context) {
+        if (!SettingsStore.getInstance().get().isActive()) return;
 
-        BlockState defaultState = Block.getBlockFromItem(context.getStack().getItem()).getDefaultState();
-        if (Stores.BLOCKS.getCache().get().stream().anyMatch(e -> e.getState() == defaultState)) {
+        BlockState defaultState = Block.byItem(context.getItemInHand().getItem()).defaultBlockState();
+        if (BlockStore.getInstance().getCache().get().stream().anyMatch(e -> e.getState() == defaultState)) {
             runTask(true);
         }
     }

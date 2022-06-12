@@ -1,13 +1,13 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import net.minecraft.client.gui.widget.SliderWidget;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.components.AbstractSliderButton;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.LiteralContents;
 
-public class RatioSliderWidget extends SliderWidget {
-  private final Text message;
+public class RatioSliderWidget extends AbstractSliderButton {
+  private final Component message;
 
-  RatioSliderWidget(int x, int y, int width, int height, Text text, double value) {
+  RatioSliderWidget(int x, int y, int width, int height, Component text, double value) {
     super(x, y, width, height, text, value);
     this.message = text;
     this.updateMessage();
@@ -18,7 +18,7 @@ public class RatioSliderWidget extends SliderWidget {
 
   @Override
   protected void updateMessage() {
-    this.setMessage(new LiteralText(this.message.getString() + ((int) (this.value * 255))));
+    this.setMessage(Component.literal(this.message.getString() + ((int) (this.value * 255))));
   }
 
   double getValue() {

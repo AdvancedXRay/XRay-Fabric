@@ -1,9 +1,9 @@
 package pro.mikey.fabric.xray.records;
 
 import com.google.gson.*;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtHelper;
+import net.minecraft.nbt.NbtUtils;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 
 import java.lang.reflect.Type;
@@ -99,7 +99,7 @@ public class BlockEntry {
         @Override
         public JsonElement serialize(BlockEntry src, Type typeOfSrc, JsonSerializationContext context) {
             JsonObject object = new JsonObject();
-            object.addProperty("state", NbtHelper.fromBlockState(src.getState()).toString());
+            object.addProperty("state", NbtUtils.writeBlockState(src.getState()).toString());
             object.addProperty("name", src.name);
             object.addProperty("color", src.color.toHex());
             object.addProperty("order", src.order);

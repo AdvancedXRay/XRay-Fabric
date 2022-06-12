@@ -1,20 +1,24 @@
 package pro.mikey.fabric.xray;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.LavaFluid;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.ChunkSection;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunkSection;
+import net.minecraft.world.level.material.LavaFluid;
 import org.jetbrains.annotations.Nullable;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.render.RenderOutlines;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScanTask implements Runnable {
@@ -27,17 +31,17 @@ public class ScanTask implements Runnable {
      * Check if we're valid and push back the blocks color for the render queue
      */
     @Nullable
-    public static BasicColor isValidBlock(BlockPos pos, World world, Set<BlockSearchEntry> blocks) {
+    public static BasicColor isValidBlock(BlockPos pos, Level world, Set<BlockSearchEntry> blocks) {
         BlockState state = world.getBlockState(pos);
         if (state.isAir()) {
             return null;
         }
 
-        if (Stores.SETTINGS.get().isShowLava() && state.getFluidState().getFluid() instanceof LavaFluid) {
+        if (SettingsStore.getInstance().get().isShowLava() && state.getFluidState().getType() instanceof LavaFluid) {
             return new BasicColor(210, 10, 10);
         }
 
-        BlockState defaultState = state.getBlock().getDefaultState();
+        BlockState defaultState = state.getBlock().defaultBlockState();
 
         return blocks.stream()
                 .filter(localState -> localState.isDefault() && defaultState == localState.getState() || !localState.isDefault() && state == localState.getState())
@@ -66,24 +70,24 @@ public class ScanTask implements Runnable {
      *
      * <p>This is only run if the cache is invalidated.
      *
-     * @implNote Using the {@link BlockPos#iterate(BlockPos, BlockPos)} may be a better system for the
+     * @implNote Using the {@link BlockPos#betweenClosed(BlockPos, BlockPos)} may be a better system for the
      * scanning.
      */
     private Set<BlockPosWithColor> collectBlocks() {
-        Set<BlockSearchEntry> blocks = Stores.BLOCKS.getCache().get();
+        Set<BlockSearchEntry> blocks = BlockStore.getInstance().getCache().get();
 
         // If we're not looking for blocks, don't run.
-        if (blocks.isEmpty() && !Stores.SETTINGS.get().isShowLava()) {
+        if (blocks.isEmpty() && !SettingsStore.getInstance().get().isShowLava()) {
             if (!ScanController.renderQueue.isEmpty()) {
                 ScanController.renderQueue.clear();
             }
             return new HashSet<>();
         }
 
-        MinecraftClient instance = MinecraftClient.getInstance();
+        Minecraft instance = Minecraft.getInstance();
 
-        final World world = instance.world;
-        final PlayerEntity player = instance.player;
+        final Level world = instance.level;
+        final Player player = instance.player;
 
         // Just stop if we can't get the player or world.
         if (world == null || player == null) {
@@ -92,8 +96,8 @@ public class ScanTask implements Runnable {
 
         final Set<BlockPosWithColor> renderQueue = new HashSet<>();
 
-        int cX = player.getChunkPos().x;
-        int cZ = player.getChunkPos().z;
+        int cX = player.chunkPosition().x;
+        int cZ = player.chunkPosition().z;
 
         int range = StateSettings.getHalfRange();
 
@@ -102,15 +106,15 @@ public class ScanTask implements Runnable {
             for (int j = cZ - range; j <= cZ + range; j++) {
                 int chunkStartZ = j << 4;
 
-                int height = Arrays.stream(world.getChunk(i, j).getSectionArray())
+                int height = Arrays.stream(world.getChunk(i, j).getSections())
                         .filter(Objects::nonNull)
-                        .mapToInt(ChunkSection::getYOffset)
+                        .mapToInt(LevelChunkSection::bottomBlockY)
                         .max()
                         .orElse(0);
 
                 for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-                        for (int m = world.getBottomY(); m < height + (1 << 4); m++) {
+                        for (int m = world.getMinBuildHeight(); m < height + (1 << 4); m++) {
                             BlockPos pos = new BlockPos(k, m, l);
                             BasicColor validBlock = isValidBlock(pos, world, blocks);
                             if (validBlock != null) {

@@ -4,14 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import pro.mikey.fabric.xray.XRay;
 
 import java.io.*;
 import java.lang.reflect.Type;
 
 public abstract class Store<T> {
-    private static final String CONFIG_PATH = String.format("%s/config/%s", MinecraftClient.getInstance().runDirectory, XRay.MOD_ID);
+    private static final String CONFIG_PATH = String.format("%s/config/%s", Minecraft.getInstance().gameDirectory, XRay.MOD_ID);
 
     private final String name;
     private final String file;

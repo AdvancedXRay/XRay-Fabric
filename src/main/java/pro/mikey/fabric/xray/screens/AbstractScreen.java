@@ -1,20 +1,20 @@
 package pro.mikey.fabric.xray.screens;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 public abstract class AbstractScreen extends Screen {
-    private static final Identifier TEXTURE = new Identifier("textures/gui/recipe_book.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/recipe_book.png");
 
-    AbstractScreen(Text title) {
+    AbstractScreen(Component title) {
         super(title);
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         this.renderBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
 
@@ -25,7 +25,7 @@ public abstract class AbstractScreen extends Screen {
         int i = (this.width - 147) / 2;
         int j = (this.height - 166) / 2;
 
-        this.drawTexture(matrices, i, j, 1, 1, 147, 166);
+        this.blit(matrices, i, j, 1, 1, 147, 166);
         //    RenderSystem.popMatrix();
     }
 }

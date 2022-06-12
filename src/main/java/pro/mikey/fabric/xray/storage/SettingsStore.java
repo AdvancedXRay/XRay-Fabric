@@ -13,7 +13,7 @@ public class SettingsStore extends Store<StateSettings> {
         this.settings = this.read();
     }
 
-    static SettingsStore getInstance() {
+    public static SettingsStore getInstance() {
         if (instance == null) {
             instance = new SettingsStore();
         }

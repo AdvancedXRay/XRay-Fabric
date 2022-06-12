@@ -1,38 +1,37 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
 
 public class GuiEdit extends GuiBase {
     private final BlockEntry block;
-    private TextFieldWidget oreName;
+    private EditBox oreName;
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
-    private ButtonWidget changeDefaultState;
+    private Button changeDefaultState;
     private BlockState lastState;
 
     GuiEdit(BlockEntry block) {
         super(true); // Has a sidebar
-        this.setSideTitle(I18n.translate("xray.single.tools"));
+        this.setSideTitle(I18n.get("xray.single.tools"));
 
         this.block = block;
     }
 
     @Override
     public void init() {
-        this.addDrawableChild(this.changeDefaultState = new ButtonWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60, 202, 20, new LiteralText(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
+        this.addRenderableWidget(this.changeDefaultState = new Button(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60, 202, 20, Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
             this.lastState = this.block.getState();
-            this.block.setState(this.block.getState().getBlock().getDefaultState());
+            this.block.setState(this.block.getState().getBlock().defaultBlockState());
             button.active = false;
         }));
 
@@ -40,46 +39,46 @@ public class GuiEdit extends GuiBase {
             this.changeDefaultState.active = false;
         }
 
-        this.addDrawableChild(new ButtonWidget((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60, 120, 20, new TranslatableText("xray.single.delete"), b -> {
+        this.addRenderableWidget(new Button((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60, 120, 20, Component.translatable("xray.single.delete"), b -> {
             try {
-                Stores.BLOCKS.get().get(0).entries().remove(this.block);
-                Stores.BLOCKS.write();
-                Stores.BLOCKS.updateCache();
+                BlockStore.getInstance().get().get(0).entries().remove(this.block);
+                BlockStore.getInstance().write();
+                BlockStore.getInstance().updateCache();
             } catch (Exception e) {
             }
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }));
 
-        this.addDrawableChild(new ButtonWidget((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58, 120, 20, new TranslatableText("xray.single.cancel"), b -> {
+        this.addRenderableWidget(new Button((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58, 120, 20, Component.translatable("xray.single.cancel"), b -> {
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }));
-        this.addDrawableChild(new ButtonWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83, 202, 20, new TranslatableText("xray.single.save"), b -> {
+        this.addRenderableWidget(new Button(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83, 202, 20, Component.translatable("xray.single.save"), b -> {
             try {
-                int index = Stores.BLOCKS.get().get(0).entries().indexOf(this.block);
-                BlockEntry entry = Stores.BLOCKS.get().get(0).entries().get(index);
-                entry.setName(this.oreName.getText());
+                int index = BlockStore.getInstance().get().get(0).entries().indexOf(this.block);
+                BlockEntry entry = BlockStore.getInstance().get().get(0).entries().get(index);
+                entry.setName(this.oreName.getValue());
                 entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
                 entry.setState(this.block.getState());
                 entry.setDefault(this.lastState != null);
-                Stores.BLOCKS.get().get(0).entries().set(index, entry);
-                Stores.BLOCKS.write();
-                Stores.BLOCKS.updateCache();
+                BlockStore.getInstance().get().get(0).entries().set(index, entry);
+                BlockStore.getInstance().write();
+                BlockStore.getInstance().updateCache();
             } catch (Exception ignored) {
             } // lazy catching for basic failures
 
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }));
 
-        this.addDrawableChild(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, new TranslatableText("xray.color.red"), 0));
-        this.addDrawableChild(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 18, 100, 20, new TranslatableText("xray.color.green"), 0));
-        this.addDrawableChild(this.blueSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 4, 100, 20, new TranslatableText("xray.color.blue"), 0));
+        this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
+        this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));
+        this.addRenderableWidget(this.blueSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 4, 100, 20, Component.translatable("xray.color.blue"), 0));
 
-        this.oreName = new TextFieldWidget(this.getMinecraft().textRenderer, this.getWidth() / 2 - 138, this.getHeight() / 2 - 63, 202, 20, LiteralText.EMPTY);
-        this.oreName.setText(this.block.getName());
-        this.addDrawableChild(this.oreName);
-        this.addDrawableChild(this.redSlider);
-        this.addDrawableChild(this.greenSlider);
-        this.addDrawableChild(this.blueSlider);
+        this.oreName = new EditBox(this.getMinecraft().font, this.getWidth() / 2 - 138, this.getHeight() / 2 - 63, 202, 20, Component.empty());
+        this.oreName.setValue(this.block.getName());
+        this.addRenderableWidget(this.oreName);
+        this.addRenderableWidget(this.redSlider);
+        this.addRenderableWidget(this.greenSlider);
+        this.addRenderableWidget(this.blueSlider);
 
         this.redSlider.setValue(this.block.getHex().red() / 255f);
         this.greenSlider.setValue(this.block.getHex().green() / 255f);
@@ -93,8 +92,8 @@ public class GuiEdit extends GuiBase {
     }
 
     @Override
-    public void renderExtra(MatrixStack stack, int x, int y, float partialTicks) {
-        this.getFontRender().drawWithShadow(stack, this.block.getName(), this.getWidth() / 2f - 138, this.getHeight() / 2f - 90, 0xffffff);
+    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
+        this.getFontRender().drawShadow(stack, this.block.getName(), this.getWidth() / 2f - 138, this.getHeight() / 2f - 90, 0xffffff);
 
         this.oreName.render(stack, x, y, partialTicks);
 
@@ -102,10 +101,10 @@ public class GuiEdit extends GuiBase {
 
         fill(stack, this.getWidth() / 2 - 35, this.getHeight() / 2 - 40, (this.getWidth() / 2 - 35) + 100, (this.getHeight() / 2 - 40) + 64, color);
 
-        this.getFontRender().drawWithShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
-        DiffuseLighting.enableGuiDepthLighting();
-        this.itemRenderer.renderInGuiWithOverrides(this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
-        DiffuseLighting.disableGuiDepthLighting();
+        this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
+        Lighting.setupFor3DItems();
+        this.itemRenderer.renderAndDecorateItem(this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+        Lighting.setupForFlatItems();
     }
 
     @Override
@@ -129,6 +128,6 @@ public class GuiEdit extends GuiBase {
 
     @Override
     public String title() {
-        return I18n.translate("xray.title.edit");
+        return I18n.get("xray.title.edit");
     }
 }

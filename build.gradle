@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'fabric-loom' version '0.12-SNAPSHOT'
     id "com.matthewprenger.cursegradle" version "1.4.0"
     id 'maven-publish'
 }
@@ -12,12 +12,20 @@ archivesBaseName = "${project.archives_base_name}"
 version = "${project.minecraft_version}-${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
 group = project.maven_group
 
+repositories {
+    maven {
+        url "https://cursemaven.com"
+    }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    mappings loom.officialMojangMappings()
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
+    modImplementation "curse.maven:another-furniture-610492:3828261"
 }
 
 processResources {

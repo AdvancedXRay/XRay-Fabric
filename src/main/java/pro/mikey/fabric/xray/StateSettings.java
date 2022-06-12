@@ -1,7 +1,7 @@
 package pro.mikey.fabric.xray;
 
-import net.minecraft.util.math.MathHelper;
-import pro.mikey.fabric.xray.storage.Stores;
+import net.minecraft.util.Mth;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
 public class StateSettings {
     private static final int maxStepsToScan = 5;
@@ -35,7 +35,7 @@ public class StateSettings {
     }
 
     public static int getRadius() {
-        return MathHelper.clamp(Stores.SETTINGS.get().range, 0, maxStepsToScan) * 3;
+        return Mth.clamp(SettingsStore.getInstance().get().range, 0, maxStepsToScan) * 3;
     }
 
     public static int getHalfRange() {
@@ -47,17 +47,17 @@ public class StateSettings {
     }
 
     public void increaseRange() {
-        if (Stores.SETTINGS.get().range < maxStepsToScan)
-            Stores.SETTINGS.get().range = Stores.SETTINGS.get().range + 1;
+        if (SettingsStore.getInstance().get().range < maxStepsToScan)
+            SettingsStore.getInstance().get().range = SettingsStore.getInstance().get().range + 1;
         else
-            Stores.SETTINGS.get().range = 0;
+            SettingsStore.getInstance().get().range = 0;
     }
 
     public void decreaseRange() {
-        if (Stores.SETTINGS.get().range > 0)
-            Stores.SETTINGS.get().range = Stores.SETTINGS.get().range - 1;
+        if (SettingsStore.getInstance().get().range > 0)
+            SettingsStore.getInstance().get().range = SettingsStore.getInstance().get().range - 1;
         else
-            Stores.SETTINGS.get().range = maxStepsToScan;
+            SettingsStore.getInstance().get().range = maxStepsToScan;
     }
 
     public boolean showOverlay() {

@@ -1,49 +1,46 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import net.minecraft.block.Block;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.render.DiffuseLighting;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryEntry;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractSelectionList;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.core.Registry;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class GuiBlockList extends GuiBase {
     private final List<BlockWithStack> blocks;
     private ScrollingBlockList blockList;
-    private TextFieldWidget search;
+    private EditBox search;
     private String lastSearched = "";
 
     GuiBlockList() {
         super(false);
 
-        this.blocks = Registry.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.getBlockFromItem(item), new ItemStack(item))).toList();
+        this.blocks = Registry.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.byItem(item), new ItemStack(item))).toList();
     }
 
     @Override
     public void init() {
         this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks);
-        this.addDrawableChild(this.blockList);
+        this.addRenderableWidget(this.blockList);
 
-        this.search = new TextFieldWidget(this.getFontRender(), this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 140, 18, LiteralText.EMPTY);
+        this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 140, 18, Component.empty());
         this.search.changeFocus(true);
         this.setFocused(this.search);
 
-        this.addDrawableChild(new ButtonWidget(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84, 60, 20, new TranslatableText("xray.single.cancel"), b -> {
+        this.addRenderableWidget(new Button(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84, 60, 20, Component.translatable("xray.single.cancel"), b -> {
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }));
     }
@@ -51,7 +48,7 @@ public class GuiBlockList extends GuiBase {
     @Override
     public void tick() {
         this.search.tick();
-        if (!this.search.getText().equals(this.lastSearched)) {
+        if (!this.search.getValue().equals(this.lastSearched)) {
             this.reloadBlocks();
         }
 
@@ -59,18 +56,18 @@ public class GuiBlockList extends GuiBase {
     }
 
     private void reloadBlocks() {
-        if (this.lastSearched.equals(this.search.getText())) {
+        if (this.lastSearched.equals(this.search.getValue())) {
             return;
         }
 
-        this.blockList.updateEntries(this.search.getText().length() == 0 ? this.blocks : this.blocks.stream().filter(e -> e.stack().getName().getString().toLowerCase().contains(this.search.getText().toLowerCase())).collect(Collectors.toList()));
+        this.blockList.updateEntries(this.search.getValue().length() == 0 ? this.blocks : this.blocks.stream().filter(e -> e.stack().getHoverName().getString().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toList()));
 
-        this.lastSearched = this.search.getText();
+        this.lastSearched = this.search.getValue();
         this.blockList.setScrollAmount(0);
     }
 
     @Override
-    public void renderExtra(MatrixStack stack, int x, int y, float partialTicks) {
+    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
         this.search.render(stack, x, y, partialTicks);
         this.blockList.render(stack, x, y, partialTicks);
     }
@@ -104,8 +101,8 @@ public class GuiBlockList extends GuiBase {
                 return;
             }
 
-            this.client.player.closeScreen();
-            this.client.setScreen(new GuiAddBlock(entry.getBlock().block().getDefaultState(), GuiBlockList::new));
+            this.minecraft.player.clientSideCloseContainer();
+            this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(), GuiBlockList::new));
         }
 
         void updateEntries(List<BlockWithStack> blocks) {
@@ -113,7 +110,7 @@ public class GuiBlockList extends GuiBase {
             blocks.forEach(block -> this.addEntry(new BlockSlot(block, this)));
         }
 
-        public static class BlockSlot extends EntryListWidget.Entry<BlockSlot> {
+        public static class BlockSlot extends AbstractSelectionList.Entry<BlockSlot> {
             BlockWithStack block;
             ScrollingBlockList parent;
 
@@ -127,16 +124,16 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public void render(MatrixStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
-                TextRenderer font = this.parent.client.textRenderer;
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+                Font font = this.parent.minecraft.font;
 
-                Identifier resource = Registry.BLOCK.getId(this.block.block());
-                font.drawWithShadow(stack, this.block.stack().getItem().getName().getString(), left + 35, top + 7, Color.WHITE.getRGB());
-                font.drawWithShadow(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
+                ResourceLocation resource = Registry.BLOCK.getKey(this.block.block());
+                font.drawShadow(stack, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
+                font.drawShadow(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
-                DiffuseLighting.enableGuiDepthLighting();
-                this.parent.client.getItemRenderer().renderInGuiWithOverrides(this.block.stack(), left + 10, top + 7);
-                DiffuseLighting.disableGuiDepthLighting();
+                Lighting.setupFor3DItems();
+                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(this.block.stack(), left + 10, top + 7);
+                Lighting.setupForFlatItems();
             }
 
             @Override
