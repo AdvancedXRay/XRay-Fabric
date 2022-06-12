@@ -7,14 +7,14 @@ import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import pro.mikey.fabric.xray.XRay;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
 public class GuiOverlay {
     private static final Identifier circle = new Identifier(XRay.PREFIX_GUI + "circle.png");
 
     public static void RenderGameOverlayEvent(MatrixStack matrixStack, float delta) {
         // Draw Indicator
-        if (!Stores.SETTINGS.get().isActive() || !Stores.SETTINGS.get().showOverlay()) {
+        if (!SettingsStore.getInstance().get().isActive() || !SettingsStore.getInstance().get().showOverlay()) {
             return;
         }
 

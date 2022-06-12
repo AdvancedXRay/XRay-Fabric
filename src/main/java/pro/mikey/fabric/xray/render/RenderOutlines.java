@@ -12,7 +12,7 @@ import net.minecraft.util.math.Vec3f;
 import org.lwjgl.opengl.GL11;
 import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -27,7 +27,7 @@ public class RenderOutlines {
             canvasLoaded = FabricLoader.getInstance().isModLoaded("canvas") ? 1 : 0;
         }
 
-        if (ScanController.renderQueue.isEmpty() || !Stores.SETTINGS.get().isActive()) {
+        if (ScanController.renderQueue.isEmpty() || !SettingsStore.getInstance().get().isActive()) {
             return;
         }
 

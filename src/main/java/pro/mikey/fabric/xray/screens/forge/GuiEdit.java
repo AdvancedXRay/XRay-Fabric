@@ -10,7 +10,7 @@ import net.minecraft.text.LiteralText;
 import net.minecraft.text.TranslatableText;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
 
 public class GuiEdit extends GuiBase {
     private final BlockEntry block;
@@ -42,9 +42,9 @@ public class GuiEdit extends GuiBase {
 
         this.addDrawableChild(new ButtonWidget((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60, 120, 20, new TranslatableText("xray.single.delete"), b -> {
             try {
-                Stores.BLOCKS.get().get(0).entries().remove(this.block);
-                Stores.BLOCKS.write();
-                Stores.BLOCKS.updateCache();
+                BlockStore.getInstance().get().get(0).entries().remove(this.block);
+                BlockStore.getInstance().write();
+                BlockStore.getInstance().updateCache();
             } catch (Exception e) {
             }
             this.getMinecraft().setScreen(new GuiSelectionScreen());
@@ -55,15 +55,15 @@ public class GuiEdit extends GuiBase {
         }));
         this.addDrawableChild(new ButtonWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83, 202, 20, new TranslatableText("xray.single.save"), b -> {
             try {
-                int index = Stores.BLOCKS.get().get(0).entries().indexOf(this.block);
-                BlockEntry entry = Stores.BLOCKS.get().get(0).entries().get(index);
+                int index = BlockStore.getInstance().get().get(0).entries().indexOf(this.block);
+                BlockEntry entry = BlockStore.getInstance().get().get(0).entries().get(index);
                 entry.setName(this.oreName.getText());
                 entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
                 entry.setState(this.block.getState());
                 entry.setDefault(this.lastState != null);
-                Stores.BLOCKS.get().get(0).entries().set(index, entry);
-                Stores.BLOCKS.write();
-                Stores.BLOCKS.updateCache();
+                BlockStore.getInstance().get().get(0).entries().set(index, entry);
+                BlockStore.getInstance().write();
+                BlockStore.getInstance().updateCache();
             } catch (Exception ignored) {
             } // lazy catching for basic failures
 

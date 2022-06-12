@@ -23,7 +23,7 @@ public class BlockStore extends Store<List<BlockGroup>> {
         this.updateCache(this.blockEntries); // ensure the cache is up to date
     }
 
-    static BlockStore getInstance() {
+    public static BlockStore getInstance() {
         if (instance == null) {
             instance = new BlockStore();
         }

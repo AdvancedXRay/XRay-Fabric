@@ -6,7 +6,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.LiteralText;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ public class MainScreen extends AbstractScreen {
     public MainScreen() {
         super(LiteralText.EMPTY);
 
-        List<BlockGroup> read = Stores.BLOCKS.read();
+        List<BlockGroup> read = BlockStore.getInstance().read();
         if (read != null) {
             this.blocks.addAll(read);
         }

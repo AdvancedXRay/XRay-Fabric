@@ -12,7 +12,7 @@ import net.minecraft.text.TranslatableText;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -56,16 +56,16 @@ public class GuiAddBlock extends GuiBase {
         this.addDrawableChild(this.addBtn = new ButtonWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 128, 20, new TranslatableText("xray.single.add"), b -> {
             this.close();
 
-            BlockGroup group = Stores.BLOCKS.get().size() >= 1 ? Stores.BLOCKS.get().get(0) : new BlockGroup("default", new ArrayList<>(), 1, true);
+            BlockGroup group = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0) : new BlockGroup("default", new ArrayList<>(), 1, true);
             group.entries().add(new BlockEntry(this.selectBlock, this.oreName.getText(), new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)), group.entries().size() + 1, this.selectBlock == this.selectBlock.getBlock().getDefaultState(), true));
 
-            if (Stores.BLOCKS.get().size() > 0) {
-                Stores.BLOCKS.get().set(0, group);
+            if (BlockStore.getInstance().get().size() > 0) {
+                BlockStore.getInstance().get().set(0, group);
             } else {
-                Stores.BLOCKS.get().add(group);
+                BlockStore.getInstance().get().add(group);
             }
-            Stores.BLOCKS.write();
-            Stores.BLOCKS.updateCache();
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
 
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }));

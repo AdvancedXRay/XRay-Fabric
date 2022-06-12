@@ -12,9 +12,13 @@ import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.render.RenderOutlines;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScanTask implements Runnable {
@@ -33,7 +37,7 @@ public class ScanTask implements Runnable {
             return null;
         }
 
-        if (Stores.SETTINGS.get().isShowLava() && state.getFluidState().getFluid() instanceof LavaFluid) {
+        if (SettingsStore.getInstance().get().isShowLava() && state.getFluidState().getFluid() instanceof LavaFluid) {
             return new BasicColor(210, 10, 10);
         }
 
@@ -70,10 +74,10 @@ public class ScanTask implements Runnable {
      * scanning.
      */
     private Set<BlockPosWithColor> collectBlocks() {
-        Set<BlockSearchEntry> blocks = Stores.BLOCKS.getCache().get();
+        Set<BlockSearchEntry> blocks = BlockStore.getInstance().getCache().get();
 
         // If we're not looking for blocks, don't run.
-        if (blocks.isEmpty() && !Stores.SETTINGS.get().isShowLava()) {
+        if (blocks.isEmpty() && !SettingsStore.getInstance().get().isShowLava()) {
             if (!ScanController.renderQueue.isEmpty()) {
                 ScanController.renderQueue.clear();
             }

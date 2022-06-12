@@ -29,7 +29,8 @@ import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
-import pro.mikey.fabric.xray.storage.Stores;
+import pro.mikey.fabric.xray.storage.BlockStore;
+import pro.mikey.fabric.xray.storage.SettingsStore;
 
 import java.awt.*;
 import java.util.List;
@@ -55,22 +56,22 @@ public class GuiSelectionScreen extends GuiBase {
 
         populateDefault();
 
-        this.itemList = Stores.BLOCKS.get().size() >= 1 ? Stores.BLOCKS.get().get(0).entries() : new ArrayList<>();
+        this.itemList = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0).entries() : new ArrayList<>();
         this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
 
         this.originalList = this.itemList;
     }
 
     private void populateDefault() {
-        if (Stores.BLOCKS.justCreated && Stores.BLOCKS.get().size() == 0) {
+        if (BlockStore.getInstance().justCreated && BlockStore.getInstance().get().size() == 0) {
             AtomicInteger order = new AtomicInteger();
             Random random = new Random();
 
-            Stores.BLOCKS.get().add(new BlockGroup("default", ORE_TAGS.stream().map(e ->
+            BlockStore.getInstance().get().add(new BlockGroup("default", ORE_TAGS.stream().map(e ->
                     new BlockEntry(e.getDefaultState(), e.asItem().getName().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
             );
 
-            Stores.BLOCKS.updateCache();
+            BlockStore.getInstance().updateCache();
         }
     }
 
@@ -129,14 +130,14 @@ public class GuiSelectionScreen extends GuiBase {
             }
         }));
 
-        this.addDrawableChild(this.distButtons = new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6, 120, 20, I18n.translate("xray.input.show-lava", Stores.SETTINGS.get().isShowLava()), "xray.tooltips.show_lava", button -> {
-            Stores.SETTINGS.get().setShowLava(!Stores.SETTINGS.get().isShowLava());
+        this.addDrawableChild(this.distButtons = new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6, 120, 20, I18n.translate("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()), "xray.tooltips.show_lava", button -> {
+            SettingsStore.getInstance().get().setShowLava(!SettingsStore.getInstance().get().isShowLava());
             ScanController.runTask(true);
-            button.setMessage(new TranslatableText("xray.input.show-lava", Stores.SETTINGS.get().isShowLava()));
+            button.setMessage(new TranslatableText("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()));
         }));
 
         this.addDrawableChild(this.distButtons = new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36, 120, 20, I18n.translate("xray.input.distance", StateSettings.getVisualRadius()), "xray.tooltips.distance", button -> {
-            Stores.SETTINGS.get().increaseRange();
+            SettingsStore.getInstance().get().increaseRange();
             button.setMessage(new TranslatableText("xray.input.distance", StateSettings.getVisualRadius()));
         }));
         this.addDrawableChild(new ButtonWidget(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58, 60, 20, new TranslatableText("xray.single.help"), button -> {
@@ -181,7 +182,7 @@ public class GuiSelectionScreen extends GuiBase {
         }
 
         if (mouse == 1 && this.distButtons.isMouseOver(x, y)) {
-            Stores.SETTINGS.get().decreaseRange();
+            SettingsStore.getInstance().get().decreaseRange();
 
             this.distButtons.setMessage(new TranslatableText("xray.input.distance", StateSettings.getVisualRadius()));
             this.distButtons.playDownSound(this.client.getSoundManager());
@@ -202,9 +203,9 @@ public class GuiSelectionScreen extends GuiBase {
 
     @Override
     public void close() {
-        Stores.SETTINGS.write();
-        Stores.BLOCKS.write();
-        Stores.BLOCKS.updateCache();
+        SettingsStore.getInstance().write();
+        BlockStore.getInstance().write();
+        BlockStore.getInstance().updateCache();
 
         ScanController.runTask(true);
 
@@ -239,12 +240,12 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             try {
-                int index = Stores.BLOCKS.get().get(0).entries().indexOf(entry.getBlock());
-                BlockEntry blockEntry = Stores.BLOCKS.get().get(0).entries().get(index);
+                int index = BlockStore.getInstance().get().get(0).entries().indexOf(entry.getBlock());
+                BlockEntry blockEntry = BlockStore.getInstance().get().get(0).entries().get(index);
                 blockEntry.setActive(!blockEntry.isActive());
-                Stores.BLOCKS.get().get(0).entries().set(index, blockEntry);
-                Stores.BLOCKS.write();
-                Stores.BLOCKS.updateCache();
+                BlockStore.getInstance().get().get(0).entries().set(index, blockEntry);
+                BlockStore.getInstance().write();
+                BlockStore.getInstance().updateCache();
             } catch (Exception ignored) {
             }
         }
