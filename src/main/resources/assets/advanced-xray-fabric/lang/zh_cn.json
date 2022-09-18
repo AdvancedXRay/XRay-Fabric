@@ -1,0 +1,8 @@
+{
+  "category.xray": "Advanced XRay",
+  "keybinding.enable_xray": "启用XRay",
+  "keybinding.open_gui": "打开Gui",
+
+  "message.xray_active": "XRay已启用",
+  "message.xray_deactivate": "XRay已停用"
+}
