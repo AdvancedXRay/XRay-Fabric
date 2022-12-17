@@ -2,19 +2,23 @@ package pro.mikey.fabric.xray.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static net.minecraft.util.Mth.cos;
+import static net.minecraft.util.Mth.sin;
 
 public class RenderOutlines {
     private static VertexBuffer vertexBuffer;
@@ -66,15 +70,17 @@ public class RenderOutlines {
             poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
             if (canvasLoaded == 1) { // canvas compat
-                poseStack.mulPose(new Quaternion(Vector3f.XP, camera.getXRot(), true));
-                poseStack.mulPose(new Quaternion(Vector3f.YP, camera.getYRot() + 180f, true));
+                float f = camera.getXRot() * 0.017453292F;
+                poseStack.mulPose(new Quaternionf(1.0 * sin(f/2.0f), 0.0, 0.0, cos(f/2.0f)));
+                f = (camera.getYRot() + 180f) * 0.017453292F;
+                poseStack.mulPose(new Quaternionf(0.0, 1.0 * sin(f/2.0f), 0.0, cos(f/2.0f)));
             }
 
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.applyModelViewMatrix();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
             vertexBuffer.bind();
-            vertexBuffer.drawWithShader(poseStack.last().pose(), context.projectionMatrix().copy(), RenderSystem.getShader());
+            vertexBuffer.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
             VertexBuffer.unbind();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
 

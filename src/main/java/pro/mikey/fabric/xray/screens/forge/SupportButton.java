@@ -17,8 +17,10 @@ class SupportButton extends Button {
             int height,
             Component text,
             MutableComponent support,
-            OnPress onPress) {
-        super(widthIn, heightIn, width, height, text, onPress);
+            OnPress onPress,
+            CreateNarration createNarration
+            ) {
+        super(widthIn, heightIn, width, height, text, onPress, createNarration);
 
         for (String line : support.getString().split("\n")) {
             this.support.add(Component.translatable(line));

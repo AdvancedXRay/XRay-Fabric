@@ -6,7 +6,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
@@ -27,8 +27,7 @@ public class GuiBlockList extends GuiBase {
 
     GuiBlockList() {
         super(false);
-
-        this.blocks = Registry.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.byItem(item), new ItemStack(item))).toList();
+        this.blocks = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.byItem(item), new ItemStack(item))).toList();
     }
 
     @Override
@@ -40,9 +39,10 @@ public class GuiBlockList extends GuiBase {
         this.search.changeFocus(true);
         this.setFocused(this.search);
 
-        this.addRenderableWidget(new Button(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84, 60, 20, Component.translatable("xray.single.cancel"), b -> {
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
+            assert this.getMinecraft() != null;
             this.getMinecraft().setScreen(new GuiSelectionScreen());
-        }));
+        }).pos(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84).size(60, 20).build());
     }
 
     @Override
@@ -101,6 +101,7 @@ public class GuiBlockList extends GuiBase {
                 return;
             }
 
+            assert this.minecraft.player != null;
             this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(), GuiBlockList::new));
         }
@@ -127,7 +128,7 @@ public class GuiBlockList extends GuiBase {
             public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
                 Font font = this.parent.minecraft.font;
 
-                ResourceLocation resource = Registry.BLOCK.getKey(this.block.block());
+                ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
                 font.drawShadow(stack, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
                 font.drawShadow(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 

@@ -42,17 +42,17 @@ public class GuiAddBlock extends GuiBase {
     public void init() {
         // Called when the gui should be (re)created
         boolean isDefaultState = this.selectBlock == this.selectBlock.getBlock().defaultBlockState();
-        this.addRenderableWidget(this.changeDefaultState = new Button(this.getWidth() / 2 - 100, this.getHeight() / 2 + 60, 202, 20, Component.literal(isDefaultState ? "Already scanning for all states" : "Scan for all block states"), button -> {
+        this.addRenderableWidget(this.changeDefaultState = new Button.Builder(Component.literal(isDefaultState ? "Already scanning for all states" : "Scan for all block states"), button -> {
             this.lastState = this.selectBlock;
             this.selectBlock = this.selectBlock.getBlock().defaultBlockState();
             button.active = false;
-        }));
+        }).pos(this.getWidth() / 2 - 100, this.getHeight() / 2 + 60).size(202,20).build());
 
         if (isDefaultState) {
             this.changeDefaultState.active = false;
         }
 
-        this.addRenderableWidget(this.addBtn = new Button(this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 128, 20, Component.translatable("xray.single.add"), b -> {
+        this.addRenderableWidget(this.addBtn = new Button.Builder(Component.translatable("xray.single.add"), button -> {
             this.onClose();
 
             BlockGroup group = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0) : new BlockGroup("default", new ArrayList<>(), 1, true);
@@ -67,11 +67,11 @@ public class GuiAddBlock extends GuiBase {
             BlockStore.getInstance().updateCache();
 
             this.getMinecraft().setScreen(new GuiSelectionScreen());
-        }));
-        this.addRenderableWidget(new Button(this.getWidth() / 2 + 30, this.getHeight() / 2 + 85, 72, 20, Component.translatable("xray.single.cancel"), b -> {
+        }).pos(this.getWidth() / 2 - 100, this.getHeight() / 2 + 85).size(128, 20).build());
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
             this.onClose();
             this.getMinecraft().setScreen(this.previousScreenCallback.get());
-        }));
+        }).pos(this.getWidth() / 2 + 30,this.getHeight() / 2 + 85).size(72, 20).build());
 
         this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
         this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));

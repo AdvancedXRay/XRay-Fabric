@@ -139,11 +139,11 @@ public class GuiSelectionScreen extends GuiBase {
             SettingsStore.getInstance().get().increaseRange();
             button.setMessage(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()));
         }));
-        this.addRenderableWidget(new Button(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58, 60, 20, Component.translatable("xray.single.help"), button -> {
+        this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {
             this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiHelp());
-        }));
-        this.addRenderableWidget(new Button((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58, 59, 20, Component.translatable("xray.single.close"), button -> this.onClose()));
+        }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58).size(60,20).build());
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
     }
 
     private void updateSearch() {
@@ -213,7 +213,7 @@ public class GuiSelectionScreen extends GuiBase {
 
     static final class SupportButtonInner extends SupportButton {
         SupportButtonInner(int widthIn, int heightIn, int width, int height, String text, String i18nKey, OnPress onPress) {
-            super(widthIn, heightIn, width, height, Component.literal(text), Component.translatable(i18nKey), onPress);
+            super(widthIn, heightIn, width, height, Component.literal(text), Component.translatable(i18nKey), onPress, null);
         }
     }
 

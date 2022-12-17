@@ -30,7 +30,7 @@ public class BlockSearchEntry {
             return Blocks.AIR.defaultBlockState();
         }
 
-        return NbtUtils.readBlockState(tag);
+        return NbtUtils.readBlockState(null, tag);
     }
 
     public static String blockStateToStringNBT(BlockState state) {

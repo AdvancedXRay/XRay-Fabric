@@ -29,17 +29,17 @@ public class GuiEdit extends GuiBase {
 
     @Override
     public void init() {
-        this.addRenderableWidget(this.changeDefaultState = new Button(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60, 202, 20, Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
+        this.addRenderableWidget(this.changeDefaultState = new Button.Builder( Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
             this.lastState = this.block.getState();
             this.block.setState(this.block.getState().getBlock().defaultBlockState());
             button.active = false;
-        }));
+        }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60).size(202, 20).build());
 
         if (this.block.isDefault()) {
             this.changeDefaultState.active = false;
         }
 
-        this.addRenderableWidget(new Button((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60, 120, 20, Component.translatable("xray.single.delete"), b -> {
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.delete"), b -> {
             try {
                 BlockStore.getInstance().get().get(0).entries().remove(this.block);
                 BlockStore.getInstance().write();
@@ -47,12 +47,12 @@ public class GuiEdit extends GuiBase {
             } catch (Exception e) {
             }
             this.getMinecraft().setScreen(new GuiSelectionScreen());
-        }));
+        }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 
-        this.addRenderableWidget(new Button((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58, 120, 20, Component.translatable("xray.single.cancel"), b -> {
+        this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.cancel"), b -> {
             this.getMinecraft().setScreen(new GuiSelectionScreen());
-        }));
-        this.addRenderableWidget(new Button(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83, 202, 20, Component.translatable("xray.single.save"), b -> {
+        }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58).size(120, 20).build());
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
             try {
                 int index = BlockStore.getInstance().get().get(0).entries().indexOf(this.block);
                 BlockEntry entry = BlockStore.getInstance().get().get(0).entries().get(index);
@@ -67,7 +67,7 @@ public class GuiEdit extends GuiBase {
             } // lazy catching for basic failures
 
             this.getMinecraft().setScreen(new GuiSelectionScreen());
-        }));
+        }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83).size(202, 20).build());
 
         this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
         this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));
