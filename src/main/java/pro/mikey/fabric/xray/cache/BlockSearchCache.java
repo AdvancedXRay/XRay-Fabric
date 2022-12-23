@@ -18,6 +18,10 @@ public class BlockSearchCache {
   private Set<BlockSearchEntry> cache = new HashSet<>();
 
   public void processGroupedList(List<BlockGroup> blockEntries) {
+    if (blockEntries == null || blockEntries.isEmpty()) {
+      return;
+    }
+
     // Flatten the grouped list down to a single cacheable list
     this.cache =
         blockEntries.stream()
