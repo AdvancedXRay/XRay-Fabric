@@ -108,13 +108,6 @@ public abstract class GuiBase extends Screen {
         }
 
         this.renderExtra(stack, x, y, partialTicks);
-
-        for (GuiEventListener button : this.children()) {
-            if (button instanceof SupportButton && ((SupportButton) button).isHoveredOrFocused()) {
-                this.renderComponentTooltip(stack, ((SupportButton) button).getSupport(), x, y);
-            }
-        }
-
         super.render(stack, x, y, partialTicks);
     }
 

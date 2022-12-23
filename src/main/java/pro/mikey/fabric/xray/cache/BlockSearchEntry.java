@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray.cache;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.TagParser;
@@ -30,7 +31,7 @@ public class BlockSearchEntry {
             return Blocks.AIR.defaultBlockState();
         }
 
-        return NbtUtils.readBlockState(null, tag);
+        return NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag);
     }
 
     public static String blockStateToStringNBT(BlockState state) {

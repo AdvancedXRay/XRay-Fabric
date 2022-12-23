@@ -8,6 +8,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -89,12 +90,17 @@ public class GuiSelectionScreen extends GuiBase {
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
-        // side bar buttons
-        this.addRenderableWidget(new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60, 120, 20, I18n.get("xray.input.add"), "xray.tooltips.add_block", button -> {
+        // sidebar buttons
+        this.addRenderableWidget(Button.builder( Component.translatable("xray.input.add"), button -> {
             this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiBlockList());
-        }));
-        this.addRenderableWidget(new SupportButtonInner(this.getWidth() / 2 + 79, this.getHeight() / 2 - 38, 120, 20, I18n.get("xray.input.add_hand"), "xray.tooltips.add_block_in_hand", button -> {
+        })
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block")))
+                .build());
+
+        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_hand"), button -> {
             this.minecraft.player.clientSideCloseContainer();
             ItemStack handItem = this.minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
 
@@ -105,40 +111,58 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             this.minecraft.setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock().defaultBlockState(), GuiSelectionScreen::new));
-        }));
-        this.addRenderableWidget(new SupportButtonInner(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16, 120, 20, I18n.get("xray.input.add_look"), "xray.tooltips.add_block_looking_at", button -> {
-            LocalPlayer player = this.minecraft.player;
-            if (this.minecraft.level == null || player == null) {
-                return;
-            }
+        })
+                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 38)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_in_hand")))
+                .build());
 
-            this.onClose();
-            try {
-                HitResult look = player.pick(100, 1f, false);
+        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_look"), button -> {
+                    LocalPlayer player = this.minecraft.player;
+                    if (this.minecraft.level == null || player == null) {
+                        return;
+                    }
 
-                if (look.getType() == BlockHitResult.Type.BLOCK) {
-                    BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
+                    this.onClose();
+                    try {
+                        HitResult look = player.pick(100, 1f, false);
 
-                    player.clientSideCloseContainer();
-                    this.minecraft.setScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
-                } else {
-                    player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
-                }
-            } catch (NullPointerException ex) {
-                player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
-            }
-        }));
+                        if (look.getType() == BlockHitResult.Type.BLOCK) {
+                            BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
 
-        this.addRenderableWidget(this.distButtons = new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6, 120, 20, I18n.get("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()), "xray.tooltips.show_lava", button -> {
+                            player.clientSideCloseContainer();
+                            this.minecraft.setScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
+                        } else {
+                            player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
+                        }
+                    } catch (NullPointerException ex) {
+                        player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
+                    }
+                })
+                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16)
+                .size(120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_looking_at")))
+                .build());
+
+        this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()), button -> {
             SettingsStore.getInstance().get().setShowLava(!SettingsStore.getInstance().get().isShowLava());
             ScanController.runTask(true);
             button.setMessage(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()));
-        }));
+        })
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6)
+                .size(120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.show_lava")))
+                .build());
 
-        this.addRenderableWidget(this.distButtons = new SupportButtonInner((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36, 120, 20, I18n.get("xray.input.distance", StateSettings.getVisualRadius()), "xray.tooltips.distance", button -> {
+        this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()), button -> {
             SettingsStore.getInstance().get().increaseRange();
             button.setMessage(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()));
-        }));
+        })
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36)
+                .size(120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.distance")))
+                .build());
+
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {
             this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiHelp());
@@ -209,12 +233,6 @@ public class GuiSelectionScreen extends GuiBase {
         ScanController.runTask(true);
 
         super.onClose();
-    }
-
-    static final class SupportButtonInner extends SupportButton {
-        SupportButtonInner(int widthIn, int heightIn, int width, int height, String text, String i18nKey, OnPress onPress) {
-            super(widthIn, heightIn, width, height, Component.literal(text), Component.translatable(i18nKey), onPress, null);
-        }
     }
 
     public static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
