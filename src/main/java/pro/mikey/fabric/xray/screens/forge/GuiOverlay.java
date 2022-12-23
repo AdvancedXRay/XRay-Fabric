@@ -18,12 +18,21 @@ public class GuiOverlay {
             return;
         }
 
+        boolean renderDebug = Minecraft.getInstance().options.renderDebug;
+
+        int x = 5, y = 5;
+        if (renderDebug) {
+            x = Minecraft.getInstance().getWindow().getGuiScaledWidth() - 10;
+            y = Minecraft.getInstance().getWindow().getGuiScaledHeight() - 10;
+        }
+
         RenderSystem.setShaderColor(0, 1f, 0, 1f);
         RenderSystem.setShaderTexture(0, circle);
-        Screen.blit(matrixStack, 5, 5, 0f, 0f, 5, 5, 5, 5);
+        Screen.blit(matrixStack, x, y, 0f, 0f, 5, 5, 5, 5);
 
+        int width = Minecraft.getInstance().font.width(I18n.get("xray.overlay"));
         Minecraft.getInstance()
             .font
-            .drawShadow(matrixStack, I18n.get("xray.overlay"), 15, 4, 0xffffffff);
+            .drawShadow(matrixStack, I18n.get("xray.overlay"), x + (!renderDebug ? 10 : -width - 5), y - (!renderDebug ? 1 : 2), 0xffffffff);
     }
 }
