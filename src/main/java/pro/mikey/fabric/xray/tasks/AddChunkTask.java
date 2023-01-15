@@ -69,10 +69,6 @@ public class AddChunkTask implements Runnable {
             return null;
         }
 
-        if (SettingsStore.getInstance().get().isShowLava() && state.getFluidState().getType() instanceof LavaFluid) {
-            return new BasicColor(210, 10, 10);
-        }
-
         BlockState defaultState = state.getBlock().defaultBlockState();
 
         return blocks.stream()

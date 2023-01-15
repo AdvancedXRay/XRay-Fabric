@@ -24,7 +24,7 @@ public class BlockSearchCache {
 
     // Flatten the grouped list down to a single cacheable list
     this.cache =
-        blockEntries.stream()
+        blockEntries.stream().filter(group -> group.active())
             .flatMap(
                 e ->
                     e.entries().stream()

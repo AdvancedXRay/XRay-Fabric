@@ -3,6 +3,9 @@ package pro.mikey.fabric.xray.records;
 import com.google.gson.*;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.AirBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 
@@ -25,6 +28,10 @@ public class BlockEntry {
         this.order = order;
         this.isDefault = isDefault;
         this.active = active;
+    }
+
+    public static BlockEntry getAir(){
+        return new BlockEntry(Blocks.AIR.defaultBlockState(), "air",new BasicColor(0,0,0),0,true,false);
     }
 
     public BlockState getState() {

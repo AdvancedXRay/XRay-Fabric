@@ -5,7 +5,6 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
@@ -38,63 +37,23 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-public class GuiSelectionScreen extends GuiBase {
+public class GuiBlockSelectionScreen extends GuiBase {
     private static final List<Block> ORE_TAGS = List.of(Blocks.GOLD_ORE, Blocks.IRON_ORE, Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.LAPIS_ORE, Blocks.COAL_ORE, Blocks.EMERALD_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.NETHER_GOLD_ORE, Blocks.ANCIENT_DEBRIS);
-    private static final List<Block> TAGS_STORAGE = List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.ENDER_CHEST);
-    private static final List<Block> PLAYER_TAGS_INTEREST = List.of(Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL);
-    private static final List<Block> LAVA_TAGS = List.of(Blocks.LAVA);
 
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
-    private final List<BlockGroup> originalList;
     public ItemRenderer render;
     private Button distButtons;
     private EditBox search;
     private String lastSearch = "";
-    private List<BlockGroup> itemList;
-    private ScrollingCategoryList scrollList;
+    private List<BlockEntry> itemList;
+    private BlockGroup group;
+    private ScrollingBlockList scrollList;
 
-    public GuiSelectionScreen() {
+    public GuiBlockSelectionScreen(BlockGroup group) {
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
 
-        populateDefault();
-
-        this.itemList = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get() : new ArrayList<>();
-
-        this.originalList = this.itemList;
-    }
-
-    private void populateDefault() {
-        if (BlockStore.getInstance().justCreated && BlockStore.getInstance().get().size() == 0) {
-            AtomicInteger order = new AtomicInteger();
-            Random random = new Random();
-
-
-            //Ores
-            BlockGroup ores = new BlockGroup("Ores", ORE_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
-            BlockStore.getInstance().get().add(ores);
-
-            //Storage
-            order.set(0);
-            BlockGroup storage = new BlockGroup("Storage", TAGS_STORAGE.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
-            Block echest = Blocks.ENDER_CHEST;
-            storage.entries().add(new BlockEntry(echest.defaultBlockState(), echest.asItem().getDescription().getString(), new BasicColor(200,30,200), order.getAndIncrement(), true, true));
-            BlockStore.getInstance().get().add(storage);
-
-            //Lava
-            BlockStore.getInstance().get().add(new BlockGroup("Lava", LAVA_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(210,30,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
-            );
-            //Player / Interest
-            order.set(0);
-            BlockStore.getInstance().get().add(new BlockGroup("Player / Interest", PLAYER_TAGS_INTEREST.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(30,30,210), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
-            );
-
-            BlockStore.getInstance().updateCache();
-        }
+        this.itemList = group.entries();
     }
 
     @Override
@@ -106,19 +65,64 @@ public class GuiSelectionScreen extends GuiBase {
         this.render = this.itemRenderer;
 //        this.buttons.clear();
 
-        this.scrollList = new ScrollingCategoryList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
+        this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
         this.addRenderableWidget(this.scrollList);
 
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
-        this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()), button -> {
-            SettingsStore.getInstance().get().increaseRange();
-            button.setMessage(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()));
+        // sidebar buttons
+        this.addRenderableWidget(Button.builder( Component.translatable("xray.input.add"), button -> {
+            this.minecraft.player.clientSideCloseContainer();
+            this.minecraft.setScreen(new GuiBlockList());
         })
-                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36)
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block")))
+                .build());
+
+        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_hand"), button -> {
+            this.minecraft.player.clientSideCloseContainer();
+            ItemStack handItem = this.minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
+
+            // Check if the hand item is a block or not
+            if (!(handItem.getItem() instanceof BlockItem)) {
+                this.minecraft.player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
+                return;
+            }
+
+            this.minecraft.setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock().defaultBlockState(), () -> new GuiBlockSelectionScreen(this.group)));
+        })
+                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 38)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_in_hand")))
+                .build());
+
+        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_look"), button -> {
+                    LocalPlayer player = this.minecraft.player;
+                    if (this.minecraft.level == null || player == null) {
+                        return;
+                    }
+
+                    this.onClose();
+                    try {
+                        HitResult look = player.pick(100, 1f, false);
+
+                        if (look.getType() == BlockHitResult.Type.BLOCK) {
+                            BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
+
+                            player.clientSideCloseContainer();
+                            this.minecraft.setScreen(new GuiAddBlock(state, () -> new GuiBlockSelectionScreen(this.group)));
+                        } else {
+                            player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
+                        }
+                    } catch (NullPointerException ex) {
+                        player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
+                    }
+                })
+                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16)
                 .size(120, 20)
-                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.distance")))
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_looking_at")))
                 .build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {
@@ -134,15 +138,15 @@ public class GuiSelectionScreen extends GuiBase {
         }
 
         if (this.search.getValue().equals("")) {
-            this.itemList = this.originalList;
+            this.itemList = group.entries();
             this.scrollList.updateEntries(this.itemList);
             this.lastSearch = "";
             return;
         }
 
-        this.itemList = this.originalList.stream().filter(b -> b.getName().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toCollection(ArrayList::new));
+        this.itemList = this.group.entries().stream().filter(b -> b.getName().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toCollection(ArrayList::new));
 
-        this.itemList.sort(Comparator.comparingInt(BlockGroup::getOrder));
+        this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
 
         this.scrollList.updateEntries(this.itemList);
         this.lastSearch = this.search.getValue();
@@ -160,13 +164,6 @@ public class GuiSelectionScreen extends GuiBase {
     public boolean mouseClicked(double x, double y, int mouse) {
         if (this.search.mouseClicked(x, y, mouse)) {
             this.setFocused(this.search);
-        }
-
-        if (mouse == 1 && this.distButtons.isMouseOver(x, y)) {
-            SettingsStore.getInstance().get().decreaseRange();
-
-            this.distButtons.setMessage(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()));
-            this.distButtons.playDownSound(this.minecraft.getSoundManager());
         }
 
         return super.mouseClicked(x, y, mouse);
@@ -191,40 +188,42 @@ public class GuiSelectionScreen extends GuiBase {
         super.onClose();
     }
 
-    public static class ScrollingCategoryList extends ScrollingList<ScrollingCategoryList.CategoryEntry> {
+    public static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
         static final int SLOT_HEIGHT = 35;
-        GuiSelectionScreen parent;
+        GuiBlockSelectionScreen parent;
 
-        ScrollingCategoryList(int x, int y, int width, int height, List<BlockGroup> blocks, GuiSelectionScreen parent) {
+        ScrollingBlockList(int x, int y, int width, int height, List<BlockEntry> blocks, GuiBlockSelectionScreen parent) {
             super(x, y, width, height, SLOT_HEIGHT);
             this.updateEntries(blocks);
             this.parent = parent;
         }
 
-        void setSelected(CategoryEntry entry, int mouse) {
+        void setSelected(BlockSlot entry, int mouse) {
             if (entry == null) {
                 return;
             }
 
-            if (GuiSelectionScreen.hasShiftDown()) {
+            if (GuiBlockSelectionScreen.hasShiftDown()) {
                 this.minecraft.player.clientSideCloseContainer();
-                this.minecraft.setScreen(new GuiBlockSelectionScreen(entry.getGroup()));
+                this.minecraft.setScreen(new GuiEdit(entry.block));
                 return;
             }
 
             try {
-                BlockStore.getInstance().get().stream().filter(group -> (group.getName().equals(entry.block.name()))).findFirst().ifPresent(group -> {
-                    group.setActive(!group.active());
-                });
+                BlockGroup group = BlockStore.getInstance().getByName(this.parent.group.name());
+                int index = group.entries().indexOf(entry.getBlock());
+                BlockEntry blockEntry = group.entries().get(index);
+                blockEntry.setActive(!blockEntry.isActive());
+                group.entries().set(index, blockEntry);
                 BlockStore.getInstance().write();
                 BlockStore.getInstance().updateCache();
             } catch (Exception ignored) {
             }
         }
 
-        void updateEntries(List<BlockGroup> blocks) {
+        void updateEntries(List<BlockEntry> blocks) {
             this.clearEntries();
-            blocks.forEach(group -> this.addEntry(new CategoryEntry(group, this))); // @mcp: func_230513_b_ = addEntry
+            blocks.forEach(block -> this.addEntry(new BlockSlot(block, this))); // @mcp: func_230513_b_ = addEntry
         }
 
         @Override
@@ -232,31 +231,30 @@ public class GuiSelectionScreen extends GuiBase {
             return Optional.empty();
         }
 
-        public class CategoryEntry extends AbstractSelectionList.Entry<CategoryEntry> {
-            BlockGroup block;
-            ScrollingCategoryList parent;
+        public class BlockSlot extends Entry<BlockSlot> {
+            BlockEntry block;
+            ScrollingBlockList parent;
 
-            CategoryEntry(BlockGroup block, ScrollingCategoryList parent) {
+            BlockSlot(BlockEntry block, ScrollingBlockList parent) {
                 this.block = block;
                 this.parent = parent;
             }
 
-            public BlockGroup getGroup() {
+            public BlockEntry getBlock() {
                 return this.block;
             }
 
             @Override
             public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
-                BlockGroup group = this.block;
-                BlockEntry display = group.entries().stream().findFirst().orElse(BlockEntry.getAir());
+                BlockEntry blockData = this.block;
 
                 Font font = this.parent.minecraft.font;
 
-                font.drawShadow(stack, group.getName(), left + 35, top + 7, 0xFFFFFF);
-                font.drawShadow(stack, group.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, group.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
+                font.drawShadow(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
+                font.drawShadow(stack, blockData.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
                 Lighting.setupFor3DItems();
-                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(display.getStack(), left + 10, top + 7);
+                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(blockData.getStack(), left + 10, top + 7);
                 Lighting.setupForFlatItems();
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.y0 + this.parent.height) && mouseY > this.parent.y0) {
@@ -265,10 +263,10 @@ public class GuiSelectionScreen extends GuiBase {
 
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
+                RenderSystem.setShaderTexture(0, GuiBlockSelectionScreen.CIRCLE);
                 RenderSystem.setShaderColor(0, 0, 0, .5f);
                 blit(stack, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
-                RenderSystem.setShaderColor(display.getHex().red() / 255f, display.getHex().green() / 255f, display.getHex().blue() / 255f, 1);
+                RenderSystem.setShaderColor(blockData.getHex().red() / 255f, blockData.getHex().green() / 255f, blockData.getHex().blue() / 255f, 1);
                 blit(stack, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
                 RenderSystem.disableBlend();
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
