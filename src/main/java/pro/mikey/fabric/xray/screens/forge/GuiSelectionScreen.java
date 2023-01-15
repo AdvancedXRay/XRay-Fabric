@@ -146,7 +146,6 @@ public class GuiSelectionScreen extends GuiBase {
 
         this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()), button -> {
             SettingsStore.getInstance().get().setShowLava(!SettingsStore.getInstance().get().isShowLava());
-            ScanController.runTask(true);
             button.setMessage(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()));
         })
                 .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6)
@@ -229,9 +228,7 @@ public class GuiSelectionScreen extends GuiBase {
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
         BlockStore.getInstance().updateCache();
-
-        ScanController.runTask(true);
-
+        ScanController.RebuildCache();
         super.onClose();
     }
 

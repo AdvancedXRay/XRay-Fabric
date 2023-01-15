@@ -5,58 +5,128 @@ import com.mojang.blaze3d.vertex.*;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
-import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.minecraft.util.Mth.cos;
-import static net.minecraft.util.Mth.sin;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 public class RenderOutlines {
-    private static VertexBuffer vertexBuffer;
-    public static AtomicBoolean requestedRefresh = new AtomicBoolean(false);
+    /**
+     * This queue holds the by the threadpool queued workloads for the Renderthread.
+     * To keep performancy high the renderthreads only uploads one Chunk per frame
+     */
+    private static ConcurrentLinkedQueue<WorkLoad> workQueue = new ConcurrentLinkedQueue<>();
+    /**
+     * This is the internal Vertexbuffers mapped by chunk so the removal is simple
+     */
+    private static Map<Long, VertexBuffer> chunkCache = new HashMap<Long, VertexBuffer>();
+    /**
+     * This queue holds the by the threadpool queued removal workloads for the Renderthread.
+     * To keep performancy high the renderthreads removes up to 100 per frame.
+     */
+    private static ConcurrentLinkedQueue<Long> deleteQueue = new ConcurrentLinkedQueue<>();
+    /**
+     * If this boolen is set to true it force clears all the buffers immediately
+     */
+    private static AtomicBoolean forceclear = new AtomicBoolean(false);
 
     private static int canvasLoaded = -1;
+    private static class WorkLoad{
+        public Long chunk;
+        public Collection<BlockPosWithColor> pos;
+        public WorkLoad(Long chunk,Collection<BlockPosWithColor> pos){
+            this.chunk = chunk;
+            this.pos = pos;
+        }
+    }
+
+    /**
+     * This function adds a Chunk into the queue to be rendered
+     */
+    public static void addChunk(Long chunk,Collection<BlockPosWithColor> pos){
+        workQueue.add(new WorkLoad(chunk,pos));
+    }
+
+    /**
+     * This function removes a chunk from the already rendered cache
+     */
+    public static void removeChunk(Long number){
+        deleteQueue.add(number);
+    }
+
+    /**
+     * This function can be called to initiate a clear,
+     * if force is set to true if completly whipes all Buffers and queues,
+     * if force is set to false it only removes onloaded chunks from the active rendered queue
+     */
+    public static void clearChunks(boolean force){
+        if(force){
+            forceclear.set(true);
+        }
+        else{
+            Set<Long> keys = new HashSet<>(chunkCache.keySet());
+            keys.forEach(chunkPos->{
+                if((Minecraft.getInstance().player.clientLevel.getChunkSource().getChunk(ChunkPos.getX(chunkPos),ChunkPos.getZ(chunkPos),false)==null)){
+                    deleteQueue.add(chunkPos);
+                }
+            });
+        }
+    }
 
     public static synchronized void render(WorldRenderContext context) {
         if (canvasLoaded == -1) {
             canvasLoaded = FabricLoader.getInstance().isModLoaded("canvas") ? 1 : 0;
         }
+        if(forceclear.get()){
+            workQueue.clear();
+            deleteQueue.clear();
+            chunkCache.clear();
+            forceclear.set(false);
+        }
 
-        if (ScanController.renderQueue.isEmpty() || !SettingsStore.getInstance().get().isActive()) {
+        if (!SettingsStore.getInstance().get().isActive()) {
             return;
         }
-
-        if (vertexBuffer == null || requestedRefresh.get()) {
-            requestedRefresh.set(false);
-            vertexBuffer = new VertexBuffer();
-
-            Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder buffer = tessellator.getBuilder();
-
-            buffer.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
-            ScanController.renderQueue.forEach(blockProps -> {
-                if (blockProps == null) {
-                    return;
-                }
-
-                renderBlock(buffer, blockProps, 1);
+        WorkLoad work = workQueue.poll();
+        if(work!=null){
+            BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
+            bufferBuilder.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
+            work.pos.stream().forEach(posWithColor -> {
+                renderBlock(bufferBuilder, posWithColor, 1);
             });
-
+            bufferBuilder.clear();
+            VertexBuffer vertexBuffer = new VertexBuffer();
             vertexBuffer.bind();
-            vertexBuffer.upload(buffer.end());
+            BufferBuilder.RenderedBuffer buffer = bufferBuilder.end();
+            vertexBuffer.upload(buffer);
             VertexBuffer.unbind();
+            chunkCache.put(work.chunk,vertexBuffer);
+            bufferBuilder.discard();
+        }
+        int removed = 0;
+        Long toRemove;
+        while ((toRemove = deleteQueue.poll()) != null && removed < 100) {
+            VertexBuffer vertexBuffer = chunkCache.get(toRemove);
+            if(vertexBuffer!=null){
+                vertexBuffer.close();
+            }
+            chunkCache.remove(toRemove);
+            removed++;
         }
 
-        if (vertexBuffer != null) {
+        if (chunkCache.size()>0) {
             Camera camera = context.camera();
             Vec3 cameraPos = camera.getPosition();
 
@@ -79,8 +149,10 @@ public class RenderOutlines {
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.applyModelViewMatrix();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
-            vertexBuffer.bind();
-            vertexBuffer.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
+            chunkCache.values().stream().forEach(buf -> {
+                buf.bind();
+                buf.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
+            });
             VertexBuffer.unbind();
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
 
