@@ -187,7 +187,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
 
             if (GuiBlockSelectionScreen.hasShiftDown()) {
                 this.minecraft.player.clientSideCloseContainer();
-                this.minecraft.setScreen(new GuiEdit(entry.block));
+                this.minecraft.setScreen(new GuiEdit(entry.block,this.parent.group));
                 return;
             }
 

@@ -9,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
+import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.storage.BlockStore;
 
 public class GuiEdit extends GuiBase {
@@ -18,12 +19,13 @@ public class GuiEdit extends GuiBase {
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
     private Button changeDefaultState;
+    private BlockGroup group;
     private BlockState lastState;
 
-    GuiEdit(BlockEntry block) {
+    GuiEdit(BlockEntry block, BlockGroup group) {
         super(true); // Has a sidebar
         this.setSideTitle(I18n.get("xray.single.tools"));
-
+        this.group = group;
         this.block = block;
     }
 
@@ -41,9 +43,8 @@ public class GuiEdit extends GuiBase {
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.delete"), b -> {
             try {
-                BlockStore.getInstance().get().get(0).entries().remove(this.block);
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
+                group.entries().remove(block);
+                group.save();
             } catch (Exception e) {
             }
             this.getMinecraft().setScreen(new GuiSelectionScreen());
@@ -54,15 +55,12 @@ public class GuiEdit extends GuiBase {
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58).size(120, 20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
             try {
-                int index = BlockStore.getInstance().get().get(0).entries().indexOf(this.block);
-                BlockEntry entry = BlockStore.getInstance().get().get(0).entries().get(index);
+                BlockEntry entry = block;
                 entry.setName(this.oreName.getValue());
                 entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
                 entry.setState(this.block.getState());
                 entry.setDefault(this.lastState != null);
-                BlockStore.getInstance().get().get(0).entries().set(index, entry);
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
+                this.group.save();
             } catch (Exception ignored) {
             } // lazy catching for basic failures
 

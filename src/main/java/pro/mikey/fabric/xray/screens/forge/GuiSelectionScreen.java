@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class GuiSelectionScreen extends GuiBase {
     private static final List<Block> ORE_TAGS = List.of(Blocks.GOLD_ORE, Blocks.IRON_ORE, Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.LAPIS_ORE, Blocks.COAL_ORE, Blocks.EMERALD_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.NETHER_GOLD_ORE, Blocks.ANCIENT_DEBRIS);
-    private static final List<Block> TAGS_STORAGE = List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.ENDER_CHEST);
+    private static final List<Block> TAGS_STORAGE = List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BARREL);
     private static final List<Block> PLAYER_TAGS_INTEREST = List.of(Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL,Blocks.BREWING_STAND,Blocks.BLAST_FURNACE, Blocks.FURNACE,Blocks.ENCHANTING_TABLE,Blocks.CARTOGRAPHY_TABLE,Blocks.FLETCHING_TABLE,Blocks.COMPOSTER,Blocks.LOOM,Blocks.SMOKER);
     private static final List<Block> LAVA_TAGS = List.of(Blocks.LAVA);
 
@@ -90,7 +90,7 @@ public class GuiSelectionScreen extends GuiBase {
             //Player / Interest
             order.set(0);
             BlockStore.getInstance().get().add(new BlockGroup("Player / Interest", PLAYER_TAGS_INTEREST.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(30,30,210), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(30,210,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
             );
 
             BlockStore.getInstance().updateCache();
