@@ -106,7 +106,6 @@ public abstract class GuiBase extends Screen {
                         );
             }
         }
-
         this.renderExtra(stack, x, y, partialTicks);
         super.render(stack, x, y, partialTicks);
     }

@@ -52,7 +52,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
     public GuiBlockSelectionScreen(BlockGroup group) {
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
-
+        this.group=group;
         this.itemList = group.entries();
     }
 
@@ -98,31 +98,13 @@ public class GuiBlockSelectionScreen extends GuiBase {
                 .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_in_hand")))
                 .build());
 
-        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_look"), button -> {
-                    LocalPlayer player = this.minecraft.player;
-                    if (this.minecraft.level == null || player == null) {
-                        return;
-                    }
-
-                    this.onClose();
-                    try {
-                        HitResult look = player.pick(100, 1f, false);
-
-                        if (look.getType() == BlockHitResult.Type.BLOCK) {
-                            BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
-
-                            player.clientSideCloseContainer();
-                            this.minecraft.setScreen(new GuiAddBlock(state, () -> new GuiBlockSelectionScreen(this.group)));
-                        } else {
-                            player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
-                        }
-                    } catch (NullPointerException ex) {
-                        player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
-                    }
+        this.addRenderableWidget(Button.builder( Component.translatable("xray.single.group.edit"), button -> {
+                    this.minecraft.player.clientSideCloseContainer();
+                    this.minecraft.setScreen(new GuiCategoryEdit(this.group));
                 })
-                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16)
-                .size(120, 20)
-                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_looking_at")))
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block")))
                 .build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {

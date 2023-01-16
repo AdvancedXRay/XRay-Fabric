@@ -41,7 +41,7 @@ import java.util.stream.Collectors;
 public class GuiSelectionScreen extends GuiBase {
     private static final List<Block> ORE_TAGS = List.of(Blocks.GOLD_ORE, Blocks.IRON_ORE, Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.LAPIS_ORE, Blocks.COAL_ORE, Blocks.EMERALD_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.NETHER_GOLD_ORE, Blocks.ANCIENT_DEBRIS);
     private static final List<Block> TAGS_STORAGE = List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.ENDER_CHEST);
-    private static final List<Block> PLAYER_TAGS_INTEREST = List.of(Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL);
+    private static final List<Block> PLAYER_TAGS_INTEREST = List.of(Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL,Blocks.BREWING_STAND,Blocks.BLAST_FURNACE, Blocks.FURNACE,Blocks.ENCHANTING_TABLE,Blocks.CARTOGRAPHY_TABLE,Blocks.FLETCHING_TABLE,Blocks.COMPOSTER,Blocks.LOOM,Blocks.SMOKER);
     private static final List<Block> LAVA_TAGS = List.of(Blocks.LAVA);
 
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
@@ -78,15 +78,15 @@ public class GuiSelectionScreen extends GuiBase {
             //Storage
             order.set(0);
             BlockGroup storage = new BlockGroup("Storage", TAGS_STORAGE.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(20,30,200), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
             Block echest = Blocks.ENDER_CHEST;
             storage.entries().add(new BlockEntry(echest.defaultBlockState(), echest.asItem().getDescription().getString(), new BasicColor(200,30,200), order.getAndIncrement(), true, true));
             BlockStore.getInstance().get().add(storage);
 
             //Lava
-            BlockStore.getInstance().get().add(new BlockGroup("Lava", LAVA_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(210,30,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
-            );
+            BlockGroup lava = new BlockGroup("Lava", LAVA_TAGS.stream().map(e ->
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(210,30,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false,new BasicColor(210,20,20));
+            BlockStore.getInstance().get().add(lava);
             //Player / Interest
             order.set(0);
             BlockStore.getInstance().get().add(new BlockGroup("Player / Interest", PLAYER_TAGS_INTEREST.stream().map(e ->
@@ -111,6 +111,16 @@ public class GuiSelectionScreen extends GuiBase {
 
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
+
+        this.addRenderableWidget(Button.builder( Component.translatable("xray.single.group.add"), button -> {
+                    this.minecraft.player.clientSideCloseContainer();
+                    BlockGroup group = new BlockGroup("New Group",new ArrayList<>(),10,true);
+                    this.minecraft.setScreen(new GuiCategoryEdit(group));
+                })
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
+                .size( 120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block")))
+                .build());
 
         this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()), button -> {
             SettingsStore.getInstance().get().increaseRange();
@@ -268,7 +278,7 @@ public class GuiSelectionScreen extends GuiBase {
                 RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
                 RenderSystem.setShaderColor(0, 0, 0, .5f);
                 blit(stack, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
-                RenderSystem.setShaderColor(display.getHex().red() / 255f, display.getHex().green() / 255f, display.getHex().blue() / 255f, 1);
+                RenderSystem.setShaderColor(group.getColor().red() / 255f, group.getColor().green() / 255f, group.getColor().blue() / 255f, 1);
                 blit(stack, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
                 RenderSystem.disableBlend();
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);

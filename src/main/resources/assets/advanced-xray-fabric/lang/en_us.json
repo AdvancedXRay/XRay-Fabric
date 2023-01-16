@@ -14,6 +14,8 @@
   "xray.single.close": "Close",
   "xray.single.search": "Search",
   "xray.single.help": "Help",
+  "xray.single.group.edit": "Edit Group",
+  "xray.single.group.add": "Add Group",
   "xray.overlay": "XRay Active",
   "xray.color.red": "Red: ",
   "xray.color.green": "Green: ",

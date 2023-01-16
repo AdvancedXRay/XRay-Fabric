@@ -1,5 +1,9 @@
 package pro.mikey.fabric.xray.records;
 
+import net.minecraft.world.level.block.Block;
+import pro.mikey.fabric.xray.storage.BlockStore;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -8,20 +12,52 @@ public final class BlockGroup {
     private List<BlockEntry> entries;
     private int order;
     private boolean active;
+    private BasicColor color;
 
-    public BlockGroup(
-            String name,
-            List<BlockEntry> entries,
-            int order,
-            boolean active
-    ) {
+    public BlockGroup(String name, List<BlockEntry> entries, int order, boolean active) {
         this.name = name;
         this.entries = entries;
         this.order = order;
         this.active = active;
+        this.color = new BasicColor(0,0,0);
+    }
+
+    public BlockGroup(String name, List<BlockEntry> entries, int order, boolean active, BasicColor color) {
+        this.name = name;
+        this.entries = entries;
+        this.order = order;
+        this.active = active;
+        this.color=color;
+    }
+
+    public BasicColor getColor(){
+        if(color==null){
+            color=new BasicColor(0,0,0);
+        }
+        return color;
+    }
+
+    public void setColor(BasicColor color){
+        this.color = color;
+    }
+
+    public void save(){
+        if(!BlockStore.getInstance().get().contains(this)){
+            BlockStore.getInstance().get().add(this);
+        }
+        BlockStore.getInstance().write();
+        BlockStore.getInstance().updateCache();
+    }
+
+    public BlockEntry getFirst(){
+        if(entries==null){
+            entries = new ArrayList<>();
+        }
+        return entries.stream().findFirst().orElse(BlockEntry.getAir());
     }
 
     public String name() {
+        if(name==null) return "";
         return name;
     }
 
@@ -91,7 +127,10 @@ public final class BlockGroup {
                 "name=" + name + ", " +
                 "entries=" + entries + ", " +
                 "order=" + order + ", " +
-                "active=" + active + ']';
+                "active=" + active + ", "+
+                "color="+color+
+                ']';
+
     }
 
 }
