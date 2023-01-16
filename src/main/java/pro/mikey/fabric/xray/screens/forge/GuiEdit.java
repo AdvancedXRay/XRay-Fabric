@@ -60,6 +60,7 @@ public class GuiEdit extends GuiBase {
                 entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
                 entry.setState(this.block.getState());
                 entry.setDefault(this.lastState != null);
+                if(!group.entries().contains(entry)) group.entries().add(entry);
                 this.group.save();
             } catch (Exception ignored) {
             } // lazy catching for basic failures
