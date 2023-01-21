@@ -13,6 +13,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
 import java.awt.*;
@@ -24,15 +25,17 @@ public class GuiBlockList extends GuiBase {
     private ScrollingBlockList blockList;
     private EditBox search;
     private String lastSearched = "";
+    private BlockGroup group;
 
-    GuiBlockList() {
+    GuiBlockList(BlockGroup group) {
         super(false);
+        this.group = group;
         this.blocks = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.byItem(item), new ItemStack(item))).toList();
     }
 
     @Override
     public void init() {
-        this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks);
+        this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks,group);
         this.addRenderableWidget(this.blockList);
 
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 140, 18, Component.empty());
@@ -89,9 +92,11 @@ public class GuiBlockList extends GuiBase {
 
     static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
         static final int SLOT_HEIGHT = 35;
+        private BlockGroup group;
 
-        ScrollingBlockList(int x, int y, int width, int height, List<BlockWithStack> blocks) {
+        ScrollingBlockList(int x, int y, int width, int height, List<BlockWithStack> blocks,BlockGroup group) {
             super(x, y, width, height, SLOT_HEIGHT);
+            this.group=group;
             this.updateEntries(blocks);
         }
 
@@ -103,7 +108,7 @@ public class GuiBlockList extends GuiBase {
 
             assert this.minecraft.player != null;
             this.minecraft.player.clientSideCloseContainer();
-            this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(), GuiBlockList::new));
+            this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(),group, () -> new GuiBlockList(group)));
         }
 
         void updateEntries(List<BlockWithStack> blocks) {

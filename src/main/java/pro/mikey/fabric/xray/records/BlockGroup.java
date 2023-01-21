@@ -1,6 +1,5 @@
 package pro.mikey.fabric.xray.records;
 
-import net.minecraft.world.level.block.Block;
 import pro.mikey.fabric.xray.storage.BlockStore;
 
 import java.util.ArrayList;

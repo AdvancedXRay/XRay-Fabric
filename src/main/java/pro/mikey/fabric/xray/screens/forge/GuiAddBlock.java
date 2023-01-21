@@ -7,6 +7,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
@@ -28,10 +29,12 @@ public class GuiAddBlock extends GuiBase {
     private RatioSliderWidget blueSlider;
     private Button changeDefaultState;
     private BlockState lastState;
+    private BlockGroup group;
     private boolean oreNameCleared = false;
 
-    GuiAddBlock(BlockState selectedBlock, Supplier<GuiBase> previousScreenCallback) {
+    GuiAddBlock(BlockState selectedBlock, BlockGroup group, Supplier<GuiBase> previousScreenCallback) {
         super(false);
+        this.group = group;
         this.selectBlock = selectedBlock;
         this.lastState = null;
         this.previousScreenCallback = previousScreenCallback;
@@ -54,15 +57,8 @@ public class GuiAddBlock extends GuiBase {
 
         this.addRenderableWidget(this.addBtn = new Button.Builder(Component.translatable("xray.single.add"), button -> {
             this.onClose();
-
-            BlockGroup group = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0) : new BlockGroup("default", new ArrayList<>(), 1, true);
+            group = group != null ? group : new BlockGroup("default", new ArrayList<>(), 1, true);
             group.entries().add(new BlockEntry(this.selectBlock, this.oreName.getValue(), new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)), group.entries().size() + 1, this.selectBlock == this.selectBlock.getBlock().defaultBlockState(), true));
-
-            if (BlockStore.getInstance().get().size() > 0) {
-                BlockStore.getInstance().get().set(0, group);
-            } else {
-                BlockStore.getInstance().get().add(group);
-            }
             BlockStore.getInstance().write();
             BlockStore.getInstance().updateCache();
 

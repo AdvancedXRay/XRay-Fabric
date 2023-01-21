@@ -74,7 +74,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
         // sidebar buttons
         this.addRenderableWidget(Button.builder( Component.translatable("xray.input.add"), button -> {
             this.minecraft.player.clientSideCloseContainer();
-            this.minecraft.setScreen(new GuiBlockList());
+            this.minecraft.setScreen(new GuiBlockList(group));
         })
                 .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
                 .size( 120, 20)
@@ -91,11 +91,38 @@ public class GuiBlockSelectionScreen extends GuiBase {
                 return;
             }
 
-            this.minecraft.setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock().defaultBlockState(), () -> new GuiBlockSelectionScreen(this.group)));
+            this.minecraft.setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock().defaultBlockState(),group, () -> new GuiBlockSelectionScreen(this.group)));
         })
                 .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 38)
                 .size( 120, 20)
                 .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_in_hand")))
+                .build());
+
+        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_look"), button -> {
+                    LocalPlayer player = this.minecraft.player;
+                    if (this.minecraft.level == null || player == null) {
+                        return;
+                    }
+
+                    this.onClose();
+                    try {
+                        HitResult look = player.pick(100, 1f, false);
+
+                        if (look.getType() == BlockHitResult.Type.BLOCK) {
+                            BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
+
+                            player.clientSideCloseContainer();
+                            this.minecraft.setScreen(new GuiAddBlock(state,group, () -> new GuiBlockSelectionScreen(group)));
+                        } else {
+                            player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
+                        }
+                    } catch (NullPointerException ex) {
+                        player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
+                    }
+                })
+                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16)
+                .size(120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_looking_at")))
                 .build());
 
         this.addRenderableWidget(Button.builder( Component.translatable("xray.single.group.edit"), button -> {
