@@ -47,11 +47,11 @@ public class ScanController {
      * This function rebuilds the ChunkCache completly and reloads all Chunks
      * without flashing the already rendered Chunks instantly away
      */
-    public static void RebuildCache(){
+    public static void RebuildCache(boolean force){
         class RebuildThread extends Thread{
             @Override
             public synchronized void run() {
-                RenderOutlines.clearChunks(false);
+                RenderOutlines.clearChunks(force);
                 executor.shutdownNow();
                 while(!executor.isTerminated()){
                     try {
@@ -72,6 +72,10 @@ public class ScanController {
         }
         Thread r = new RebuildThread();
         r.start();
+    }
+
+    public static void RebuildCache(){
+        RebuildCache(false);
     }
 
     /**

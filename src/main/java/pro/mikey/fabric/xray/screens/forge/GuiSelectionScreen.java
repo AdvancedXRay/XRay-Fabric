@@ -197,7 +197,7 @@ public class GuiSelectionScreen extends GuiBase {
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
         BlockStore.getInstance().updateCache();
-        ScanController.RebuildCache();
+        ScanController.RebuildCache(true);
         super.onClose();
     }
 
