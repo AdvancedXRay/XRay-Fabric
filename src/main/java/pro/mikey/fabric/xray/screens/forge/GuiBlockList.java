@@ -44,7 +44,7 @@ public class GuiBlockList extends GuiBase {
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
             assert this.getMinecraft() != null;
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84).size(60, 20).build());
     }
 

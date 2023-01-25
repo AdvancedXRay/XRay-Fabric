@@ -46,7 +46,7 @@ public class GuiEdit extends GuiBase {
                 group.save();
             } catch (Exception e) {
             }
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.cancel"), b -> {
@@ -64,7 +64,7 @@ public class GuiEdit extends GuiBase {
             } catch (Exception ignored) {
             } // lazy catching for basic failures
 
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83).size(202, 20).build());
 
         this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));

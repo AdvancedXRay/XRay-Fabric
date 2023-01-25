@@ -62,7 +62,7 @@ public class GuiAddBlock extends GuiBase {
             BlockStore.getInstance().write();
             BlockStore.getInstance().updateCache();
 
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos(this.getWidth() / 2 - 100, this.getHeight() / 2 + 85).size(128, 20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
             this.onClose();
