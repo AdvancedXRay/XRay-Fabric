@@ -138,7 +138,9 @@ public class GuiBlockSelectionScreen extends GuiBase {
             this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiHelp());
         }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58).size(60,20).build());
-        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.back"), b -> {
+            this.getMinecraft().setScreen(new GuiSelectionScreen());
+        }).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
     }
 
     private void updateSearch() {

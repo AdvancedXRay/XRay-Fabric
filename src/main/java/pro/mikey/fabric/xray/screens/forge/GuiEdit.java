@@ -10,7 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
-import pro.mikey.fabric.xray.storage.BlockStore;
 
 public class GuiEdit extends GuiBase {
     private final BlockEntry block;
@@ -51,7 +50,7 @@ public class GuiEdit extends GuiBase {
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.cancel"), b -> {
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58).size(120, 20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
             try {
