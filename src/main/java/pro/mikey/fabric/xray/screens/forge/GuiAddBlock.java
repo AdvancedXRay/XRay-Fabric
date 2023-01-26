@@ -7,7 +7,6 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
@@ -23,12 +22,9 @@ public class GuiAddBlock extends GuiBase {
     private final Supplier<GuiBase> previousScreenCallback;
     private BlockState selectBlock;
     private EditBox oreName;
-    private Button addBtn;
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
-    private Button changeDefaultState;
-    private BlockState lastState;
     private BlockGroup group;
     private boolean oreNameCleared = false;
 
@@ -36,7 +32,6 @@ public class GuiAddBlock extends GuiBase {
         super(false);
         this.group = group;
         this.selectBlock = selectedBlock;
-        this.lastState = null;
         this.previousScreenCallback = previousScreenCallback;
         this.itemStack = new ItemStack(this.selectBlock.getBlock(), 1);
     }
@@ -45,17 +40,17 @@ public class GuiAddBlock extends GuiBase {
     public void init() {
         // Called when the gui should be (re)created
         boolean isDefaultState = this.selectBlock == this.selectBlock.getBlock().defaultBlockState();
-        this.addRenderableWidget(this.changeDefaultState = new Button.Builder(Component.literal(isDefaultState ? "Already scanning for all states" : "Scan for all block states"), button -> {
-            this.lastState = this.selectBlock;
+        Button changeDefaultState;
+        this.addRenderableWidget(changeDefaultState = new Button.Builder(Component.literal(isDefaultState ? "Already scanning for all states" : "Scan for all block states"), button -> {
             this.selectBlock = this.selectBlock.getBlock().defaultBlockState();
             button.active = false;
-        }).pos(this.getWidth() / 2 - 100, this.getHeight() / 2 + 60).size(202,20).build());
+        }).pos(this.getWidth() / 2 - 100, this.getHeight() / 2 + 60).size(202, 20).build());
 
         if (isDefaultState) {
-            this.changeDefaultState.active = false;
+            changeDefaultState.active = false;
         }
 
-        this.addRenderableWidget(this.addBtn = new Button.Builder(Component.translatable("xray.single.add"), button -> {
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.add"), button -> {
             this.onClose();
             group = group != null ? group : new BlockGroup("default", new ArrayList<>(), 1, true);
             group.entries().add(new BlockEntry(this.selectBlock, this.oreName.getValue(), new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)), group.entries().size() + 1, this.selectBlock == this.selectBlock.getBlock().defaultBlockState(), true));
@@ -81,7 +76,7 @@ public class GuiAddBlock extends GuiBase {
         this.addRenderableWidget(this.redSlider);
         this.addRenderableWidget(this.greenSlider);
         this.addRenderableWidget(this.blueSlider);
-        this.addRenderableWidget(this.changeDefaultState);
+        this.addRenderableWidget(changeDefaultState);
     }
 
     @Override

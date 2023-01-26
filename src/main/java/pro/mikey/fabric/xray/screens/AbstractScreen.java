@@ -18,14 +18,11 @@ public abstract class AbstractScreen extends Screen {
         this.renderBackground(matrices);
         super.render(matrices, mouseX, mouseY, delta);
 
-        //    RenderSystem.pushMatrix();
-        //    RenderSystem.translatef(0.0F, 0.0F, 100.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         int i = (this.width - 147) / 2;
         int j = (this.height - 166) / 2;
 
         this.blit(matrices, i, j, 1, 1, 147, 166);
-        //    RenderSystem.popMatrix();
     }
 }

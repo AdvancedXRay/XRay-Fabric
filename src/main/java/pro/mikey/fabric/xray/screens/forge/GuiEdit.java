@@ -13,12 +13,11 @@ import pro.mikey.fabric.xray.records.BlockGroup;
 
 public class GuiEdit extends GuiBase {
     private final BlockEntry block;
+    private final BlockGroup group;
     private EditBox oreName;
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
-    private Button changeDefaultState;
-    private BlockGroup group;
     private BlockState lastState;
 
     GuiEdit(BlockEntry block, BlockGroup group) {
@@ -30,22 +29,20 @@ public class GuiEdit extends GuiBase {
 
     @Override
     public void init() {
-        this.addRenderableWidget(this.changeDefaultState = new Button.Builder( Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
+        Button changeDefaultState;
+        this.addRenderableWidget(changeDefaultState = new Button.Builder(Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
             this.lastState = this.block.getState();
             this.block.setState(this.block.getState().getBlock().defaultBlockState());
             button.active = false;
         }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60).size(202, 20).build());
 
         if (this.block.isDefault()) {
-            this.changeDefaultState.active = false;
+            changeDefaultState.active = false;
         }
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.delete"), b -> {
-            try {
-                group.entries().remove(block);
-                group.save();
-            } catch (Exception e) {
-            }
+            group.entries().remove(block);
+            group.save();
             this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 
@@ -53,16 +50,13 @@ public class GuiEdit extends GuiBase {
             this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58).size(120, 20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
-            try {
-                BlockEntry entry = block;
-                entry.setName(this.oreName.getValue());
-                entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
-                entry.setState(this.block.getState());
-                entry.setDefault(this.lastState != null);
-                if(!group.entries().contains(entry)) group.entries().add(entry);
-                this.group.save();
-            } catch (Exception ignored) {
-            } // lazy catching for basic failures
+            BlockEntry entry = block;
+            entry.setName(this.oreName.getValue());
+            entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
+            entry.setState(this.block.getState());
+            entry.setDefault(this.lastState != null);
+            if (!group.entries().contains(entry)) group.entries().add(entry);
+            this.group.save();
 
             this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83).size(202, 20).build());

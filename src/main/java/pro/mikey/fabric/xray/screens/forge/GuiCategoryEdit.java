@@ -29,12 +29,9 @@ public class GuiCategoryEdit extends GuiBase {
     public void init() {
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.delete"), b -> {
-            try {
-                BlockStore.getInstance().get().remove(group);
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
-            } catch (Exception e) {
-            }
+            BlockStore.getInstance().get().remove(group);
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 

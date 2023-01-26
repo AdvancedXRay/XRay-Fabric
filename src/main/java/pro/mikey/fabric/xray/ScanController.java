@@ -14,11 +14,11 @@ public class ScanController {
     static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             StateSettings.getRadius(), StateSettings.getRadius(),
             0L, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>()
+            new LinkedBlockingQueue<>()
     );
 
     /**
-     * This function sets the Threadpool up properly.
+     * This function sets the ThreadPool up properly.
      * Technically the threads set their own Priority to one anyways, so a normal Threapool would be sufficient
      */
     public static void setup(){
@@ -36,9 +36,9 @@ public class ScanController {
     }
 
     /**
-     * Just a security measure to forceclose the threadpool to make sure it doesnt linger in the background
+     * Just a security measure to force-close the ThreadPool to make sure it doesn't linger in the background
      */
-    public static void CloseGame(){
+    public static void closeGame() {
         executor.shutdownNow();
     }
 
@@ -47,13 +47,13 @@ public class ScanController {
      * This function rebuilds the ChunkCache completly and reloads all Chunks
      * without flashing the already rendered Chunks instantly away
      */
-    public static void RebuildCache(boolean force){
-        class RebuildThread extends Thread{
+    public static void reBuildCache(boolean force) {
+        class RebuildThread extends Thread {
             @Override
             public synchronized void run() {
                 RenderOutlines.clearChunks(force);
                 executor.shutdownNow();
-                while(!executor.isTerminated()){
+                while (!executor.isTerminated()) {
                     try {
                         currentThread().wait(5);
                     } catch (InterruptedException e) {
@@ -63,10 +63,10 @@ public class ScanController {
                 executor = new ThreadPoolExecutor(
                         StateSettings.getRadius(), StateSettings.getRadius(),
                         0L, TimeUnit.MILLISECONDS,
-                        new LinkedBlockingQueue<Runnable>()
+                        new LinkedBlockingQueue<>()
                 );
                 setup();
-                Runnable worker =  new ReBuildCache();
+                Runnable worker = new ReBuildCache();
                 executor.execute(worker);
             }
         }
@@ -74,16 +74,30 @@ public class ScanController {
         r.start();
     }
 
-    public static void RebuildCache(){
-        RebuildCache(false);
+    /**
+     * This function clears the Cache on a seperate Thread
+     */
+    public static void clearCache(boolean force) {
+        class ClearThread extends Thread {
+            @Override
+            public synchronized void run() {
+                RenderOutlines.clearChunks(force);
+            }
+        }
+        Thread r = new ClearThread();
+        r.start();
+    }
+
+    public static void reBuildCache() {
+        reBuildCache(false);
     }
 
     /**
      * This function updates a Chunk based on Pos
      */
-    public static void updateChunk(ChunkPos pos){
-        if(SettingsStore.getInstance().get().isActive()){
-            Runnable worker =  new UpdateChunkTask(pos);
+    public static void updateChunk(ChunkPos pos) {
+        if (SettingsStore.getInstance().get().isActive()) {
+            Runnable worker = new UpdateChunkTask(pos);
             submitTask(worker);
         }
     }

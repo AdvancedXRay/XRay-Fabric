@@ -21,7 +21,7 @@ public class BlockStore extends Store<List<BlockGroup>> {
         super("blocks");
 
         this.blockEntries = this.read();
-        this.updateCache(this.blockEntries); // ensure the cache is up to date
+        this.updateCache(this.blockEntries); // ensure the cache is up-to-date
     }
 
     public static BlockStore getInstance() {

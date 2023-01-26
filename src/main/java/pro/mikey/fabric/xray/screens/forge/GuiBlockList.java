@@ -85,9 +85,9 @@ public class GuiBlockList extends GuiBase {
     }
 
     @Override
-    public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
-        this.blockList.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
-        return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
+    public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled2, double pMouseScrolled3) {
+        this.blockList.mouseScrolled(pMouseScrolled1, pMouseScrolled2, pMouseScrolled3);
+        return super.mouseScrolled(pMouseScrolled1, pMouseScrolled2, pMouseScrolled3);
     }
 
     static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
@@ -130,7 +130,7 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean boolean5, float partialTicks) {
                 Font font = this.parent.minecraft.font;
 
                 ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
@@ -143,7 +143,7 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
+            public boolean mouseClicked(double pMouseClicked1, double pMouseClicked3, int pMouseClicked5) {
                 this.parent.setSelected(this);
                 return false;
             }

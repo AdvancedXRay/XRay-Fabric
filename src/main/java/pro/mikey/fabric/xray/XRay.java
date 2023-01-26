@@ -29,9 +29,6 @@ import pro.mikey.fabric.xray.screens.forge.GuiSelectionScreen;
 import pro.mikey.fabric.xray.storage.BlockStore;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class XRay implements ModInitializer {
 
     public static final String MOD_ID = "advanced-xray-fabric";
@@ -41,8 +38,7 @@ public class XRay implements ModInitializer {
     private final KeyMapping xrayButton = new KeyMapping("keybinding.enable_xray", GLFW.GLFW_KEY_BACKSLASH, "category.xray");
 
     private final KeyMapping guiButton = new KeyMapping("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
-
-    public static volatile Set<LevelChunk> chunks = new HashSet<>();
+    private int counter = 0;
 
     @Override
     public void onInitialize() {
@@ -50,9 +46,9 @@ public class XRay implements ModInitializer {
 
         ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);
         ClientLifecycleEvents.CLIENT_STOPPING.register(this::gameClosing);
-        ClientChunkEvents.CHUNK_LOAD.register(this::ChunkLoad);
-        ClientChunkEvents.CHUNK_UNLOAD.register(this::ChunkUnload);
-        HudRenderCallback.EVENT.register(GuiOverlay::RenderGameOverlayEvent);
+        ClientChunkEvents.CHUNK_LOAD.register(this::chunkLoad);
+        ClientChunkEvents.CHUNK_UNLOAD.register(this::chunkUnload);
+        HudRenderCallback.EVENT.register(GuiOverlay::renderGameOverlayEvent);
 
         WorldRenderEvents.LAST.register(RenderOutlines::render);
         PlayerBlockBreakEvents.AFTER.register(this::blockBroken);
@@ -65,18 +61,16 @@ public class XRay implements ModInitializer {
     /**
      * Upon unloading a chunk the chunk can be removed from the rendering
      */
-    private void ChunkUnload(ClientLevel clientLevel, LevelChunk levelChunk) {
+    private void chunkUnload(ClientLevel clientLevel, LevelChunk levelChunk) {
         if (!SettingsStore.getInstance().get().isActive()) return;
-        chunks.remove(levelChunk);
         ScanController.removeChunk(levelChunk.getPos());
     }
 
     /**
      * Upon loading a chunk the chunk needs to be queued for scanning and rendering
      */
-    private void ChunkLoad(ClientLevel clientLevel, LevelChunk levelChunk) {
+    private void chunkLoad(ClientLevel clientLevel, LevelChunk levelChunk) {
         if (!SettingsStore.getInstance().get().isActive()) return;
-        chunks.add(levelChunk);
         ScanController.updateChunk(levelChunk.getPos());
     }
 
@@ -102,7 +96,7 @@ public class XRay implements ModInitializer {
      * we go about saving throughout the rest of the mod
      */
     private void gameClosing(Minecraft client) {
-        ScanController.CloseGame();
+        ScanController.closeGame();
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
     }
@@ -114,10 +108,13 @@ public class XRay implements ModInitializer {
         if (mc.player == null || mc.level == null || mc.screen != null) {
             return;
         }
-        int counter = 0;
+        /*
+        this part only executes every 200 ticks, so every 10 seconds.
+        its making sure all unloaded Chunks are removed, because for some reason the Chunk unload event is not reliable at this
+         */
         if (counter % 200 == 0) {
-            RenderOutlines.clearChunks(false);
-            counter=0;
+            ScanController.clearCache(false);
+            counter = 0;
         }
         counter++;
 
@@ -131,10 +128,10 @@ public class XRay implements ModInitializer {
             StateSettings stateSettings = SettingsStore.getInstance().get();
             stateSettings.setActive(!stateSettings.isActive());
             if(stateSettings.isActive()){
-                ScanController.RebuildCache();
+                ScanController.reBuildCache();
             }
             else{
-                RenderOutlines.clearChunks(true);
+                ScanController.clearCache(true);
             }
 
             mc.player.displayClientMessage(Component.translatable("message.xray_" + (!stateSettings.isActive() ? "deactivate" : "active")).withStyle(stateSettings.isActive() ? ChatFormatting.GREEN : ChatFormatting.RED), true);

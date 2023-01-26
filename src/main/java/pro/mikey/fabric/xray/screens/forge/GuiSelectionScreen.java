@@ -10,19 +10,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.StateSettings;
 import pro.mikey.fabric.xray.XRay;
@@ -46,7 +38,6 @@ public class GuiSelectionScreen extends GuiBase {
 
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
     private final List<BlockGroup> originalList;
-    public ItemRenderer render;
     private Button distButtons;
     private EditBox search;
     private String lastSearch = "";
@@ -102,9 +93,6 @@ public class GuiSelectionScreen extends GuiBase {
         if (this.minecraft.player == null) {
             return;
         }
-
-        this.render = this.itemRenderer;
-//        this.buttons.clear();
 
         this.scrollList = new ScrollingCategoryList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
         this.addRenderableWidget(this.scrollList);
@@ -197,7 +185,7 @@ public class GuiSelectionScreen extends GuiBase {
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
         BlockStore.getInstance().updateCache();
-        ScanController.RebuildCache(true);
+        ScanController.reBuildCache(true);
         super.onClose();
     }
 
@@ -216,20 +204,17 @@ public class GuiSelectionScreen extends GuiBase {
                 return;
             }
 
-            if (GuiSelectionScreen.hasShiftDown()  || mouse == 1 ) {
+            if (GuiSelectionScreen.hasShiftDown() || mouse == 1) {
                 this.minecraft.player.clientSideCloseContainer();
                 this.minecraft.setScreen(new GuiBlockSelectionScreen(entry.getGroup()));
                 return;
             }
 
-            try {
-                BlockStore.getInstance().get().stream().filter(group -> (group.getName().equals(entry.block.name()))).findFirst().ifPresent(group -> {
-                    group.setActive(!group.active());
-                });
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
-            } catch (Exception ignored) {
-            }
+            BlockStore.getInstance().get().stream().filter(group -> (group.getName().equals(entry.block.name()))).findFirst().ifPresent(group -> {
+                group.setActive(!group.active());
+            });
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
         }
 
         void updateEntries(List<BlockGroup> blocks) {
@@ -242,7 +227,7 @@ public class GuiSelectionScreen extends GuiBase {
             return Optional.empty();
         }
 
-        public class CategoryEntry extends AbstractSelectionList.Entry<CategoryEntry> {
+        public static class CategoryEntry extends AbstractSelectionList.Entry<CategoryEntry> {
             BlockGroup block;
             ScrollingCategoryList parent;
 
@@ -256,7 +241,7 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean unknown, float partialTicks) {
                 BlockGroup group = this.block;
                 BlockEntry display = group.entries().stream().findFirst().orElse(BlockEntry.getAir());
 
@@ -285,7 +270,7 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouse) {
+            public boolean mouseClicked(double pMouseClicked1, double pMouseClicked3, int mouse) {
                 this.parent.setSelected(this, mouse);
                 return false;
             }

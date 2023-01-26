@@ -10,22 +10,17 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import pro.mikey.fabric.xray.ScanController;
-import pro.mikey.fabric.xray.StateSettings;
 import pro.mikey.fabric.xray.XRay;
-import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.storage.BlockStore;
@@ -34,15 +29,10 @@ import pro.mikey.fabric.xray.storage.SettingsStore;
 import java.awt.*;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class GuiBlockSelectionScreen extends GuiBase {
-    private static final List<Block> ORE_TAGS = List.of(Blocks.GOLD_ORE, Blocks.IRON_ORE, Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.LAPIS_ORE, Blocks.COAL_ORE, Blocks.EMERALD_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.NETHER_GOLD_ORE, Blocks.ANCIENT_DEBRIS);
-
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
-    public ItemRenderer render;
-    private Button distButtons;
     private EditBox search;
     private String lastSearch = "";
     private List<BlockEntry> itemList;
@@ -61,9 +51,6 @@ public class GuiBlockSelectionScreen extends GuiBase {
         if (this.minecraft.player == null) {
             return;
         }
-
-        this.render = this.itemRenderer;
-//        this.buttons.clear();
 
         this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
         this.addRenderableWidget(this.scrollList);
@@ -108,11 +95,11 @@ public class GuiBlockSelectionScreen extends GuiBase {
                     try {
                         HitResult look = player.pick(100, 1f, false);
 
-                        if (look.getType() == BlockHitResult.Type.BLOCK) {
+                        if (look.getType() == HitResult.Type.BLOCK) {
                             BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
 
                             player.clientSideCloseContainer();
-                            this.minecraft.setScreen(new GuiAddBlock(state,group, () -> new GuiBlockSelectionScreen(group)));
+                            this.minecraft.setScreen(new GuiAddBlock(state, group, () -> new GuiBlockSelectionScreen(group)));
                         } else {
                             player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
                         }
@@ -195,7 +182,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
         BlockStore.getInstance().updateCache();
-        ScanController.RebuildCache();
+        ScanController.reBuildCache();
         super.onClose();
     }
 
@@ -214,22 +201,19 @@ public class GuiBlockSelectionScreen extends GuiBase {
                 return;
             }
 
-            if (GuiBlockSelectionScreen.hasShiftDown() || mouse==1) {
+            if (GuiBlockSelectionScreen.hasShiftDown() || mouse == 1) {
                 this.minecraft.player.clientSideCloseContainer();
-                this.minecraft.setScreen(new GuiEdit(entry.block,this.parent.group));
+                this.minecraft.setScreen(new GuiEdit(entry.block, this.parent.group));
                 return;
             }
 
-            try {
-                BlockGroup group = BlockStore.getInstance().getByName(this.parent.group.name());
-                int index = group.entries().indexOf(entry.getBlock());
-                BlockEntry blockEntry = group.entries().get(index);
-                blockEntry.setActive(!blockEntry.isActive());
-                group.entries().set(index, blockEntry);
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
-            } catch (Exception ignored) {
-            }
+            BlockGroup group = BlockStore.getInstance().getByName(this.parent.group.name());
+            int index = group.entries().indexOf(entry.getBlock());
+            BlockEntry blockEntry = group.entries().get(index);
+            blockEntry.setActive(!blockEntry.isActive());
+            group.entries().set(index, blockEntry);
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
         }
 
         void updateEntries(List<BlockEntry> blocks) {
@@ -242,7 +226,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
             return Optional.empty();
         }
 
-        public class BlockSlot extends Entry<BlockSlot> {
+        public static class BlockSlot extends Entry<BlockSlot> {
             BlockEntry block;
             ScrollingBlockList parent;
 
@@ -256,7 +240,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean boolean5, float partialTicks) {
                 BlockEntry blockData = this.block;
 
                 Font font = this.parent.minecraft.font;
@@ -284,7 +268,7 @@ public class GuiBlockSelectionScreen extends GuiBase {
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouse) {
+            public boolean mouseClicked(double pMouseClicked1, double pMouseClicked3, int mouse) {
                 this.parent.setSelected(this, mouse);
                 return false;
             }
