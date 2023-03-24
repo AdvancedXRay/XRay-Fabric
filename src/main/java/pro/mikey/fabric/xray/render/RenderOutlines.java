@@ -13,6 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
+import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
@@ -201,7 +202,9 @@ public class RenderOutlines {
                 if (buf != null && distance<maxRenderDistance) {
                     buf.bind();
                     float[] color = RenderSystem.getShaderColor();
-                    RenderSystem.setShaderColor(color[0],color[1],color[2],fadeInMap.get(sortedCache.get(i)));
+                    float newAlhpa = fadeInMap.get(sortedCache.get(i));
+                    newAlhpa = newAlhpa*newAlhpa;
+                    RenderSystem.setShaderColor(color[0],color[1],color[2], newAlhpa);
                     buf.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
                     RenderSystem.setShaderColor(color[0],color[1],color[2],color[3]);
                 }
