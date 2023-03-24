@@ -23,11 +23,6 @@ public class MainScreen extends AbstractScreen {
         }
     }
 
-//  @Override
-//  public void init(MinecraftClient client, int width, int height) {
-//    super.init(client, width, height);
-//  }
-
     @Override
     public void render(PoseStack matrices, int mouseX, int mouseY, float delta) {
         super.render(matrices, mouseX, mouseY, delta);

@@ -6,88 +6,72 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
+import pro.mikey.fabric.xray.storage.BlockStore;
 
-public class GuiEdit extends GuiBase {
-    private final BlockEntry block;
+public class GuiCategoryEdit extends GuiBase {
     private final BlockGroup group;
-    private EditBox oreName;
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
-    private BlockState lastState;
+    private EditBox groupName;
 
-    GuiEdit(BlockEntry block, BlockGroup group) {
+    GuiCategoryEdit(BlockGroup block) {
         super(true); // Has a sidebar
         this.setSideTitle(I18n.get("xray.single.tools"));
-        this.group = group;
-        this.block = block;
+
+        this.group = block;
     }
 
     @Override
     public void init() {
-        Button changeDefaultState;
-        this.addRenderableWidget(changeDefaultState = new Button.Builder(Component.literal(this.block.isDefault() ? "Already scanning for all states" : "Scan for all block states"), button -> {
-            this.lastState = this.block.getState();
-            this.block.setState(this.block.getState().getBlock().defaultBlockState());
-            button.active = false;
-        }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 60).size(202, 20).build());
-
-        if (this.block.isDefault()) {
-            changeDefaultState.active = false;
-        }
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.delete"), b -> {
-            group.entries().remove(block);
-            group.save();
-            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
+            BlockStore.getInstance().get().remove(group);
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
+            this.getMinecraft().setScreen(new GuiSelectionScreen());
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 - 60).size(120, 20).build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.cancel"), b -> {
-            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
+            this.getMinecraft().setScreen(new GuiSelectionScreen());
         }).pos((this.getWidth() / 2) + 78, this.getHeight() / 2 + 58).size(120, 20).build());
-        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
-            BlockEntry entry = block;
-            entry.setName(this.oreName.getValue());
-            entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
-            entry.setState(this.block.getState());
-            entry.setDefault(this.lastState != null);
-            if (!group.entries().contains(entry)) group.entries().add(entry);
-            this.group.save();
 
-            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.save"), b -> {
+            group.setName(groupName.getValue());
+            BasicColor color = new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255));
+            group.setColor(color);
+            group.save();
+
+            this.getMinecraft().setScreen(new GuiSelectionScreen());
         }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83).size(202, 20).build());
 
         this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
         this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));
         this.addRenderableWidget(this.blueSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 4, 100, 20, Component.translatable("xray.color.blue"), 0));
 
-        this.oreName = new EditBox(this.getMinecraft().font, this.getWidth() / 2 - 138, this.getHeight() / 2 - 63, 202, 20, Component.empty());
-        this.oreName.setValue(this.block.getName());
-        this.addRenderableWidget(this.oreName);
-        this.addRenderableWidget(this.redSlider);
-        this.addRenderableWidget(this.greenSlider);
-        this.addRenderableWidget(this.blueSlider);
 
-        this.redSlider.setValue(this.block.getHex().red() / 255f);
-        this.greenSlider.setValue(this.block.getHex().green() / 255f);
-        this.blueSlider.setValue(this.block.getHex().blue() / 255f);
+        this.groupName = new EditBox(this.getMinecraft().font, this.getWidth() / 2 - 138, this.getHeight() / 2 - 63, 202, 20, Component.empty());
+        this.groupName.setValue(this.group.getName());
+        this.addRenderableWidget(this.groupName);
+        this.redSlider.setValue(this.group.getColor().red() / 255f);
+        this.greenSlider.setValue(this.group.getColor().green() / 255f);
+        this.blueSlider.setValue(this.group.getColor().blue() / 255f);
     }
 
     @Override
     public void tick() {
         super.tick();
-        this.oreName.tick();
+        this.groupName.tick();
     }
 
     @Override
     public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
-        this.getFontRender().drawShadow(stack, this.block.getName(), this.getWidth() / 2f - 138, this.getHeight() / 2f - 90, 0xffffff);
+        this.getFontRender().drawShadow(stack, this.group.getName(), this.getWidth() / 2f - 138, this.getHeight() / 2f - 90, 0xffffff);
 
-        this.oreName.render(stack, x, y, partialTicks);
+        this.groupName.render(stack, x, y, partialTicks);
 
         int color = (255 << 24) | ((int) (this.redSlider.getValue() * 255) << 16) | ((int) (this.greenSlider.getValue() * 255) << 8) | (int) (this.blueSlider.getValue() * 255);
 
@@ -95,14 +79,16 @@ public class GuiEdit extends GuiBase {
 
         this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
         Lighting.setupFor3DItems();
-        this.itemRenderer.renderAndDecorateItem(this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+        if(!this.group.getFirst().getStack().getItem().equals(BlockEntry.getAir().getStack().getItem())){
+            this.itemRenderer.renderAndDecorateItem(this.group.getFirst().getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+        }
         Lighting.setupForFlatItems();
     }
 
     @Override
     public boolean mouseClicked(double x, double y, int mouse) {
-        if (this.oreName.mouseClicked(x, y, mouse)) {
-            this.setFocused(this.oreName);
+        if (this.groupName.mouseClicked(x, y, mouse)) {
+            this.setFocused(this.groupName);
         }
 
         return super.mouseClicked(x, y, mouse);
@@ -120,6 +106,6 @@ public class GuiEdit extends GuiBase {
 
     @Override
     public String title() {
-        return I18n.get("xray.title.edit");
+        return I18n.get("xray.single.group.edit");
     }
 }

@@ -10,19 +10,11 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.StateSettings;
 import pro.mikey.fabric.xray.XRay;
@@ -40,15 +32,17 @@ import java.util.stream.Collectors;
 
 public class GuiSelectionScreen extends GuiBase {
     private static final List<Block> ORE_TAGS = List.of(Blocks.GOLD_ORE, Blocks.IRON_ORE, Blocks.DIAMOND_ORE, Blocks.REDSTONE_ORE, Blocks.LAPIS_ORE, Blocks.COAL_ORE, Blocks.EMERALD_ORE, Blocks.COPPER_ORE, Blocks.DEEPSLATE_GOLD_ORE, Blocks.DEEPSLATE_IRON_ORE, Blocks.DEEPSLATE_DIAMOND_ORE, Blocks.DEEPSLATE_REDSTONE_ORE, Blocks.DEEPSLATE_LAPIS_ORE, Blocks.DEEPSLATE_COAL_ORE, Blocks.DEEPSLATE_EMERALD_ORE, Blocks.DEEPSLATE_COPPER_ORE, Blocks.NETHER_GOLD_ORE, Blocks.ANCIENT_DEBRIS);
+    private static final List<Block> TAGS_STORAGE = List.of(Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.BARREL);
+    private static final List<Block> PLAYER_TAGS_INTEREST = List.of(Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.CHIPPED_ANVIL, Blocks.DAMAGED_ANVIL,Blocks.BREWING_STAND,Blocks.BLAST_FURNACE, Blocks.FURNACE,Blocks.ENCHANTING_TABLE,Blocks.CARTOGRAPHY_TABLE,Blocks.FLETCHING_TABLE,Blocks.COMPOSTER,Blocks.LOOM,Blocks.SMOKER);
+    private static final List<Block> LAVA_TAGS = List.of(Blocks.LAVA);
 
     private static final ResourceLocation CIRCLE = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
-    private final List<BlockEntry> originalList;
-    public ItemRenderer render;
+    private final List<BlockGroup> originalList;
     private Button distButtons;
     private EditBox search;
     private String lastSearch = "";
-    private List<BlockEntry> itemList;
-    private ScrollingBlockList scrollList;
+    private List<BlockGroup> itemList;
+    private ScrollingCategoryList scrollList;
 
     public GuiSelectionScreen() {
         super(true);
@@ -56,8 +50,7 @@ public class GuiSelectionScreen extends GuiBase {
 
         populateDefault();
 
-        this.itemList = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0).entries() : new ArrayList<>();
-        this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
+        this.itemList = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get() : new ArrayList<>();
 
         this.originalList = this.itemList;
     }
@@ -67,8 +60,28 @@ public class GuiSelectionScreen extends GuiBase {
             AtomicInteger order = new AtomicInteger();
             Random random = new Random();
 
-            BlockStore.getInstance().get().add(new BlockGroup("default", ORE_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
+
+            //Ores
+            BlockGroup ores = new BlockGroup("Ores", ORE_TAGS.stream().map(e ->
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
+            BlockStore.getInstance().get().add(ores);
+
+            //Storage
+            order.set(0);
+            BlockGroup storage = new BlockGroup("Storage", TAGS_STORAGE.stream().map(e ->
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(20,30,200), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true);
+            Block echest = Blocks.ENDER_CHEST;
+            storage.entries().add(new BlockEntry(echest.defaultBlockState(), echest.asItem().getDescription().getString(), new BasicColor(200,30,200), order.getAndIncrement(), true, true));
+            BlockStore.getInstance().get().add(storage);
+
+            //Lava
+            BlockGroup lava = new BlockGroup("Lava", LAVA_TAGS.stream().map(e ->
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(210,30,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false,new BasicColor(210,20,20));
+            BlockStore.getInstance().get().add(lava);
+            //Player / Interest
+            order.set(0);
+            BlockStore.getInstance().get().add(new BlockGroup("Player / Interest", PLAYER_TAGS_INTEREST.stream().map(e ->
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(30,210,30), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, false)
             );
 
             BlockStore.getInstance().updateCache();
@@ -81,77 +94,20 @@ public class GuiSelectionScreen extends GuiBase {
             return;
         }
 
-        this.render = this.itemRenderer;
-//        this.buttons.clear();
-
-        this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
+        this.scrollList = new ScrollingCategoryList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
         this.addRenderableWidget(this.scrollList);
 
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
-        // sidebar buttons
-        this.addRenderableWidget(Button.builder( Component.translatable("xray.input.add"), button -> {
-            this.minecraft.player.clientSideCloseContainer();
-            this.minecraft.setScreen(new GuiBlockList());
-        })
+        this.addRenderableWidget(Button.builder( Component.translatable("xray.single.group.add"), button -> {
+                    this.minecraft.player.clientSideCloseContainer();
+                    BlockGroup group = new BlockGroup("New Group",new ArrayList<>(),10,true);
+                    this.minecraft.setScreen(new GuiCategoryEdit(group));
+                })
                 .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
                 .size( 120, 20)
                 .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block")))
-                .build());
-
-        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_hand"), button -> {
-            this.minecraft.player.clientSideCloseContainer();
-            ItemStack handItem = this.minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
-
-            // Check if the hand item is a block or not
-            if (!(handItem.getItem() instanceof BlockItem)) {
-                this.minecraft.player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.invalid_hand", handItem.getHoverName().getString())), false);
-                return;
-            }
-
-            this.minecraft.setScreen(new GuiAddBlock(((BlockItem) handItem.getItem()).getBlock().defaultBlockState(), GuiSelectionScreen::new));
-        })
-                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 38)
-                .size( 120, 20)
-                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_in_hand")))
-                .build());
-
-        this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_look"), button -> {
-                    LocalPlayer player = this.minecraft.player;
-                    if (this.minecraft.level == null || player == null) {
-                        return;
-                    }
-
-                    this.onClose();
-                    try {
-                        HitResult look = player.pick(100, 1f, false);
-
-                        if (look.getType() == BlockHitResult.Type.BLOCK) {
-                            BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
-
-                            player.clientSideCloseContainer();
-                            this.minecraft.setScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
-                        } else {
-                            player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
-                        }
-                    } catch (NullPointerException ex) {
-                        player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.thats_odd")), false);
-                    }
-                })
-                .pos(this.getWidth() / 2 + 79, this.getHeight() / 2 - 16)
-                .size(120, 20)
-                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.add_block_looking_at")))
-                .build());
-
-        this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()), button -> {
-            SettingsStore.getInstance().get().setShowLava(!SettingsStore.getInstance().get().isShowLava());
-            ScanController.runTask(true);
-            button.setMessage(Component.translatable("xray.input.show-lava", SettingsStore.getInstance().get().isShowLava()));
-        })
-                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 6)
-                .size(120, 20)
-                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.show_lava")))
                 .build());
 
         this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()), button -> {
@@ -184,7 +140,7 @@ public class GuiSelectionScreen extends GuiBase {
 
         this.itemList = this.originalList.stream().filter(b -> b.getName().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toCollection(ArrayList::new));
 
-        this.itemList.sort(Comparator.comparingInt(BlockEntry::getOrder));
+        this.itemList.sort(Comparator.comparingInt(BlockGroup::getOrder));
 
         this.scrollList.updateEntries(this.itemList);
         this.lastSearch = this.search.getValue();
@@ -229,47 +185,41 @@ public class GuiSelectionScreen extends GuiBase {
         SettingsStore.getInstance().write();
         BlockStore.getInstance().write();
         BlockStore.getInstance().updateCache();
-
-        ScanController.runTask(true);
-
+        ScanController.reBuildCache(true);
         super.onClose();
     }
 
-    public static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
+    public static class ScrollingCategoryList extends ScrollingList<ScrollingCategoryList.CategoryEntry> {
         static final int SLOT_HEIGHT = 35;
         GuiSelectionScreen parent;
 
-        ScrollingBlockList(int x, int y, int width, int height, List<BlockEntry> blocks, GuiSelectionScreen parent) {
+        ScrollingCategoryList(int x, int y, int width, int height, List<BlockGroup> blocks, GuiSelectionScreen parent) {
             super(x, y, width, height, SLOT_HEIGHT);
             this.updateEntries(blocks);
             this.parent = parent;
         }
 
-        void setSelected(BlockSlot entry, int mouse) {
+        void setSelected(CategoryEntry entry, int mouse) {
             if (entry == null) {
                 return;
             }
 
-            if (GuiSelectionScreen.hasShiftDown()) {
+            if (GuiSelectionScreen.hasShiftDown() || mouse == 1) {
                 this.minecraft.player.clientSideCloseContainer();
-                this.minecraft.setScreen(new GuiEdit(entry.block));
+                this.minecraft.setScreen(new GuiBlockSelectionScreen(entry.getGroup()));
                 return;
             }
 
-            try {
-                int index = BlockStore.getInstance().get().get(0).entries().indexOf(entry.getBlock());
-                BlockEntry blockEntry = BlockStore.getInstance().get().get(0).entries().get(index);
-                blockEntry.setActive(!blockEntry.isActive());
-                BlockStore.getInstance().get().get(0).entries().set(index, blockEntry);
-                BlockStore.getInstance().write();
-                BlockStore.getInstance().updateCache();
-            } catch (Exception ignored) {
-            }
+            BlockStore.getInstance().get().stream().filter(group -> (group.getName().equals(entry.block.name()))).findFirst().ifPresent(group -> {
+                group.setActive(!group.active());
+            });
+            BlockStore.getInstance().write();
+            BlockStore.getInstance().updateCache();
         }
 
-        void updateEntries(List<BlockEntry> blocks) {
+        void updateEntries(List<BlockGroup> blocks) {
             this.clearEntries();
-            blocks.forEach(block -> this.addEntry(new BlockSlot(block, this))); // @mcp: func_230513_b_ = addEntry
+            blocks.forEach(group -> this.addEntry(new CategoryEntry(group, this))); // @mcp: func_230513_b_ = addEntry
         }
 
         @Override
@@ -277,30 +227,31 @@ public class GuiSelectionScreen extends GuiBase {
             return Optional.empty();
         }
 
-        public class BlockSlot extends AbstractSelectionList.Entry<BlockSlot> {
-            BlockEntry block;
-            ScrollingBlockList parent;
+        public static class CategoryEntry extends AbstractSelectionList.Entry<CategoryEntry> {
+            BlockGroup block;
+            ScrollingCategoryList parent;
 
-            BlockSlot(BlockEntry block, ScrollingBlockList parent) {
+            CategoryEntry(BlockGroup block, ScrollingCategoryList parent) {
                 this.block = block;
                 this.parent = parent;
             }
 
-            public BlockEntry getBlock() {
+            public BlockGroup getGroup() {
                 return this.block;
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
-                BlockEntry blockData = this.block;
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean unknown, float partialTicks) {
+                BlockGroup group = this.block;
+                BlockEntry display = group.entries().stream().findFirst().orElse(BlockEntry.getAir());
 
                 Font font = this.parent.minecraft.font;
 
-                font.drawShadow(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
-                font.drawShadow(stack, blockData.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
+                font.drawShadow(stack, group.getName(), left + 35, top + 7, 0xFFFFFF);
+                font.drawShadow(stack, group.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, group.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
                 Lighting.setupFor3DItems();
-                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(blockData.getStack(), left + 10, top + 7);
+                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(display.getStack(), left + 10, top + 7);
                 Lighting.setupForFlatItems();
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.y0 + this.parent.height) && mouseY > this.parent.y0) {
@@ -312,14 +263,14 @@ public class GuiSelectionScreen extends GuiBase {
                 RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
                 RenderSystem.setShaderColor(0, 0, 0, .5f);
                 blit(stack, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
-                RenderSystem.setShaderColor(blockData.getHex().red() / 255f, blockData.getHex().green() / 255f, blockData.getHex().blue() / 255f, 1);
+                RenderSystem.setShaderColor(group.getColor().red() / 255f, group.getColor().green() / 255f, group.getColor().blue() / 255f, 1);
                 blit(stack, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
                 RenderSystem.disableBlend();
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int mouse) {
+            public boolean mouseClicked(double pMouseClicked1, double pMouseClicked3, int mouse) {
                 this.parent.setSelected(this, mouse);
                 return false;
             }

@@ -4,7 +4,7 @@ import net.minecraft.util.Mth;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
 public class StateSettings {
-    private static final int maxStepsToScan = 5;
+    private static final int MAX_STEPS_TO_SCAN = 5;
 
     private transient boolean isActive;
     private boolean showLava;
@@ -35,7 +35,7 @@ public class StateSettings {
     }
 
     public static int getRadius() {
-        return Mth.clamp(SettingsStore.getInstance().get().range, 0, maxStepsToScan) * 3;
+        return Mth.clamp(SettingsStore.getInstance().get().range, 0, MAX_STEPS_TO_SCAN) * 3;
     }
 
     public static int getHalfRange() {
@@ -47,7 +47,7 @@ public class StateSettings {
     }
 
     public void increaseRange() {
-        if (SettingsStore.getInstance().get().range < maxStepsToScan)
+        if (SettingsStore.getInstance().get().range < MAX_STEPS_TO_SCAN)
             SettingsStore.getInstance().get().range = SettingsStore.getInstance().get().range + 1;
         else
             SettingsStore.getInstance().get().range = 0;
@@ -57,7 +57,7 @@ public class StateSettings {
         if (SettingsStore.getInstance().get().range > 0)
             SettingsStore.getInstance().get().range = SettingsStore.getInstance().get().range - 1;
         else
-            SettingsStore.getInstance().get().range = maxStepsToScan;
+            SettingsStore.getInstance().get().range = MAX_STEPS_TO_SCAN;
     }
 
     public boolean showOverlay() {

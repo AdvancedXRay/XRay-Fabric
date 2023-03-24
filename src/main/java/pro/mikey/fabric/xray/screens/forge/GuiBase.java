@@ -4,7 +4,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -29,8 +28,8 @@ public abstract class GuiBase extends Screen {
     abstract void renderExtra(PoseStack stack, int x, int y, float partialTicks);
 
     @Override
-    public boolean charTyped(char keyTyped, int __unknown) {
-        super.charTyped(keyTyped, __unknown);
+    public boolean charTyped(char keyTyped, int unknown) {
+        super.charTyped(keyTyped, unknown);
 
         if (keyTyped == 1 && this.getMinecraft().player != null) {
             this.getMinecraft().player.clientSideCloseContainer();
@@ -106,7 +105,6 @@ public abstract class GuiBase extends Screen {
                         );
             }
         }
-
         this.renderExtra(stack, x, y, partialTicks);
         super.render(stack, x, y, partialTicks);
     }
