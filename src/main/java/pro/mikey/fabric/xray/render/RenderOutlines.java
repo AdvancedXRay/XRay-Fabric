@@ -7,14 +7,12 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.RenderBuffers;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
-import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
@@ -206,6 +204,9 @@ public class RenderOutlines {
                     RenderSystem.setShaderColor(color[0],color[1],color[2],fadeInMap.get(sortedCache.get(i)));
                     buf.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
                     RenderSystem.setShaderColor(color[0],color[1],color[2],color[3]);
+                }
+                else{
+                    fadeInMap.put(sortedCache.get(i),0f);
                 }
                 //this is a semi-bubble-sort algorithm
                 //it only loops through the array once per frame
