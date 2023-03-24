@@ -107,7 +107,7 @@ public class GuiAddBlock extends GuiBase {
         this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f + 10, this.getHeight() / 2f - 35, 0xffffff);
 
         Lighting.setupFor3DItems();
-        this.itemRenderer.renderAndDecorateItem(this.itemStack, this.getWidth() / 2 + 85, this.getHeight() / 2 - 105);
+        this.itemRenderer.renderAndDecorateItem(stack, this.itemStack, this.getWidth() / 2 + 85, this.getHeight() / 2 - 105);
         Lighting.setupForFlatItems();
     }
 
