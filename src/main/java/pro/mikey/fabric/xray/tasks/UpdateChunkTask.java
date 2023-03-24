@@ -48,9 +48,9 @@ public class UpdateChunkTask implements Runnable{
         assert world != null;
         int height = world.getHeight();
         List<BlockPosWithColor> toAdd = new ArrayList<>();
-        for (int k = chunkStartX; k < chunkStartX + 16; k++) {
+        for (int m = world.getMinBuildHeight(); m < height + (1 << 4); m++) {
             for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-                for (int m = world.getMinBuildHeight(); m < height + (1 << 4); m++) {
+                for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     BlockPos pos = new BlockPos(k, m, l);
                     BasicColor validBlock = isValidBlock(pos, world, blocks);
                     if (validBlock != null) {

@@ -12,7 +12,9 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
+import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
@@ -34,6 +36,10 @@ public class RenderOutlines {
      */
     private static final Map<Long, VertexBuffer> chunkCache = new HashMap<>();
     /**
+     * This Map holds the current Alpa value per Chunk for fadeIns
+     */
+    public static Map<Long,Float> fadeInMap = new HashMap<>();
+    /**
      * This List provides the sorting for the rendering.
      * I'm not aware of a way to make this faster, as this way im avoiding unnecessarily looping through the list
      */
@@ -47,6 +53,16 @@ public class RenderOutlines {
      * If this boolen is set to true it force clears all the buffers immediately
      */
     private static final AtomicBoolean forceclear = new AtomicBoolean(false);
+
+    /**
+     * Render Distance in Chunks
+     */
+    public static int maxRenderDistance = 4;
+
+    /**
+     * Fade in time for new Chunks in seconds
+     */
+    public static float fadeInSeconds = 1;
 
     private static int canvasLoaded = -1;
 
@@ -112,6 +128,13 @@ public class RenderOutlines {
         if (!SettingsStore.getInstance().get().isActive()) {
             return;
         }
+        double increment = (1.0 / fadeInSeconds) * (Minecraft.getInstance().getDeltaFrameTime()/20);
+        fadeInMap.forEach((pos,value)->{
+            if(value<1){
+                fadeInMap.put(pos, (float) Math.min(value + increment, 1.0));
+            }
+        });
+
         WorkLoad work = workQueue.poll();
         if(work!=null){
             BufferBuilder bufferBuilder = Tesselator.getInstance().getBuilder();
@@ -128,6 +151,7 @@ public class RenderOutlines {
             chunkCache.put(work.chunk, vertexBuffer);
             sortedCache.add(0, work.chunk);
             bufferBuilder.discard();
+            fadeInMap.put(work.chunk,0f);
         }
         int removed = 0;
         Long toRemove;
@@ -168,17 +192,25 @@ public class RenderOutlines {
             int z = (int) context.camera().getPosition().z / 16;
             double distance;
             double lastDistance = Double.MAX_VALUE;
+            Matrix4f projectionMatrix = new Matrix4f(context.projectionMatrix());
+            Vector3f pos = new Vector3f((float) cameraPos.x,(float)cameraPos.y,(float)cameraPos.z);
+            Vector3f lookAt = new Vector3f(pos.x+camera.getLookVector().x,pos.y+camera.getLookVector().y,pos.z+camera.getLookVector().z);
+
+            projectionMatrix.lookAt(pos,lookAt,camera.getUpVector());
             for (int i = 0; i < sortedCache.size(); i++) {
                 VertexBuffer buf = chunkCache.get(sortedCache.get(i));
-                if (buf != null) {
+                distance = distance(sortedCache.get(i), x, z);
+                if (buf != null && distance<maxRenderDistance) {
                     buf.bind();
+                    float[] color = RenderSystem.getShaderColor();
+                    RenderSystem.setShaderColor(color[0],color[1],color[2],fadeInMap.get(sortedCache.get(i)));
                     buf.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
+                    RenderSystem.setShaderColor(color[0],color[1],color[2],color[3]);
                 }
                 //this is a semi-bubble-sort algorithm
                 //it only loops through the array once per frame
                 //this might take a couple frames to reach a sorted array but lower frame-times are more important that a perfectly sorted array
                 //why sorting at all? because the depth buffer does not seem to do its job properly with debug lines, so closer chunks should be rendered later
-                distance = distance(sortedCache.get(i), x, z);
                 if (distance > lastDistance) {
                     Long temp = sortedCache.get(i - 1);
                     sortedCache.set(i - 1, sortedCache.get(i));
@@ -198,7 +230,7 @@ public class RenderOutlines {
         int x2 = (int) l1;
         int z2 = (int) (l1 >> 32);
         //technically the sqrt is required for the distance, but it does not change the ordering so i can just skip it
-        return (x2 - x1) * (x2 - x1) + (z2 - z1) * (z2 - z1);
+        return Math.sqrt((x2 - x1) * (x2 - x1) + (z2 - z1) * (z2 - z1));
     }
 
     private static void renderBlock(BufferBuilder buffer, BlockPosWithColor blockProps, float opacity) {
