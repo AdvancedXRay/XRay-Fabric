@@ -16,7 +16,7 @@
 
 Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/AdvancedXRay/XRay-Mod/) which is typically the more up-to-date version of the mod.
 
-[![Discord invite link](.github/assets/discord-join-badge.svg)](https://discord.gg/yYNuqJxucJ)
+[![Discord invite link](.github/assets/discord-join-badge.svg)](https://discord.gg/KV7yDTfEkm)
 
 > I'm currently looking for a new developer to take on Advanced XRay for forge and fabric, if you're intrested, please reach out to me on discord at `MiKeY#2628`
 
