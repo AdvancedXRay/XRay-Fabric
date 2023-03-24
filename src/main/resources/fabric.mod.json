@@ -24,7 +24,8 @@
   ],
   "depends": {
     "fabricloader": ">=0.14.8",
-    "fabric": "*",
+    "fabric-api": "*",
     "minecraft": ">=1.19.1"
-  }
+  },
+  "accessWidener": "advanced-xray-fabric.accesswidener"
 }
