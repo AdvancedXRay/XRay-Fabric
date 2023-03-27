@@ -36,5 +36,7 @@ public class GuiOverlay {
         Minecraft.getInstance()
             .font
             .drawShadow(matrixStack, I18n.get("xray.overlay"), x + (!renderDebug ? 10 : -width - 5), y - (!renderDebug ? 1 : 2), 0xffffffff);
+
+        RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }

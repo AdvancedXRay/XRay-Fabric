@@ -251,7 +251,7 @@ public class GuiSelectionScreen extends GuiBase {
                 font.drawShadow(stack, group.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, group.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
                 Lighting.setupFor3DItems();
-                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(display.getStack(), left + 10, top + 7);
+                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(stack, display.getStack(), left + 10, top + 7);
                 Lighting.setupForFlatItems();
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.y0 + this.parent.height) && mouseY > this.parent.y0) {

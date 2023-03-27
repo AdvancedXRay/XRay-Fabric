@@ -88,7 +88,7 @@ public abstract class GuiBase extends Screen {
             );
         }
 
-        RenderSystem.enableTexture();
+//        RenderSystem.enableTexture();
         if (this.hasTitle()) {
             if (this.hasSide) {
                 this.getFontRender()

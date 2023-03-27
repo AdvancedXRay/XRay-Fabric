@@ -171,7 +171,7 @@ public class RenderOutlines {
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-            RenderSystem.disableTexture();
+//            RenderSystem.disableTexture();
 
             PoseStack poseStack = RenderSystem.getModelViewStack();
             poseStack.pushPose();

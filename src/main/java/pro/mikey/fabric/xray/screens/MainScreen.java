@@ -38,7 +38,7 @@ public class MainScreen extends AbstractScreen {
                 matrices.pushPose();
                 matrices.translate(this.width / 2f - 60, y - 5, 0);
                 matrices.scale(.8f, .8f, .8f);
-                this.itemRenderer.renderAndDecorateFakeItem(new ItemStack(Items.GOLD_BLOCK), 0, 0);
+                this.itemRenderer.renderAndDecorateFakeItem(matrices, new ItemStack(Items.GOLD_BLOCK), 0, 0);
                 matrices.popPose();
 
                 y += this.font.lineHeight + 10;

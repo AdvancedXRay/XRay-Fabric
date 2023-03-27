@@ -95,7 +95,7 @@ public class GuiEdit extends GuiBase {
 
         this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
         Lighting.setupFor3DItems();
-        this.itemRenderer.renderAndDecorateItem(this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+        this.itemRenderer.renderAndDecorateItem(stack, this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
         Lighting.setupForFlatItems();
     }
 
