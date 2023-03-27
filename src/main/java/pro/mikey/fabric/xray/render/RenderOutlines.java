@@ -56,7 +56,7 @@ public class RenderOutlines {
     /**
      * Render Distance in Chunks
      */
-    public static int maxRenderDistance = 4;
+    public static int maxRenderDistance = 32;
 
     /**
      * Fade in time for new Chunks in seconds
@@ -175,7 +175,7 @@ public class RenderOutlines {
 
             PoseStack poseStack = RenderSystem.getModelViewStack();
             poseStack.pushPose();
-            poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+            //poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
             if (canvasLoaded == 1) { // canvas compat
                 float f = camera.getXRot() * 0.017453292F;
@@ -205,7 +205,7 @@ public class RenderOutlines {
                     float newAlhpa = fadeInMap.get(sortedCache.get(i));
                     newAlhpa = newAlhpa*newAlhpa;
                     RenderSystem.setShaderColor(color[0],color[1],color[2], newAlhpa);
-                    buf.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
+                    buf.drawWithShader(poseStack.last().pose(), new Matrix4f(projectionMatrix), RenderSystem.getShader());
                     RenderSystem.setShaderColor(color[0],color[1],color[2],color[3]);
                 }
                 else{

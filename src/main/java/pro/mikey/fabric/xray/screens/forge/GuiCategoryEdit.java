@@ -80,7 +80,7 @@ public class GuiCategoryEdit extends GuiBase {
         this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
         Lighting.setupFor3DItems();
         if(!this.group.getFirst().getStack().getItem().equals(BlockEntry.getAir().getStack().getItem())){
-            this.itemRenderer.renderAndDecorateItem(this.group.getFirst().getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+            this.itemRenderer.renderAndDecorateItem(stack,this.group.getFirst().getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
         }
         Lighting.setupForFlatItems();
     }
