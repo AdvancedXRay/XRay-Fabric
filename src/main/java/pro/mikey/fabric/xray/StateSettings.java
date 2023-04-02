@@ -10,12 +10,14 @@ public class StateSettings {
     private boolean showLava;
     private int range;
     private boolean showOverlay;
+    private int threadCount;
 
     public StateSettings() {
         this.isActive = false;
         this.showLava = false;
         this.showOverlay = true;
         this.range = 3;
+        this.threadCount = 3;
     }
 
     public boolean isActive() {
@@ -36,6 +38,10 @@ public class StateSettings {
 
     public static int getRadius() {
         return Mth.clamp(SettingsStore.getInstance().get().range, 0, MAX_STEPS_TO_SCAN) * 3;
+    }
+
+    public static int getThreadCount(){
+        return SettingsStore.getInstance().get().threadCount;
     }
 
     public static int getHalfRange() {

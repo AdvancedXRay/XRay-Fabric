@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;

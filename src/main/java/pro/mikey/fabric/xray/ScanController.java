@@ -48,6 +48,7 @@ public class ScanController {
      * without flashing the already rendered Chunks instantly away
      */
     public static void reBuildCache(boolean force) {
+        RenderOutlines.maxRenderDistance = StateSettings.getRadius();
         class RebuildThread extends Thread {
             @Override
             public synchronized void run() {
@@ -61,7 +62,7 @@ public class ScanController {
                     }
                 }
                 executor = new ThreadPoolExecutor(
-                        StateSettings.getRadius(), StateSettings.getRadius(),
+                        StateSettings.getThreadCount(), StateSettings.getRadius(),
                         0L, TimeUnit.MILLISECONDS,
                         new LinkedBlockingQueue<>()
                 );

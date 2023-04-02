@@ -9,19 +9,20 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
+import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiBlockList extends GuiBase {
-    private final List<BlockWithStack> blocks;
+    private List<BlockWithStack> blocks;
     private ScrollingBlockList blockList;
     private EditBox search;
     private String lastSearched = "";
@@ -35,6 +36,14 @@ public class GuiBlockList extends GuiBase {
 
     @Override
     public void init() {
+        blocks = new ArrayList<>(blocks);
+        BuiltInRegistries.FLUID.stream().forEach(fluid -> {
+            if(fluid.isSource(fluid.defaultFluidState())){
+                BlockWithStack stack = new BlockWithStack( fluid.defaultFluidState().createLegacyBlock().getBlock(),new ItemStack(fluid.getBucket()));
+                blocks.add(stack);
+            }
+        });
+
         this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks,group);
         this.addRenderableWidget(this.blockList);
 
