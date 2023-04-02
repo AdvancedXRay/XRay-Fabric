@@ -63,11 +63,9 @@ public class RenderOutlines {
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
-//            RenderSystem.disableTexture();
 
             PoseStack poseStack = RenderSystem.getModelViewStack();
             poseStack.pushPose();
-            poseStack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
             if (canvasLoaded == 1) { // canvas compat
                 float f = camera.getXRot() * 0.017453292F;
@@ -79,6 +77,9 @@ public class RenderOutlines {
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.applyModelViewMatrix();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
+
+            context.projectionMatrix().lookAt(cameraPos.toVector3f(), cameraPos.toVector3f().add(camera.getLookVector()), camera.getUpVector());
+
             vertexBuffer.bind();
             vertexBuffer.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
             VertexBuffer.unbind();

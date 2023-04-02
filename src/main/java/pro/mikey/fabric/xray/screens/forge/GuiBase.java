@@ -14,8 +14,6 @@ import pro.mikey.fabric.xray.XRay;
 public abstract class GuiBase extends Screen {
     static final ResourceLocation BG_LARGE = new ResourceLocation(XRay.PREFIX_GUI + "bg-help.png");
     private static final ResourceLocation BG_NORMAL = new ResourceLocation(XRay.PREFIX_GUI + "bg.png");
-    private static final MutableComponent NON_FINAL_WARNING =
-            Component.literal("This Gui is NOT final, changes to come soon");
     private final boolean hasSide;
     private String sideTitle = "";
     private int backgroundWidth = 229;
@@ -42,14 +40,6 @@ public abstract class GuiBase extends Screen {
     @Override
     public void render(PoseStack stack, int x, int y, float partialTicks) {
         this.renderBackground(stack);
-
-        this.font.drawShadow(
-                stack,
-                NON_FINAL_WARNING,
-                this.width / 2f - this.font.width(NON_FINAL_WARNING) / 2f,
-                this.height / 2f - 128,
-                0xFFaf00
-        );
 
         int width = this.width;
         int height = this.height;
