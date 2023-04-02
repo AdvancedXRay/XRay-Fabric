@@ -196,7 +196,6 @@ public class RenderOutlines {
             Vector3f lookAt = new Vector3f(pos.x+camera.getLookVector().x,pos.y+camera.getLookVector().y,pos.z+camera.getLookVector().z);
 
             projectionMatrix.lookAt(pos,lookAt,camera.getUpVector());
-            XRay.LOGGER.info("chunkX "+x + " chunkz "+z);
             for (int i = 0; i < sortedCache.size(); i++) {
                 VertexBuffer buf = chunkCache.get(sortedCache.get(i));
                 distance = distance(sortedCache.get(i), x, z);
