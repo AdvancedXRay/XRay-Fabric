@@ -61,8 +61,9 @@ public class ScanController {
                         e.printStackTrace();
                     }
                 }
+                int threadCount = Math.max(1,StateSettings.getThreadCount());
                 executor = new ThreadPoolExecutor(
-                        StateSettings.getThreadCount(), StateSettings.getRadius(),
+                        threadCount, threadCount,
                         0L, TimeUnit.MILLISECONDS,
                         new LinkedBlockingQueue<>()
                 );

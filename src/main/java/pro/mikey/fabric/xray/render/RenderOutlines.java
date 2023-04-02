@@ -187,8 +187,8 @@ public class RenderOutlines {
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.applyModelViewMatrix();
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
-            int x = (int) context.camera().getPosition().x / 16;
-            int z = (int) context.camera().getPosition().z / 16;
+            int x = Math.floorDiv((int)context.camera().getPosition().x, 16);
+            int z = Math.floorDiv((int)context.camera().getPosition().z, 16);
             double distance;
             double lastDistance = Double.MAX_VALUE;
             Matrix4f projectionMatrix = new Matrix4f(context.projectionMatrix());
@@ -196,10 +196,11 @@ public class RenderOutlines {
             Vector3f lookAt = new Vector3f(pos.x+camera.getLookVector().x,pos.y+camera.getLookVector().y,pos.z+camera.getLookVector().z);
 
             projectionMatrix.lookAt(pos,lookAt,camera.getUpVector());
+            XRay.LOGGER.info("chunkX "+x + " chunkz "+z);
             for (int i = 0; i < sortedCache.size(); i++) {
                 VertexBuffer buf = chunkCache.get(sortedCache.get(i));
                 distance = distance(sortedCache.get(i), x, z);
-                if (buf != null && distance<maxRenderDistance) {
+                if (buf != null && distance<=maxRenderDistance) {
                     buf.bind();
                     float[] color = RenderSystem.getShaderColor();
                     float newAlhpa = fadeInMap.get(sortedCache.get(i));
@@ -233,7 +234,6 @@ public class RenderOutlines {
     private static double distance(long l1, int x1, int z1) {
         int x2 = (int) l1;
         int z2 = (int) (l1 >> 32);
-        //technically the sqrt is required for the distance, but it does not change the ordering so i can just skip it
         return Math.sqrt((x2 - x1) * (x2 - x1) + (z2 - z1) * (z2 - z1));
     }
 
