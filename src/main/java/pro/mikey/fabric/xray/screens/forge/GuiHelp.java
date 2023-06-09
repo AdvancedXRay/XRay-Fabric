@@ -1,6 +1,6 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -37,13 +37,12 @@ public class GuiHelp extends GuiBase {
     }
 
     @Override
-    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
-        float lineY = (this.getHeight() / 2f) - 85;
+    public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        int lineY = (this.getHeight() / 2) - 85;
         for (LinedText linedText : this.areas) {
             for (String line : linedText.getLines()) {
                 lineY += 12;
-                this.getFontRender()
-                        .drawShadow(stack, line, (this.getWidth() / 2f) - 176, lineY, Color.WHITE.getRGB());
+                guiGraphics.drawString(this.font, line, (this.getWidth() / 2) - 176, lineY, Color.WHITE.getRGB());
             }
             lineY += 10;
         }

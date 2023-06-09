@@ -2,6 +2,7 @@ package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import org.lwjgl.opengl.GL11;
@@ -27,7 +28,7 @@ public class ScrollingList<E extends AbstractSelectionList.Entry<E>> extends Abs
     }
 
     @Override
-    public void render(PoseStack stack, int mouseX, int mouseY, float partialTicks) {
+    public void render(GuiGraphics stack, int mouseX, int mouseY, float partialTicks) {
         double scale = this.minecraft.getWindow().getGuiScale();
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);

@@ -1,7 +1,8 @@
 package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
@@ -92,19 +93,20 @@ public class GuiEdit extends GuiBase {
     }
 
     @Override
-    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
-        this.getFontRender().drawShadow(stack, this.block.getName(), this.getWidth() / 2f - 138, this.getHeight() / 2f - 90, 0xffffff);
+    public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        guiGraphics.drawString(this.font, this.block.getName(), this.getWidth() / 2 - 138, this.getHeight() / 2 - 90, 0xffffff);
 
-        this.oreName.render(stack, x, y, partialTicks);
+        this.oreName.render(guiGraphics, x, y, partialTicks);
 
         int color = (255 << 24) | ((int) (this.redSlider.getValue() * 255) << 16) | ((int) (this.greenSlider.getValue() * 255) << 8) | (int) (this.blueSlider.getValue() * 255);
 
-        fill(stack, this.getWidth() / 2 - 35, this.getHeight() / 2 - 40, (this.getWidth() / 2 - 35) + 100, (this.getHeight() / 2 - 40) + 64, color);
+        guiGraphics.fill(this.getWidth() / 2 - 35, this.getHeight() / 2 - 40, (this.getWidth() / 2 - 35) + 100, (this.getHeight() / 2 - 40) + 64, color);
 
-        this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f - 30, this.getHeight() / 2f - 35, 0xffffff);
-        Lighting.setupFor3DItems();
-        this.itemRenderer.renderAndDecorateItem(stack, this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
-        Lighting.setupForFlatItems();
+        guiGraphics.drawString(this.font, "Color", this.getWidth() / 2 - 30, this.getHeight() / 2 - 35, 0xffffff);
+//        Lighting.setupFor3DItems();
+        // TODO: Check
+        guiGraphics.renderItem(this.block.getStack(), this.getWidth() / 2 + 50, this.getHeight() / 2 - 105);
+//        Lighting.setupForFlatItems();
     }
 
     @Override

@@ -1,7 +1,7 @@
 package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.resources.language.I18n;
@@ -95,20 +95,20 @@ public class GuiAddBlock extends GuiBase {
     }
 
     @Override
-    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
+    public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
         int color = (255 << 24) | ((int) (this.redSlider.getValue() * 255) << 16) | ((int) (this.greenSlider.getValue() * 255) << 8) | (int) (this.blueSlider.getValue() * 255);
 
-        fill(stack, this.getWidth() / 2 + 2, this.getHeight() / 2 - 40, (this.getWidth() / 2 + 2) + 100, (this.getHeight() / 2 - 40) + 64, color);
+        guiGraphics.fill(this.getWidth() / 2 + 2, this.getHeight() / 2 - 40, (this.getWidth() / 2 + 2) + 100, (this.getHeight() / 2 - 40) + 64, color);
 
-        this.getFontRender().drawShadow(stack, this.selectBlock.getBlock().getName().getString(), this.getWidth() / 2f - 100, this.getHeight() / 2f - 90, 0xffffff);
+        guiGraphics.drawString(this.font, this.selectBlock.getBlock().getName().getString(), this.getWidth() / 2 - 100, this.getHeight() / 2 - 90, 0xffffff);
 
-        this.oreName.render(stack, x, y, partialTicks);
+        this.oreName.render(guiGraphics, x, y, partialTicks);
 
-        this.getFontRender().drawShadow(stack, "Color", this.getWidth() / 2f + 10, this.getHeight() / 2f - 35, 0xffffff);
+        guiGraphics.drawString(this.font, "Color", this.getWidth() / 2 + 10, this.getHeight() / 2 - 35, 0xffffff);
 
-        Lighting.setupFor3DItems();
-        this.itemRenderer.renderAndDecorateItem(stack, this.itemStack, this.getWidth() / 2 + 85, this.getHeight() / 2 - 105);
-        Lighting.setupForFlatItems();
+//        Lighting.setupFor3DItems();
+        guiGraphics.renderItem(this.itemStack, this.getWidth() / 2 + 85, this.getHeight() / 2 - 105);
+//        Lighting.setupForFlatItems();
     }
 
     @Override

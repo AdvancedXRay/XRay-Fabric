@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray.screens.forge;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -67,9 +68,9 @@ public class GuiBlockList extends GuiBase {
     }
 
     @Override
-    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
-        this.search.render(stack, x, y, partialTicks);
-        this.blockList.render(stack, x, y, partialTicks);
+    public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        this.search.render(guiGraphics, x, y, partialTicks);
+        this.blockList.render(guiGraphics, x, y, partialTicks);
     }
 
     @Override
@@ -125,16 +126,18 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(GuiGraphics graphics, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
                 Font font = this.parent.minecraft.font;
 
                 ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
-                font.drawShadow(stack, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
-                font.drawShadow(stack, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
+                graphics.drawString(font, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
+                graphics.drawString(font, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
-                Lighting.setupFor3DItems();
-                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(stack, this.block.stack(), left + 10, top + 7);
-                Lighting.setupForFlatItems();
+                // TODO: CHECK
+//                Lighting.setupFor3DItems();
+                graphics.renderItem(this.block.stack(), left + 10, top + 7);
+//                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(stack, this.block.stack(), left + 10, top + 7);
+//                Lighting.setupForFlatItems();
             }
 
             @Override

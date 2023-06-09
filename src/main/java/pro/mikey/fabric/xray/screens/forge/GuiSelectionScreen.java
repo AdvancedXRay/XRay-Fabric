@@ -4,7 +4,9 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
@@ -81,7 +83,7 @@ public class GuiSelectionScreen extends GuiBase {
             return;
         }
 
-        this.render = this.itemRenderer;
+        this.render = Minecraft.getInstance().getItemRenderer();
 //        this.buttons.clear();
 
         this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
@@ -215,12 +217,12 @@ public class GuiSelectionScreen extends GuiBase {
     }
 
     @Override
-    public void renderExtra(PoseStack stack, int x, int y, float partialTicks) {
-        this.search.render(stack, x, y, partialTicks);
-        this.scrollList.render(stack, x, y, partialTicks);
+    public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        this.search.render(guiGraphics, x, y, partialTicks);
+        this.scrollList.render(guiGraphics, x, y, partialTicks);
 
         if (!this.search.isFocused() && this.search.getValue().equals("")) {
-            this.minecraft.font.drawShadow(stack, I18n.get("xray.single.search"), (float) this.getWidth() / 2 - 130, (float) this.getHeight() / 2 - 101, Color.GRAY.getRGB());
+            guiGraphics.drawString(this.font, I18n.get("xray.single.search"), this.getWidth() / 2 - 130, this.getHeight() / 2 - 101, Color.GRAY.getRGB());
         }
     }
 
@@ -291,29 +293,29 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(GuiGraphics guiGraphics, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
                 BlockEntry blockData = this.block;
 
                 Font font = this.parent.minecraft.font;
 
-                font.drawShadow(stack, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
-                font.drawShadow(stack, blockData.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
+                guiGraphics.drawString(font, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
+                guiGraphics.drawString(font, blockData.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
-                Lighting.setupFor3DItems();
-                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(stack, blockData.getStack(), left + 10, top + 7);
-                Lighting.setupForFlatItems();
+//                Lighting.setupFor3DItems();
+                guiGraphics.renderItem(blockData.getStack(), left + 10, top + 7);
+//                Lighting.setupForFlatItems();
 
                 if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.y0 + this.parent.height) && mouseY > this.parent.y0) {
-                    this.parent.parent.renderTooltip(stack, Arrays.asList(Component.translatable("xray.tooltips.edit1").getVisualOrderText(), Component.translatable("xray.tooltips.edit2").getVisualOrderText()), left + 15, (entryIdx == this.parent.children().size() - 1 && entryIdx != 0 ? (top - (entryHeight - 20)) : (top + (entryHeight + 15))));
+                    guiGraphics.renderTooltip(font, Arrays.asList(Component.translatable("xray.tooltips.edit1").getVisualOrderText(), Component.translatable("xray.tooltips.edit2").getVisualOrderText()), left + 15, (entryIdx == this.parent.children().size() - 1 && entryIdx != 0 ? (top - (entryHeight - 20)) : (top + (entryHeight + 15))));
                 }
 
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
+//                RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
                 RenderSystem.setShaderColor(0, 0, 0, .5f);
-                blit(stack, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
+                guiGraphics.blit(GuiSelectionScreen.CIRCLE, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
                 RenderSystem.setShaderColor(blockData.getHex().red() / 255f, blockData.getHex().green() / 255f, blockData.getHex().blue() / 255f, 1);
-                blit(stack, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
+                guiGraphics.blit(GuiSelectionScreen.CIRCLE, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
                 RenderSystem.disableBlend();
                 RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
             }

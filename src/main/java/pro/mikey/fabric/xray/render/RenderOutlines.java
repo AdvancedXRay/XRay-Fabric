@@ -37,7 +37,7 @@ public class RenderOutlines {
 
         if (vertexBuffer == null || requestedRefresh.get()) {
             requestedRefresh.set(false);
-            vertexBuffer = new VertexBuffer();
+            vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
 
             Tesselator tessellator = Tesselator.getInstance();
             BufferBuilder buffer = tessellator.getBuilder();
