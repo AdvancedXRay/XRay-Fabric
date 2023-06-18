@@ -23,9 +23,9 @@
     "advanced-xray-fabric.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.14.8",
+    "fabricloader": ">=${fabricloader}",
     "fabric-api": "*",
-    "minecraft": ">=1.19.1"
+    "minecraft": ">=${mc_version}"
   },
   "accessWidener": "advanced-xray-fabric.accesswidener"
 }

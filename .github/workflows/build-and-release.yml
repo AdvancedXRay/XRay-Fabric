@@ -31,10 +31,9 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew curseforge --stacktrace --no-daemon
-
-      - uses: "marvinpinto/action-automatic-releases@latest"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          prerelease: false
-          files: |
-            build/libs/*.jar
+      - name: Release to github through GH CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          gh release create ${{ github.ref }} -t ${{ github.ref }} -F CHANGELOG.md ./build/libs/*.jar
