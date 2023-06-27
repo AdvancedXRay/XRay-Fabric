@@ -15,6 +15,7 @@
   "xray.single.search": "Search",
   "xray.single.help": "Help",
   "xray.overlay": "XRay Active",
+  "xray.color.alpha": "Alpha: ",
   "xray.color.red": "Red: ",
   "xray.color.green": "Green: ",
   "xray.color.blue": "Blue: ",
