@@ -26,6 +26,7 @@ public class GuiAddBlock extends GuiBase {
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
+    private RatioSliderWidget alphaSlider;
     private Button changeDefaultState;
     private BlockState lastState;
     private boolean oreNameCleared = false;
@@ -73,10 +74,10 @@ public class GuiAddBlock extends GuiBase {
             this.getMinecraft().setScreen(this.previousScreenCallback.get());
         }).pos(this.getWidth() / 2 + 30,this.getHeight() / 2 + 85).size(72, 20).build());
 
-        this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
+        this.addRenderableWidget(this.redSlider   = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"),   0));
         this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));
-
-        this.addRenderableWidget(this.blueSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 + 4, 100, 20, Component.translatable("xray.color.blue"), 0));
+        this.addRenderableWidget(this.blueSlider  = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 + 4,  100, 20, Component.translatable("xray.color.blue"),  0));
+        this.addRenderableWidget(this.alphaSlider = new RatioSliderWidget(this.getWidth() / 2 - 100, this.getHeight() / 2 + 26, 100, 20, Component.translatable("xray.color.alpha"), 1));
 
         this.oreName = new EditBox(this.getMinecraft().font, this.getWidth() / 2 - 100, this.getHeight() / 2 - 70, 202, 20, Component.empty());
 
@@ -85,6 +86,7 @@ public class GuiAddBlock extends GuiBase {
         this.addRenderableWidget(this.redSlider);
         this.addRenderableWidget(this.greenSlider);
         this.addRenderableWidget(this.blueSlider);
+        this.addRenderableWidget(this.alphaSlider);
         this.addRenderableWidget(this.changeDefaultState);
     }
 

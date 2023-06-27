@@ -18,6 +18,7 @@ public class GuiEdit extends GuiBase {
     private RatioSliderWidget redSlider;
     private RatioSliderWidget greenSlider;
     private RatioSliderWidget blueSlider;
+    private RatioSliderWidget alphaSlider;
     private Button changeDefaultState;
     private BlockState lastState;
 
@@ -70,9 +71,10 @@ public class GuiEdit extends GuiBase {
             this.getMinecraft().setScreen(new GuiSelectionScreen());
         }).pos(this.getWidth() / 2 - 138, this.getHeight() / 2 + 83).size(202, 20).build());
 
-        this.addRenderableWidget(this.redSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"), 0));
+        this.addRenderableWidget(this.redSlider   = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 40, 100, 20, Component.translatable("xray.color.red"),   0));
         this.addRenderableWidget(this.greenSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 - 18, 100, 20, Component.translatable("xray.color.green"), 0));
-        this.addRenderableWidget(this.blueSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 4, 100, 20, Component.translatable("xray.color.blue"), 0));
+        this.addRenderableWidget(this.blueSlider  = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 4,  100, 20, Component.translatable("xray.color.blue"),  0));
+        this.addRenderableWidget(this.alphaSlider = new RatioSliderWidget(this.getWidth() / 2 - 138, this.getHeight() / 2 + 26, 100, 20, Component.translatable("xray.color.alpha"), 1));
 
         this.oreName = new EditBox(this.getMinecraft().font, this.getWidth() / 2 - 138, this.getHeight() / 2 - 63, 202, 20, Component.empty());
         this.oreName.setValue(this.block.getName());
@@ -80,10 +82,12 @@ public class GuiEdit extends GuiBase {
         this.addRenderableWidget(this.redSlider);
         this.addRenderableWidget(this.greenSlider);
         this.addRenderableWidget(this.blueSlider);
+        this.addRenderableWidget(this.alphaSlider);
 
         this.redSlider.setValue(this.block.getHex().red() / 255f);
         this.greenSlider.setValue(this.block.getHex().green() / 255f);
         this.blueSlider.setValue(this.block.getHex().blue() / 255f);
+        this.alphaSlider.setValue(this.block.getHex().alpha() / 255f);
     }
 
     @Override
