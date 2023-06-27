@@ -70,7 +70,12 @@ public class GuiSelectionScreen extends GuiBase {
             Random random = new Random();
 
             BlockStore.getInstance().get().add(new BlockGroup("default", ORE_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(
+                            random.nextInt(255),
+                            random.nextInt(255),
+                            random.nextInt(255),
+                            255 // default is always fully opaque
+                    ), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
             );
 
             BlockStore.getInstance().updateCache();
