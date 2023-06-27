@@ -57,7 +57,12 @@ public class GuiAddBlock extends GuiBase {
             this.onClose();
 
             BlockGroup group = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0) : new BlockGroup("default", new ArrayList<>(), 1, true);
-            group.entries().add(new BlockEntry(this.selectBlock, this.oreName.getValue(), new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)), group.entries().size() + 1, this.selectBlock == this.selectBlock.getBlock().defaultBlockState(), true));
+            group.entries().add(new BlockEntry(this.selectBlock, this.oreName.getValue(), new BasicColor(
+                    (int) (this.redSlider.getValue() * 255),
+                    (int) (this.greenSlider.getValue() * 255),
+                    (int) (this.blueSlider.getValue() * 255),
+                    (int) (this.alphaSlider.getValue() * 255)
+            ), group.entries().size() + 1, this.selectBlock == this.selectBlock.getBlock().defaultBlockState(), true));
 
             if (BlockStore.getInstance().get().size() > 0) {
                 BlockStore.getInstance().get().set(0, group);
@@ -98,7 +103,12 @@ public class GuiAddBlock extends GuiBase {
 
     @Override
     public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        int color = (255 << 24) | ((int) (this.redSlider.getValue() * 255) << 16) | ((int) (this.greenSlider.getValue() * 255) << 8) | (int) (this.blueSlider.getValue() * 255);
+        final int depth = 255;
+        final int alpha = (int) (this.alphaSlider.getValue() * depth);
+        final int red   = (int) (this.redSlider.getValue()   * depth);
+        final int green = (int) (this.greenSlider.getValue() * depth);
+        final int blue  = (int) (this.blueSlider.getValue()  * depth);
+        final int color = alpha << 24 | red << 16 | green << 8 | blue;
 
         guiGraphics.fill(this.getWidth() / 2 + 2, this.getHeight() / 2 - 40, (this.getWidth() / 2 + 2) + 100, (this.getHeight() / 2 - 40) + 64, color);
 

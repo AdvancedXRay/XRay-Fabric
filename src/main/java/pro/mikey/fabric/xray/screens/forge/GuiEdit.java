@@ -59,7 +59,12 @@ public class GuiEdit extends GuiBase {
                 int index = BlockStore.getInstance().get().get(0).entries().indexOf(this.block);
                 BlockEntry entry = BlockStore.getInstance().get().get(0).entries().get(index);
                 entry.setName(this.oreName.getValue());
-                entry.setColor(new BasicColor((int) (this.redSlider.getValue() * 255), (int) (this.greenSlider.getValue() * 255), (int) (this.blueSlider.getValue() * 255)));
+                entry.setColor(new BasicColor(
+                        (int) (this.redSlider.getValue() * 255),
+                        (int) (this.greenSlider.getValue() * 255),
+                        (int) (this.blueSlider.getValue() * 255),
+                        (int) (this.alphaSlider.getValue() * 255)
+                ));
                 entry.setState(this.block.getState());
                 entry.setDefault(this.lastState != null);
                 BlockStore.getInstance().get().get(0).entries().set(index, entry);
@@ -102,7 +107,12 @@ public class GuiEdit extends GuiBase {
 
         this.oreName.render(guiGraphics, x, y, partialTicks);
 
-        int color = (255 << 24) | ((int) (this.redSlider.getValue() * 255) << 16) | ((int) (this.greenSlider.getValue() * 255) << 8) | (int) (this.blueSlider.getValue() * 255);
+        final int depth = 255;
+        final int alpha = (int) (this.alphaSlider.getValue() * depth);
+        final int red   = (int) (this.redSlider.getValue()   * depth);
+        final int green = (int) (this.greenSlider.getValue() * depth);
+        final int blue  = (int) (this.blueSlider.getValue()  * depth);
+        final int color = alpha << 24 | red << 16 | green << 8 | blue;
 
         guiGraphics.fill(this.getWidth() / 2 - 35, this.getHeight() / 2 - 40, (this.getWidth() / 2 - 35) + 100, (this.getHeight() / 2 - 40) + 64, color);
 
