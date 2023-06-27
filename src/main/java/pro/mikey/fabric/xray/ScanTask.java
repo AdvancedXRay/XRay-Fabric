@@ -38,7 +38,7 @@ public class ScanTask implements Runnable {
         }
 
         if (SettingsStore.getInstance().get().isShowLava() && state.getFluidState().getType() instanceof LavaFluid) {
-            return new BasicColor(210, 10, 10);
+            return new BasicColor(210, 10, 10, 255 / 3);
         }
 
         BlockState defaultState = state.getBlock().defaultBlockState();
