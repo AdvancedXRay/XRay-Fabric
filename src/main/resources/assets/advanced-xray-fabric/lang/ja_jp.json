@@ -1,0 +1,8 @@
+{
+  "category.xray": "Advanced XRay",
+  "keybinding.enable_xray": "XRayを有効化",
+  "keybinding.open_gui": "GUIを開く",
+
+  "message.xray_active": "XRayを有効化しました",
+  "message.xray_deactivate": "XRayを無効化しました"
+}
