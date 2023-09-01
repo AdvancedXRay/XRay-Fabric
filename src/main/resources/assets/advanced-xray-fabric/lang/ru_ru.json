@@ -1,0 +1,8 @@
+{
+  "category.xray": "Продвинутый X-ray",
+  "keybinding.enable_xray": "Включить X-ray",
+  "keybinding.open_gui": "Открыть графический интерфейс",
+	
+  "message.xray_active": "X-ray включен",
+  "message.xray_deactivate": "X-ray выключен"
+}
