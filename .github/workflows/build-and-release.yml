@@ -9,7 +9,7 @@ jobs:
   build:
     if: |
       !contains(github.event.head_commit.message, '[ciskip]')
-    uses: nanite/workflows/.github/workflows/standard-modmuss.yml@v1.1
+    uses: nanite/workflows/.github/workflows/standard-modmuss.yml@v1.2
     with:
       java-version: 17
     secrets:
