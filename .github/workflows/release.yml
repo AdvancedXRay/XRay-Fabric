@@ -1,4 +1,4 @@
-name: Java CI
+name: Release
 
 on:
   push:
@@ -7,10 +7,24 @@ on:
 
 jobs:
   build:
-    if: |
-      !contains(github.event.head_commit.message, '[ciskip]')
-    uses: nanite/workflows/.github/workflows/release.yml@v1.2
-    secrets:
-      release-files: ./build/libs/*
-      saps-token: ${{ secrets.SAPS_TOKEN }}
-      curse-token: ${{ secrets.CURSE_DEPLOY_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone project
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          distribution: "temurin"
+          java-version: ${{ inputs.java-version }}
+      - name: Fix borked permissions
+        run: chmod +x ./gradlew
+      - name: Run gradle tasks [${{ inputs.gradle-tasks }}]
+        uses: gradle/gradle-build-action@v2
+        env:
+          SNAPSHOT: false
+          SAPS_TOKEN: ${{ secrets.SAPS_TOKEN }}
+          CURSE_TOKEN: ${{ secrets.CURSE_DEPLOY_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.github-token }}
+        with:
+          arguments: publish publishMods
+
