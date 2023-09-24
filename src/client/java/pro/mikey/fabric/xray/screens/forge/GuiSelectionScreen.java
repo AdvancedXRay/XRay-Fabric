@@ -195,7 +195,7 @@ public class GuiSelectionScreen extends GuiBase {
     @Override
     public void tick() {
         super.tick();
-        this.search.tick();
+//        this.search.tick();
 
         this.updateSearch();
     }

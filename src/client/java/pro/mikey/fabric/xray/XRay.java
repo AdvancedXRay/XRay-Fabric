@@ -1,7 +1,6 @@
 package pro.mikey.fabric.xray;
 
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientEntityEvents;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -12,7 +11,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.block.LevelEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.glfw.GLFW;
@@ -22,8 +20,7 @@ import pro.mikey.fabric.xray.screens.forge.GuiSelectionScreen;
 import pro.mikey.fabric.xray.storage.BlockStore;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
-public class XRay implements ModInitializer {
-
+public class XRay implements ClientModInitializer {
     public static final String MOD_ID = "advanced-xray-fabric";
     public static final String PREFIX_GUI = String.format("%s:textures/gui/", MOD_ID);
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
@@ -33,7 +30,7 @@ public class XRay implements ModInitializer {
     private final KeyMapping guiButton = new KeyMapping("keybinding.open_gui", GLFW.GLFW_KEY_G, "category.xray");
 
     @Override
-    public void onInitialize() {
+    public void onInitializeClient() {
         LOGGER.info("XRay mod has been initialized");
 
         ClientTickEvents.END_CLIENT_TICK.register(this::clientTickEvent);

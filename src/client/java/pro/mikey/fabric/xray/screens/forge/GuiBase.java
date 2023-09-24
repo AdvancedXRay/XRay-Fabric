@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray.screens.forge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -36,8 +37,7 @@ public abstract class GuiBase extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        this.renderBackground(guiGraphics);
-
+        this.renderBackground(guiGraphics, x, y, partialTicks);
         int width = this.width;
         int height = this.height;
         if (this.hasSide) {
@@ -89,8 +89,11 @@ public abstract class GuiBase extends Screen {
             }
         }
 
+        for (Renderable renderable : this.renderables) {
+            renderable.render(guiGraphics, x, y, partialTicks);
+        }
+
         this.renderExtra(guiGraphics, x, y, partialTicks);
-        super.render(guiGraphics, x, y, partialTicks);
     }
 
     public ResourceLocation getBackground() {

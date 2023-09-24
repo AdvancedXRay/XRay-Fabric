@@ -1,7 +1,5 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -48,7 +46,7 @@ public class GuiBlockList extends GuiBase {
 
     @Override
     public void tick() {
-        this.search.tick();
+//        this.search.tick
         if (!this.search.getValue().equals(this.lastSearched)) {
             this.reloadBlocks();
         }
@@ -61,7 +59,7 @@ public class GuiBlockList extends GuiBase {
             return;
         }
 
-        this.blockList.updateEntries(this.search.getValue().length() == 0 ? this.blocks : this.blocks.stream().filter(e -> e.stack().getHoverName().getString().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toList()));
+        this.blockList.updateEntries(this.search.getValue().isEmpty() ? this.blocks : this.blocks.stream().filter(e -> e.stack().getHoverName().getString().toLowerCase().contains(this.search.getValue().toLowerCase())).collect(Collectors.toList()));
 
         this.lastSearched = this.search.getValue();
         this.blockList.setScrollAmount(0);
@@ -82,11 +80,11 @@ public class GuiBlockList extends GuiBase {
         return super.mouseClicked(x, y, button);
     }
 
-    @Override
-    public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
-        this.blockList.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
-        return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
-    }
+//    @Override
+//    public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
+//        this.blockList.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
+//        return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
+//    }
 
     static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
         static final int SLOT_HEIGHT = 35;

@@ -1,9 +1,13 @@
 pluginManagement {
     repositories {
+        gradlePluginPortal()
         maven {
             name = 'Fabric'
             url = 'https://maven.fabricmc.net/'
         }
-        gradlePluginPortal()
+        maven {
+            name = 'saps'
+            url = 'https://maven.saps.dev/snapshots'
+        }
     }
 }

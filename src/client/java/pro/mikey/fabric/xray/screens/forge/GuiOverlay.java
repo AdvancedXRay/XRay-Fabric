@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray.screens.forge;
 
+import com.mojang.blaze3d.platform.GlDebug;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -19,7 +20,7 @@ public class GuiOverlay {
             return;
         }
 
-        boolean renderDebug = Minecraft.getInstance().options.renderDebug;
+        boolean renderDebug = GlDebug.isDebugEnabled();
 
         int x = 5, y = 5;
         if (renderDebug) {

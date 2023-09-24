@@ -16,7 +16,6 @@ public abstract class AbstractScreen extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
-        this.renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
 
         //    RenderSystem.pushMatrix();

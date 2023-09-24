@@ -15,12 +15,15 @@
   "icon": "assets/advanced-xray-fabric/icon.png",
   "environment": "client",
   "entrypoints": {
-    "main": [
+    "client": [
       "pro.mikey.fabric.xray.XRay"
     ]
   },
   "mixins": [
-    "advanced-xray-fabric.mixins.json"
+    {
+      "config": "advanced-xray-fabric.mixins.json",
+      "environment": "client"
+    }
   ],
   "depends": {
     "fabricloader": ">=${fabricloader}",

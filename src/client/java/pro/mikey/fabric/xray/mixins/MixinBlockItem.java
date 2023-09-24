@@ -12,7 +12,7 @@ import pro.mikey.fabric.xray.ScanController;
 // Thanks to architectury
 @Mixin(BlockItem.class)
 public abstract class MixinBlockItem {
-    @Inject(method = "place", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/InteractionResult;sidedSuccess(Z)Lnet/minecraft/world/InteractionResult;"))
+    @Inject(method = "place", at = @At("TAIL"))
     private void place(BlockPlaceContext context, CallbackInfoReturnable<InteractionResult> cir) {
         if (context.getLevel().isClientSide) {
             ScanController.blockPlaced(context);

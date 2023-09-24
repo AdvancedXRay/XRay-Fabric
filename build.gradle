@@ -1,24 +1,28 @@
 plugins {
-    id 'fabric-loom' version '1.0-SNAPSHOT'
-    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id 'fabric-loom' version '1.3-SNAPSHOT'
     id 'maven-publish'
+    id 'pro.mikey.plugins.insaniam' version "0.1-SNAPSHOT"
+    id "me.modmuss50.mod-publish-plugin" version "0.3.5"
 }
-
-sourceCompatibility = JavaVersion.VERSION_17
-targetCompatibility = JavaVersion.VERSION_17
 
 def ENV = System.getenv();
-archivesBaseName = "${project.archives_base_name}"
-version = "${project.minecraft_version}-${project.mod_version}-build.${ENV.GITHUB_RUN_NUMBER ?: 9999}"
+version = "${project.mod_version}"
 group = project.maven_group
 
-loom {
-    accessWidenerPath = file("src/main/resources/advanced-xray-fabric.accesswidener")
+base {
+    archivesName = project.archives_base_name
 }
 
-repositories {
-    maven {
-        url "https://cursemaven.com"
+loom {
+    splitEnvironmentSourceSets()
+
+    accessWidenerPath = file("src/main/resources/advanced-xray-fabric.accesswidener")
+
+    mods {
+        "xray" {
+            sourceSet sourceSets.client
+            sourceSet sourceSets.main
+        }
     }
 }
 
@@ -48,6 +52,9 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     withSourcesJar()
+
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 jar {
@@ -77,18 +84,34 @@ publishing {
     }
 }
 
+def changelogData = insaniamUtils.createChangelog {
+    file = file('CHANGELOG.md')
+    versionPattern = ~/## \[[^]]+]/
+    fallbackValue = "No changelog provided"
+    version = project.mod_version
+}
 
-if (ENV.CURSE_DEPLOY_TOKEN) {
+publishMods {
+    def curseToken = providers.environmentVariable("CURSE_TOKEN")
+
+    dryRun = curseToken.getOrNull() == null
+    changelog = changelogData
+    version = project.mod_version
+    type = STABLE
+    file = remapJar.archiveFile
+
     curseforge {
-        apiKey = ENV.CURSE_DEPLOY_TOKEN
-        project {
-            id = "444663"
-            releaseType = "release"
-            addGameVersion "Fabric"
-            addGameVersion "$minecraft_version"
-            changelog = file('CHANGELOG.md')
-            changelogType = 'markdown'
-            mainArtifact(remapJar)
-        }
+        displayName = "Advanced XRay Fabric ${mod_version}"
+        accessToken = curseToken
+        projectId = project.curse_id
+        minecraftVersions.add("${minecraft_version}")
+        modLoaders.add("fabric")
+    }
+
+    github {
+        repository = "AdvancedXRay/XRay-Fabric"
+        accessToken = providers.environmentVariable("GITHUB_TOKEN")
+        commitish = providers.environmentVariable("GITHUB_SHA").orElse("main")
+        tagName = providers.environmentVariable("GITHUB_REF_NAME").orElse("v${mod_version}")
     }
 }
