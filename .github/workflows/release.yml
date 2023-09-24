@@ -15,10 +15,10 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: "temurin"
-          java-version: ${{ inputs.java-version }}
+          java-version: 17
       - name: Fix borked permissions
         run: chmod +x ./gradlew
-      - name: Run gradle tasks [${{ inputs.gradle-tasks }}]
+      - name: Run gradle tasks
         uses: gradle/gradle-build-action@v2
         env:
           SNAPSHOT: false
