@@ -24,7 +24,6 @@ jobs:
           SNAPSHOT: false
           SAPS_TOKEN: ${{ secrets.SAPS_TOKEN }}
           CURSE_TOKEN: ${{ secrets.CURSE_DEPLOY_TOKEN }}
-          GITHUB_TOKEN: ${{ secrets.github-token }}
         with:
           arguments: publish publishMods
 
