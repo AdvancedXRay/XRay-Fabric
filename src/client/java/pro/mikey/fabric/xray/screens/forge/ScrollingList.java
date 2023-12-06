@@ -20,36 +20,36 @@ public class ScrollingList<E extends AbstractSelectionList.Entry<E>> extends Abs
                 width,
                 height,
                 y - (height / 2),
-                (y - (height / 2)) + height,
+//                (y - (height / 2)) + height,
                 slotHeightIn);
-        this.setLeftPos(x - (width / 2));
+        this.setX(x - (width / 2));
 //        this.setRenderTopAndBottom(false);
         this.setRenderBackground(false); // removes background
     }
 
     @Override
-    public void render(GuiGraphics stack, int mouseX, int mouseY, float partialTicks) {
+    public void renderWidget(GuiGraphics stack, int mouseX, int mouseY, float partialTicks) {
         double scale = this.minecraft.getWindow().getGuiScale();
 
         GL11.glEnable(GL11.GL_SCISSOR_TEST);
         GL11.glScissor(
-                (int) (this.x0 * scale),
-                (int) (this.minecraft.getWindow().getHeight() - ((this.y0 + this.height) * scale)),
+                (int) (this.getX() * scale),
+                (int) (this.minecraft.getWindow().getHeight() - ((this.getY() + this.height) * scale)),
                 (int) (this.width * scale),
                 (int) (this.height * scale));
 
-        super.render(stack, mouseX, mouseY, partialTicks);
+        super.renderWidget(stack, mouseX, mouseY, partialTicks);
 
         GL11.glDisable(GL11.GL_SCISSOR_TEST);
     }
 
     @Override
     protected int getScrollbarPosition() {
-        return (this.x0 + this.width) - 6;
+        return (this.getX() + this.width) - 6;
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput builder) {
+    protected void updateWidgetNarration(NarrationElementOutput narrationElementOutput) {
 
     }
 }

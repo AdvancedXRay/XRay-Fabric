@@ -305,7 +305,7 @@ public class GuiSelectionScreen extends GuiBase {
                 guiGraphics.renderItem(blockData.getStack(), left + 10, top + 7);
 //                Lighting.setupForFlatItems();
 
-                if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.y0 + this.parent.height) && mouseY > this.parent.y0) {
+                if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.getY() + this.parent.height) && mouseY > this.parent.getY()) {
                     guiGraphics.renderTooltip(font, Arrays.asList(Component.translatable("xray.tooltips.edit1").getVisualOrderText(), Component.translatable("xray.tooltips.edit2").getVisualOrderText()), left + 15, (entryIdx == this.parent.children().size() - 1 && entryIdx != 0 ? (top - (entryHeight - 20)) : (top + (entryHeight + 15))));
                 }
 
