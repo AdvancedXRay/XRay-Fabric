@@ -2,7 +2,6 @@ package pro.mikey.fabric.xray.screens.forge;
 
 import net.minecraft.client.gui.components.AbstractSliderButton;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.contents.LiteralContents;
 
 public class RatioSliderWidget extends AbstractSliderButton {
   private final Component message;

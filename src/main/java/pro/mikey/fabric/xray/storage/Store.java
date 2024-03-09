@@ -32,16 +32,13 @@ public abstract class Store<T> {
     public T read() {
         Gson gson = this.getGson();
 
-        try {
-            try {
-                return gson.fromJson(new FileReader(this.file), this.getType());
-            } catch (JsonIOException | JsonSyntaxException e) {
-                XRay.LOGGER.fatal("Fatal error with json loading on {}.json", this.name, e);
-            }
-        } catch (FileNotFoundException ignored) {
-            this.justCreated = true;
-
+        try (FileReader reader = new FileReader(this.file)) {
+            return gson.fromJson(reader, this.getType());
+        } catch (JsonIOException | JsonSyntaxException e) {
+            XRay.LOGGER.fatal("Fatal error with json loading on {}.json", this.name, e);
+        } catch (IOException ignored) {
             // Write a blank version of the file
+            this.justCreated = true;
             if (new File(CONFIG_PATH).mkdirs()) {
                 this.write(true);
             }
@@ -54,7 +51,7 @@ public abstract class Store<T> {
         this.write(false);
     }
 
-    private void write(Boolean firstWrite) {
+    private void write(boolean firstWrite) {
         Gson gson = this.getGson();
 
         try {

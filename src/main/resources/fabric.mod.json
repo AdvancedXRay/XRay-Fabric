@@ -5,7 +5,8 @@
   "name": "Advanced XRay (Fabric)",
   "description": "An Advanced XRay mod for Fabric with all your block finding needs baked right in!",
   "authors": [
-    "ErrorMikey"
+    "ErrorMikey",
+    "Smartin"
   ],
   "contact": {
     "homepage": "https://github.com/AdvancedXRay/xray-fabric",
