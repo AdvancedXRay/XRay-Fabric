@@ -7,7 +7,7 @@ import net.minecraft.client.gui.narration.NarrationElementOutput;
 import org.lwjgl.opengl.GL11;
 
 /**
- * A bare bones implementation of the without the background or borders. With GL_SCISSOR to crop out
+ * A bare-bones implementation of the without the background or borders. With GL_SCISSOR to crop out
  * the overflow
  *
  * <p>This is how an abstract implementation should look... :cry:

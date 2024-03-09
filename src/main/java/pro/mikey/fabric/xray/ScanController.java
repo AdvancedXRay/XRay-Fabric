@@ -1,78 +1,124 @@
 package pro.mikey.fabric.xray;
 
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import pro.mikey.fabric.xray.records.BlockPosWithColor;
-import pro.mikey.fabric.xray.storage.BlockStore;
+import pro.mikey.fabric.xray.render.RenderOutlines;
 import pro.mikey.fabric.xray.storage.SettingsStore;
+import pro.mikey.fabric.xray.tasks.*;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.concurrent.*;
+
 
 public class ScanController {
-    public static Set<BlockPosWithColor> renderQueue = Collections.synchronizedSet(new HashSet<>());
-    private static ChunkPos playerLastChunk;
+    static ThreadPoolExecutor executor = new ThreadPoolExecutor(
+            StateSettings.getRadius(), StateSettings.getRadius(),
+            0L, TimeUnit.MILLISECONDS,
+            new LinkedBlockingQueue<>()
+    );
 
     /**
-     * No point even running if the player is still in the same chunk.
+     * This function sets the ThreadPool up properly.
+     * Technically the threads set their own Priority to one anyways, so a normal Threapool would be sufficient
      */
-    private static boolean playerLocationChanged() {
-        if (Minecraft.getInstance().player == null)
-            return false;
+    public static void setup(){
+        executor.setThreadFactory(r -> {
+            Thread thread = new Thread(r);
+            thread.setPriority(Thread.MIN_PRIORITY);
+            return thread;
+        });
+    }
 
-        ChunkPos plyChunkPos = Minecraft.getInstance().player.chunkPosition();
-        int range = StateSettings.getHalfRange();
-
-        return playerLastChunk == null ||
-                plyChunkPos.x > playerLastChunk.x + range || plyChunkPos.x < playerLastChunk.x - range ||
-                plyChunkPos.z > playerLastChunk.z + range || plyChunkPos.z < playerLastChunk.z - range;
+    private static void submitTask(Runnable worker){
+        if(!executor.isShutdown()){
+            executor.execute(worker);
+        }
     }
 
     /**
-     * Runs the scan task by checking if the thread is ready but first attempting to provide the cache
-     * if the cache is still valid.
-     *
-     * @param forceRerun if the task is required to re-run for instance, a block is broken in the
-     *                   world.
+     * Just a security measure to force-close the ThreadPool to make sure it doesn't linger in the background
      */
-    public static synchronized void runTask(boolean forceRerun) {
-        Minecraft client = Minecraft.getInstance();
-        if (client.player == null && client.level == null) {
-            return;
-        }
-
-        if (!SettingsStore.getInstance().get().isActive() || (!forceRerun && !playerLocationChanged())) {
-            return;
-        }
-
-        // Update the players last chunk to eval against above.
-        playerLastChunk = client.player.chunkPosition();
-        Util.backgroundExecutor().execute(new ScanTask());
+    public static void closeGame() {
+        executor.shutdownNow();
     }
 
-    public static void blockBroken(Level world, Player playerEntity, BlockPos blockPos, BlockState blockState, BlockEntity blockEntity) {
-        if (!SettingsStore.getInstance().get().isActive()) return;
 
-        if (renderQueue.stream().anyMatch(e -> e.pos().equals(blockPos))) {
-            runTask(true);
+    /**
+     * This function rebuilds the ChunkCache completly and reloads all Chunks
+     * without flashing the already rendered Chunks instantly away
+     */
+    public static void reBuildCache(boolean force) {
+        RenderOutlines.maxRenderDistance = StateSettings.getRadius();
+        class RebuildThread extends Thread {
+            @Override
+            public synchronized void run() {
+                RenderOutlines.clearChunks(force);
+                executor.shutdownNow();
+                while (!executor.isTerminated()) {
+                    try {
+                        currentThread().wait(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                int threadCount = Math.max(1,StateSettings.getThreadCount());
+                executor = new ThreadPoolExecutor(
+                        threadCount, threadCount,
+                        0L, TimeUnit.MILLISECONDS,
+                        new LinkedBlockingQueue<>()
+                );
+                setup();
+                Runnable worker = new ReBuildCache();
+                executor.execute(worker);
+            }
+        }
+        Thread r = new RebuildThread();
+        r.start();
+    }
+
+    /**
+     * This function clears the Cache on a seperate Thread
+     */
+    public static void clearCache(boolean force) {
+        class ClearThread extends Thread {
+            @Override
+            public synchronized void run() {
+                RenderOutlines.clearChunks(force);
+            }
+        }
+        Thread r = new ClearThread();
+        r.start();
+    }
+
+    public static void reBuildCache() {
+        reBuildCache(false);
+    }
+
+    /**
+     * This function updates a Chunk based on Pos
+     */
+    public static void updateChunk(ChunkPos pos) {
+        if (SettingsStore.getInstance().get().isActive()) {
+            Runnable worker = new UpdateChunkTask(pos);
+            submitTask(worker);
         }
     }
 
-    public static void blockPlaced(BlockPlaceContext context) {
-        if (!SettingsStore.getInstance().get().isActive()) return;
+    /**
+     * This function updates a Chunk based on Pos
+     */
+    public static void updateChunk(BlockPos pos){
+        int chunkx = SectionPos.blockToSectionCoord(pos.getX());
+        int chunkz = SectionPos.blockToSectionCoord(pos.getZ());
+        ChunkPos chunkPos = new ChunkPos(chunkx,chunkz);
+        updateChunk(chunkPos);
+    }
 
-        BlockState defaultState = Block.byItem(context.getItemInHand().getItem()).defaultBlockState();
-        if (BlockStore.getInstance().getCache().get().stream().anyMatch(e -> e.getState() == defaultState)) {
-            runTask(true);
-        }
+    /**
+     * This function removes a chunk from the Rendering
+     */
+    public static void removeChunk(ChunkPos pos){
+        Runnable worker =  new RemoveChunkTask(pos);
+        submitTask(worker);
     }
 }

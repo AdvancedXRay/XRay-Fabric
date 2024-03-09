@@ -7,6 +7,7 @@
   "spacer": "-------------------------------------------------------",
   "comment_forge": "Forge mod old lang stuff, please never translate",
   "xray.single.cancel": "Cancel",
+  "xray.single.back": "Back",
   "xray.single.add": "Add",
   "xray.single.delete": "Delete",
   "xray.single.save": "Save",
@@ -14,6 +15,8 @@
   "xray.single.close": "Close",
   "xray.single.search": "Search",
   "xray.single.help": "Help",
+  "xray.single.group.edit": "Edit Group",
+  "xray.single.group.add": "Add Group",
   "xray.overlay": "XRay Active",
   "xray.color.red": "Red: ",
   "xray.color.green": "Green: ",
@@ -22,7 +25,7 @@
   "xray.input.add": "Add Block",
   "xray.input.add_hand": "Add Block in hand",
   "xray.input.add_look": "Add Looking at",
-  "xray.input.distance": "Distance: %s",
+  "xray.input.distance": "Render Distance: %s",
   "xray.input.show-lava": "Show Lava: %s",
   "xray.input.toggle_oredict": "Use Dictionary",
   "xray.title.config": "Configure Block",
@@ -47,9 +50,9 @@
   "xray.tooltips.add_block_in_hand": "Automatically selects the block you've\ngot in your hand to add to the list.",
   "xray.tooltips.add_block_looking_at": "Automatically selects the block you're\nlooking at to add to the list.",
   "xray.tooltips.show_lava": "Displays lava in RED like a normal block.\nWatch out! It's hot.",
-  "xray.tooltips.distance": "This is the amount of chunks around the player.",
+  "xray.tooltips.andistce": "High render distance might decrease performance.",
   "xray.tooltips.edit1": "Click to enable / disable",
   "xray.tooltips.edit2": "Hold shift and click to edit.",
   "xray.message.help.gui": "To edit a block simply shift click on the block you wish to edit.\nIf you want to enable / disable a block then click on a block\n and it'll toggle on and off.",
-  "xray.message.help.warning": "As a warning, using any distance over 64 will cause FPS drops due\nto the vast amount of blocks that we have to scan. (It's like 256^3)"
+  "xray.message.help.warning": "High render distance might decrease performance."
 }

@@ -3,6 +3,7 @@ package pro.mikey.fabric.xray.storage;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.jetbrains.annotations.Nullable;
 import pro.mikey.fabric.xray.cache.BlockSearchCache;
 import pro.mikey.fabric.xray.records.BlockEntry;
 import pro.mikey.fabric.xray.records.BlockGroup;
@@ -20,7 +21,7 @@ public class BlockStore extends Store<List<BlockGroup>> {
         super("blocks");
 
         this.blockEntries = this.read();
-        this.updateCache(this.blockEntries); // ensure the cache is up to date
+        this.updateCache(this.blockEntries); // ensure the cache is up-to-date
     }
 
     public static BlockStore getInstance() {
@@ -30,6 +31,7 @@ public class BlockStore extends Store<List<BlockGroup>> {
 
         return instance;
     }
+
 
     public void updateCache() {
         this.updateCache(this.get());
@@ -46,6 +48,11 @@ public class BlockStore extends Store<List<BlockGroup>> {
     @Override
     public List<BlockGroup> get() {
         return this.blockEntries;
+    }
+
+    @Nullable
+    public BlockGroup getByName(String name) {
+        return BlockStore.getInstance().get().stream().filter(group -> (group.getName().equals(name))).findFirst().orElse(null);
     }
 
     @Override
