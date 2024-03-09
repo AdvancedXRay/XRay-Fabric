@@ -34,10 +34,6 @@ public class BlockSearchEntry {
         return NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag);
     }
 
-    public static String blockStateToStringNBT(BlockState state) {
-        return NbtUtils.writeBlockState(state).toString();
-    }
-
     public BlockState getState() {
         return this.state;
     }

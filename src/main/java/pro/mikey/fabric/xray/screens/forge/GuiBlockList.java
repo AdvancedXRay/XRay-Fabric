@@ -9,30 +9,42 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Fluid;
+import pro.mikey.fabric.xray.XRay;
+import pro.mikey.fabric.xray.records.BlockGroup;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class GuiBlockList extends GuiBase {
-    private final List<BlockWithStack> blocks;
+    private List<BlockWithStack> blocks;
     private ScrollingBlockList blockList;
     private EditBox search;
     private String lastSearched = "";
+    private BlockGroup group;
 
-    GuiBlockList() {
+    GuiBlockList(BlockGroup group) {
         super(false);
+        this.group = group;
         this.blocks = BuiltInRegistries.ITEM.stream().filter(item -> item instanceof BlockItem && item != Items.AIR).map(item -> new BlockWithStack(Block.byItem(item), new ItemStack(item))).toList();
     }
 
     @Override
     public void init() {
-        this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks);
+        blocks = new ArrayList<>(blocks);
+        BuiltInRegistries.FLUID.stream().forEach(fluid -> {
+            if(fluid.isSource(fluid.defaultFluidState())){
+                BlockWithStack stack = new BlockWithStack( fluid.defaultFluidState().createLegacyBlock().getBlock(),new ItemStack(fluid.getBucket()));
+                blocks.add(stack);
+            }
+        });
+
+        this.blockList = new ScrollingBlockList((this.getWidth() / 2) + 1, this.getHeight() / 2 - 12, 202, 185, this.blocks,group);
         this.addRenderableWidget(this.blockList);
 
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 140, 18, Component.empty());
@@ -41,7 +53,7 @@ public class GuiBlockList extends GuiBase {
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
             assert this.getMinecraft() != null;
-            this.getMinecraft().setScreen(new GuiSelectionScreen());
+            this.getMinecraft().setScreen(new GuiBlockSelectionScreen(group));
         }).pos(this.getWidth() / 2 + 43, this.getHeight() / 2 + 84).size(60, 20).build());
     }
 
@@ -82,16 +94,18 @@ public class GuiBlockList extends GuiBase {
     }
 
     @Override
-    public boolean mouseScrolled(double p_mouseScrolled_1_, double p_mouseScrolled_3_, double p_mouseScrolled_5_) {
-        this.blockList.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
-        return super.mouseScrolled(p_mouseScrolled_1_, p_mouseScrolled_3_, p_mouseScrolled_5_);
+    public boolean mouseScrolled(double pMouseScrolled1, double pMouseScrolled2, double pMouseScrolled3) {
+        this.blockList.mouseScrolled(pMouseScrolled1, pMouseScrolled2, pMouseScrolled3);
+        return super.mouseScrolled(pMouseScrolled1, pMouseScrolled2, pMouseScrolled3);
     }
 
     static class ScrollingBlockList extends ScrollingList<ScrollingBlockList.BlockSlot> {
         static final int SLOT_HEIGHT = 35;
+        private BlockGroup group;
 
-        ScrollingBlockList(int x, int y, int width, int height, List<BlockWithStack> blocks) {
+        ScrollingBlockList(int x, int y, int width, int height, List<BlockWithStack> blocks,BlockGroup group) {
             super(x, y, width, height, SLOT_HEIGHT);
+            this.group=group;
             this.updateEntries(blocks);
         }
 
@@ -103,7 +117,7 @@ public class GuiBlockList extends GuiBase {
 
             assert this.minecraft.player != null;
             this.minecraft.player.clientSideCloseContainer();
-            this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(), GuiBlockList::new));
+            this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(),group, () -> new GuiBlockList(group)));
         }
 
         void updateEntries(List<BlockWithStack> blocks) {
@@ -125,7 +139,7 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean p_194999_5_, float partialTicks) {
+            public void render(PoseStack stack, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean boolean5, float partialTicks) {
                 Font font = this.parent.minecraft.font;
 
                 ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
@@ -138,7 +152,7 @@ public class GuiBlockList extends GuiBase {
             }
 
             @Override
-            public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
+            public boolean mouseClicked(double pMouseClicked1, double pMouseClicked3, int pMouseClicked5) {
                 this.parent.setSelected(this);
                 return false;
             }
