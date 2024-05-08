@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           distribution: "temurin"
-          java-version: 17
+          java-version: 21
       - name: Fix borked permissions
         run: chmod +x ./gradlew
       - name: Run gradle tasks
