@@ -64,7 +64,9 @@ public class RenderOutlines {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
 
-            PoseStack poseStack = RenderSystem.getModelViewStack();
+            RenderSystem.applyModelViewMatrix();
+
+            PoseStack poseStack = context.matrixStack();
             poseStack.pushPose();
 
             if (canvasLoaded == 1) { // canvas compat

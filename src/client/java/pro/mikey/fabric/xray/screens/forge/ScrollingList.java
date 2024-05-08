@@ -20,11 +20,8 @@ public class ScrollingList<E extends AbstractSelectionList.Entry<E>> extends Abs
                 width,
                 height,
                 y - (height / 2),
-//                (y - (height / 2)) + height,
                 slotHeightIn);
         this.setX(x - (width / 2));
-//        this.setRenderTopAndBottom(false);
-        this.setRenderBackground(false); // removes background
     }
 
     @Override
