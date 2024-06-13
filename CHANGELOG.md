@@ -1,3 +1,10 @@
+## [21.0.0]
+
+### Changes
+
+- Ported to 1.21
+- Changed the version system to match the Minecraft versioning system / Neoforges versioning system
+
 ## [86.0.0]
 
 ### Changes

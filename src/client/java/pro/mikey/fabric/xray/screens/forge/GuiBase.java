@@ -7,11 +7,12 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import pro.mikey.fabric.xray.Utils;
 import pro.mikey.fabric.xray.XRay;
 
 public abstract class GuiBase extends Screen {
-    static final ResourceLocation BG_LARGE = new ResourceLocation(XRay.PREFIX_GUI + "bg-help.png");
-    private static final ResourceLocation BG_NORMAL = new ResourceLocation(XRay.PREFIX_GUI + "bg.png");
+    static final ResourceLocation BG_LARGE = Utils.rlFull(XRay.PREFIX_GUI + "bg-help.png");
+    private static final ResourceLocation BG_NORMAL = Utils.rlFull(XRay.PREFIX_GUI + "bg.png");
     private final boolean hasSide;
     private String sideTitle = "";
     private int backgroundWidth = 229;

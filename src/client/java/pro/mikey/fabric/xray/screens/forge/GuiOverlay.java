@@ -2,19 +2,19 @@ package pro.mikey.fabric.xray.screens.forge;
 
 import com.mojang.blaze3d.platform.GlDebug;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
+import pro.mikey.fabric.xray.Utils;
 import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.storage.SettingsStore;
 
 public class GuiOverlay {
-    private static final ResourceLocation circle = new ResourceLocation(XRay.PREFIX_GUI + "circle.png");
+    private static final ResourceLocation circle = Utils.rlFull(XRay.PREFIX_GUI + "circle.png");
 
-    public static void RenderGameOverlayEvent(GuiGraphics guiGraphics, float delta) {
+    public static void RenderGameOverlayEvent(GuiGraphics guiGraphics, DeltaTracker counter) {
         // Draw Indicator
         if (!SettingsStore.getInstance().get().isActive() || !SettingsStore.getInstance().get().showOverlay()) {
             return;

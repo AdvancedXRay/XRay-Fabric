@@ -6,9 +6,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import pro.mikey.fabric.xray.Utils;
 
 public abstract class AbstractScreen extends Screen {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("textures/gui/recipe_book.png");
+    private static final ResourceLocation TEXTURE = Utils.rlFull("textures/gui/recipe_book.png");
 
     AbstractScreen(Component title) {
         super(title);

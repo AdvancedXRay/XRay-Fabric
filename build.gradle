@@ -2,7 +2,7 @@ plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
     id 'pro.mikey.plugins.insaniam' version "0.1-SNAPSHOT"
-    id "me.modmuss50.mod-publish-plugin" version "0.4.5"
+    id "me.modmuss50.mod-publish-plugin" version "0.5.1"
 }
 
 def ENV = System.getenv();
@@ -106,6 +106,7 @@ publishMods {
         projectId = project.curse_id
         minecraftVersions.add("${minecraft_version}")
         modLoaders.add("fabric")
+        javaVersions.add(JavaVersion.VERSION_21)
     }
 
     github {
