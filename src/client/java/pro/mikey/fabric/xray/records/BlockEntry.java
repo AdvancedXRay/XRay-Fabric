@@ -2,6 +2,7 @@ package pro.mikey.fabric.xray.records;
 
 import com.google.gson.*;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
@@ -87,9 +88,10 @@ public class BlockEntry {
         @Override
         public BlockEntry deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             JsonObject asJsonObject = json.getAsJsonObject();
+            BlockState blockState = BlockSearchEntry.blockStateFromStringNBT(asJsonObject.get("state").getAsString());
             return new BlockEntry(
-                    BlockSearchEntry.blockStateFromStringNBT(asJsonObject.get("state").getAsString()),
-                    asJsonObject.get("name").getAsString(),
+                    blockState,
+                    blockState.getBlock().getName().getString(),
                     BasicColor.of(asJsonObject.get("color").getAsString()),
                     asJsonObject.get("order").getAsInt(),
                     asJsonObject.get("isDefault").getAsBoolean(),

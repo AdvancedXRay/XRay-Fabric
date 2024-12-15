@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import pro.mikey.fabric.xray.Utils;
@@ -42,8 +43,9 @@ public abstract class GuiBase extends Screen {
         int width = this.width;
         int height = this.height;
         if (this.hasSide) {
-            guiGraphics.blit(this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 180, 150, 180);
+            guiGraphics.blit(RenderType::guiTextured, this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 180, 150, 180);
             guiGraphics.blit(
+                    RenderType::guiOpaqueTexturedBackground,
                     this.getBackground(),
                     width / 2 - 150,
                     height / 2 - 118,
@@ -62,6 +64,7 @@ public abstract class GuiBase extends Screen {
 
         if (!this.hasSide) {
             guiGraphics.blit(
+                    RenderType::guiTextured,
                     this.getBackground(),
                     width / 2 - this.backgroundWidth / 2 + 1,
                     height / 2 - this.backgroundHeight / 2,

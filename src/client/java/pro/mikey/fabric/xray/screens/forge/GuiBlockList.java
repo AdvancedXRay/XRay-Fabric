@@ -128,7 +128,7 @@ public class GuiBlockList extends GuiBase {
                 Font font = this.parent.minecraft.font;
 
                 ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
-                graphics.drawString(font, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
+                graphics.drawString(font, this.block.stack().getItem().getName(), left + 35, top + 7, Color.WHITE.getRGB());
                 graphics.drawString(font, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
                 // TODO: CHECK

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import pro.mikey.fabric.xray.Utils;
@@ -26,7 +27,7 @@ public abstract class AbstractScreen extends Screen {
         int i = (this.width - 147) / 2;
         int j = (this.height - 166) / 2;
 
-        guiGraphics.blit(TEXTURE, i, j, 1, 1, 147, 166);
+        guiGraphics.blit(RenderType::guiTextured, TEXTURE, i, j, 1, 1, 147, 166, 256, 256);
         //    RenderSystem.popMatrix();
     }
 }

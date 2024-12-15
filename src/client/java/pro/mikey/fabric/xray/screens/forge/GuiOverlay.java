@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.resources.ResourceLocation;
 import pro.mikey.fabric.xray.Utils;
@@ -30,7 +31,7 @@ public class GuiOverlay {
 
         RenderSystem.setShaderColor(0, 1f, 0, 1f);
 //        RenderSystem.setShaderTexture(0, circle);
-        guiGraphics.blit(circle, x, y, 0f, 0f, 5, 5, 5, 5);
+        guiGraphics.blit(RenderType::guiTexturedOverlay, circle, x, y, 0f, 0f, 5, 5, 5, 5);
 
         int width = Minecraft.getInstance().font.width(I18n.get("xray.overlay"));
         guiGraphics.drawString(Minecraft.getInstance().font, I18n.get("xray.overlay"), x + (!renderDebug ? 10 : -width - 5), y - (!renderDebug ? 1 : 2), 0xffffffff);

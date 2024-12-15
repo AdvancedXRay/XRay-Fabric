@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.6-SNAPSHOT'
+    id 'fabric-loom' version '1.8.13'
     id 'maven-publish'
     id 'pro.mikey.plugins.insaniam' version "0.1-SNAPSHOT"
     id "me.modmuss50.mod-publish-plugin" version "0.5.1"
