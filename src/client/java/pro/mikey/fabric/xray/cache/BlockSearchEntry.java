@@ -31,7 +31,7 @@ public class BlockSearchEntry {
             return Blocks.AIR.defaultBlockState();
         }
 
-        return NbtUtils.readBlockState(BuiltInRegistries.BLOCK.asLookup(), tag);
+        return NbtUtils.readBlockState(BuiltInRegistries.BLOCK, tag);
     }
 
     public static String blockStateToStringNBT(BlockState state) {

@@ -1,10 +1,12 @@
 package pro.mikey.fabric.xray.render;
 
+import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.CoreShaders;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -37,7 +39,7 @@ public class RenderOutlines {
 
         if (vertexBuffer == null || requestedRefresh.get()) {
             requestedRefresh.set(false);
-            vertexBuffer = new VertexBuffer(VertexBuffer.Usage.STATIC);
+            vertexBuffer = new VertexBuffer(BufferUsage.STATIC_WRITE);
 
             Tesselator tessellator = Tesselator.getInstance();
             BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
@@ -59,13 +61,12 @@ public class RenderOutlines {
             Camera camera = context.camera();
             Vec3 cameraPos = camera.getPosition();
 
+            PoseStack poseStack = context.matrixStack();
+
             RenderSystem.depthMask(false);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
 
-            RenderSystem.applyModelViewMatrix();
-
-            PoseStack poseStack = context.matrixStack();
             poseStack.pushPose();
 
             if (canvasLoaded == 1) { // canvas compat
@@ -75,19 +76,23 @@ public class RenderOutlines {
                 poseStack.mulPose(new Quaternionf(0.0, 1.0 * sin(f/2.0f), 0.0, cos(f/2.0f)));
             }
 
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.applyModelViewMatrix();
+            RenderSystem.setShader(CoreShaders.POSITION_COLOR);
             RenderSystem.depthFunc(GL11.GL_ALWAYS);
 
-            context.projectionMatrix().lookAt(cameraPos.toVector3f(), cameraPos.toVector3f().add(camera.getLookVector()), camera.getUpVector());
+            Matrix4f matrix4f = new Matrix4f(context.projectionMatrix());
+
+            matrix4f.lookAt(cameraPos.toVector3f(), cameraPos.toVector3f().add(camera.getLookVector()), camera.getUpVector());
 
             vertexBuffer.bind();
-            vertexBuffer.drawWithShader(poseStack.last().pose(), new Matrix4f(context.projectionMatrix()), RenderSystem.getShader());
+            vertexBuffer.drawWithShader(poseStack.last().pose(), matrix4f, RenderSystem.getShader());
             VertexBuffer.unbind();
+
+            // Reset everything
             RenderSystem.depthFunc(GL11.GL_LEQUAL);
+            RenderSystem.disableBlend();
+            RenderSystem.depthMask(true);
 
             poseStack.popPose();
-            RenderSystem.applyModelViewMatrix();
         }
     }
 

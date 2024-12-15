@@ -1,3 +1,14 @@
+## [21.2.0]
+
+### Changes
+
+- Ported to 1.21.2
+- Tooltip on entry hover has how been moved to help text under the main gui
+
+### Fixed
+
+- Scrollbar should no longer click through to the entry behind it
+
 ## [21.0.0]
 
 ### Changes

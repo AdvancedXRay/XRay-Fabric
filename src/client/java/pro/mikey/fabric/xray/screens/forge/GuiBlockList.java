@@ -1,5 +1,6 @@
 package pro.mikey.fabric.xray.screens.forge;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -12,6 +13,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import pro.mikey.fabric.xray.records.BasicColor;
 import pro.mikey.fabric.xray.records.BlockWithStack;
 
 import java.awt.*;
@@ -37,6 +39,9 @@ public class GuiBlockList extends GuiBase {
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 100, this.getHeight() / 2 + 85, 140, 18, Component.empty());
         this.search.setFocused(true);
         this.setFocused(this.search);
+
+        this.addRenderableWidget(this.search);
+        this.addRenderableWidget(this.blockList);
 
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.cancel"), b -> {
             assert this.getMinecraft() != null;
@@ -67,8 +72,8 @@ public class GuiBlockList extends GuiBase {
 
     @Override
     public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        this.search.render(guiGraphics, x, y, partialTicks);
-        this.blockList.render(guiGraphics, x, y, partialTicks);
+//        this.search.render(guiGraphics, x, y, partialTicks);
+//        this.blockList.render(guiGraphics, x, y, partialTicks);
     }
 
     @Override
@@ -101,7 +106,6 @@ public class GuiBlockList extends GuiBase {
             }
 
             assert this.minecraft.player != null;
-            this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiAddBlock(entry.getBlock().block().defaultBlockState(), GuiBlockList::new));
         }
 
@@ -128,14 +132,10 @@ public class GuiBlockList extends GuiBase {
                 Font font = this.parent.minecraft.font;
 
                 ResourceLocation resource = BuiltInRegistries.BLOCK.getKey(this.block.block());
-                graphics.drawString(font, this.block.stack().getItem().getDescription().getString(), left + 35, top + 7, Color.WHITE.getRGB());
+                graphics.drawString(font, this.block.stack().getItem().getName().getString(), left + 35, top + 7, Color.WHITE.getRGB());
                 graphics.drawString(font, resource.getNamespace(), left + 35, top + 17, Color.WHITE.getRGB());
 
-                // TODO: CHECK
-//                Lighting.setupFor3DItems();
                 graphics.renderItem(this.block.stack(), left + 10, top + 7);
-//                this.parent.minecraft.getItemRenderer().renderAndDecorateItem(stack, this.block.stack(), left + 10, top + 7);
-//                Lighting.setupForFlatItems();
             }
 
             @Override

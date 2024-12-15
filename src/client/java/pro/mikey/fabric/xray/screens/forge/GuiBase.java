@@ -1,10 +1,12 @@
 package pro.mikey.fabric.xray.screens.forge;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import pro.mikey.fabric.xray.Utils;
@@ -38,12 +40,16 @@ public abstract class GuiBase extends Screen {
 
     @Override
     public void render(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
+        super.render(guiGraphics, x, y, partialTicks);
+        this.renderExtra(guiGraphics, x, y, partialTicks);
+
         this.renderBackground(guiGraphics, x, y, partialTicks);
         int width = this.width;
         int height = this.height;
         if (this.hasSide) {
-            guiGraphics.blit(this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 180, 150, 180);
+            guiGraphics.blit(RenderType::guiTextured, this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 180, 150, 180);
             guiGraphics.blit(
+                    RenderType::guiTextured,
                     this.getBackground(),
                     width / 2 - 150,
                     height / 2 - 118,
@@ -54,14 +60,11 @@ public abstract class GuiBase extends Screen {
                     this.backgroundWidth,
                     this.backgroundHeight
             );
-
-            if (this.hasSideTitle()) {
-                guiGraphics.drawString(this.font, this.sideTitle, width / 2 + 80, height / 2 - 77, 0xffff00);
-            }
         }
 
         if (!this.hasSide) {
             guiGraphics.blit(
+                    RenderType::guiTextured,
                     this.getBackground(),
                     width / 2 - this.backgroundWidth / 2 + 1,
                     height / 2 - this.backgroundHeight / 2,
@@ -74,27 +77,33 @@ public abstract class GuiBase extends Screen {
             );
         }
 
-//        RenderSystem.enableTexture();
-        if (this.hasTitle()) {
-            if (this.hasSide) {
-                guiGraphics.drawString(
-                                this.font, this.title(), width / 2 - 138,  height / 2 - 105, 0xffff00);
-            } else {
-                guiGraphics.drawString(
-                        this.font,
-                                this.title(),
-                                width / 2 - ( this.backgroundWidth / 2) + 14,
-                                 height / 2 - ( this.backgroundHeight / 2) + 13,
-                                0xffff00
-                        );
-            }
-        }
-
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
         for (Renderable renderable : this.renderables) {
             renderable.render(guiGraphics, x, y, partialTicks);
         }
+        pose.popPose();
 
         this.renderExtra(guiGraphics, x, y, partialTicks);
+
+        if (this.hasTitle()) {
+            if (this.hasSide) {
+                guiGraphics.drawString(
+                        this.font, this.title(), width / 2 - 138,  height / 2 - 105, 0xffff00);
+            } else {
+                guiGraphics.drawString(
+                        this.font,
+                        this.title(),
+                        width / 2 - ( this.backgroundWidth / 2) + 14,
+                        height / 2 - ( this.backgroundHeight / 2) + 13,
+                        0xffff00
+                );
+            }
+        }
+
+        if (this.hasSide && this.hasSideTitle()) {
+            guiGraphics.drawString(this.font, this.sideTitle, width / 2 + 80, height / 2 - 77, 0xffff00);
+        }
     }
 
     public ResourceLocation getBackground() {

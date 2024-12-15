@@ -108,7 +108,7 @@ public class ScanTask implements Runnable {
 
                 for (int k = chunkStartX; k < chunkStartX + 16; k++) {
                     for (int l = chunkStartZ; l < chunkStartZ + 16; l++) {
-                        for (int m = world.getMinBuildHeight(); m < world.getMaxBuildHeight() + (1 << 4); m++) {
+                        for (int m = world.getMinY(); m < world.getMaxY() + (1 << 4); m++) {
                             BlockPos pos = new BlockPos(k, m, l);
                             BasicColor validBlock = isValidBlock(pos, world, blocks);
                             if (validBlock != null) {

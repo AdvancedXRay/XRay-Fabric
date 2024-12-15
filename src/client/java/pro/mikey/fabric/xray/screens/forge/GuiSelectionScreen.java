@@ -13,6 +13,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -71,7 +72,7 @@ public class GuiSelectionScreen extends GuiBase {
             Random random = new Random();
 
             BlockStore.getInstance().get().add(new BlockGroup("default", ORE_TAGS.stream().map(e ->
-                    new BlockEntry(e.defaultBlockState(), e.asItem().getDescription().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
+                    new BlockEntry(e.defaultBlockState(), e.asItem().getName().getString(), new BasicColor(random.nextInt(255), random.nextInt(255), random.nextInt(255)), order.getAndIncrement(), true, true)).collect(Collectors.toList()), 0, true)
             );
 
             BlockStore.getInstance().updateCache();
@@ -93,9 +94,10 @@ public class GuiSelectionScreen extends GuiBase {
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
+        this.addRenderableWidget(this.search);
+
         // sidebar buttons
         this.addRenderableWidget(Button.builder( Component.translatable("xray.input.add"), button -> {
-            this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiBlockList());
         })
                 .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 - 60)
@@ -104,7 +106,6 @@ public class GuiSelectionScreen extends GuiBase {
                 .build());
 
         this.addRenderableWidget(Button.builder(Component.translatable("xray.input.add_hand"), button -> {
-            this.minecraft.player.clientSideCloseContainer();
             ItemStack handItem = this.minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
 
             // Check if the hand item is a block or not
@@ -133,7 +134,6 @@ public class GuiSelectionScreen extends GuiBase {
                         if (look.getType() == BlockHitResult.Type.BLOCK) {
                             BlockState state = this.minecraft.level.getBlockState(((BlockHitResult) look).getBlockPos());
 
-                            player.clientSideCloseContainer();
                             this.minecraft.setScreen(new GuiAddBlock(state, GuiSelectionScreen::new));
                         } else {
                             player.displayClientMessage(Component.literal("[XRay] " + I18n.get("xray.message.nothing_infront")), false);
@@ -167,7 +167,6 @@ public class GuiSelectionScreen extends GuiBase {
                 .build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {
-            this.minecraft.player.clientSideCloseContainer();
             this.minecraft.setScreen(new GuiHelp());
         }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58).size(60,20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
@@ -196,8 +195,6 @@ public class GuiSelectionScreen extends GuiBase {
     @Override
     public void tick() {
         super.tick();
-//        this.search.tick();
-
         this.updateSearch();
     }
 
@@ -219,12 +216,18 @@ public class GuiSelectionScreen extends GuiBase {
 
     @Override
     public void renderExtra(GuiGraphics guiGraphics, int x, int y, float partialTicks) {
-        this.search.render(guiGraphics, x, y, partialTicks);
-        this.scrollList.render(guiGraphics, x, y, partialTicks);
-
         if (!this.search.isFocused() && this.search.getValue().equals("")) {
             guiGraphics.drawString(this.font, I18n.get("xray.single.search"), this.getWidth() / 2 - 130, this.getHeight() / 2 - 101, Color.GRAY.getRGB());
         }
+
+        PoseStack pose = guiGraphics.pose();
+        pose.pushPose();
+        pose.translate(this.getWidth() / 2f - 140, ((this.getHeight() / 2f) - 3) + 120, 0);
+        pose.scale(0.75f, 0.75f, 0.75f);
+        guiGraphics.drawString(this.font, Component.translatable("xray.tooltips.edit1"), 0, 0, Color.GRAY.getRGB());
+        pose.translate(0, 12, 0);
+        guiGraphics.drawString(this.font, Component.translatable("xray.tooltips.edit2"), 0, 0, Color.GRAY.getRGB());
+        pose.popPose();
     }
 
     @Override
@@ -254,7 +257,6 @@ public class GuiSelectionScreen extends GuiBase {
             }
 
             if (GuiSelectionScreen.hasShiftDown()) {
-                this.minecraft.player.clientSideCloseContainer();
                 this.minecraft.setScreen(new GuiEdit(entry.block));
                 return;
             }
@@ -302,23 +304,15 @@ public class GuiSelectionScreen extends GuiBase {
                 guiGraphics.drawString(font, blockData.getName(), left + 35, top + 7, 0xFFFFFF);
                 guiGraphics.drawString(font, blockData.isActive() ? "Enabled" : "Disabled", left + 35, top + 17, blockData.isActive() ? Color.GREEN.getRGB() : Color.RED.getRGB());
 
-//                Lighting.setupFor3DItems();
                 guiGraphics.renderItem(blockData.getStack(), left + 10, top + 7);
-//                Lighting.setupForFlatItems();
-
-                if (mouseX > left && mouseX < (left + entryWidth) && mouseY > top && mouseY < (top + entryHeight) && mouseY < (this.parent.getY() + this.parent.height) && mouseY > this.parent.getY()) {
-                    guiGraphics.renderTooltip(font, Arrays.asList(Component.translatable("xray.tooltips.edit1").getVisualOrderText(), Component.translatable("xray.tooltips.edit2").getVisualOrderText()), left + 15, (entryIdx == this.parent.children().size() - 1 && entryIdx != 0 ? (top - (entryHeight - 20)) : (top + (entryHeight + 15))));
-                }
 
                 RenderSystem.enableBlend();
                 RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-//                RenderSystem.setShaderTexture(0, GuiSelectionScreen.CIRCLE);
-                RenderSystem.setShaderColor(0, 0, 0, .5f);
-                guiGraphics.blit(GuiSelectionScreen.CIRCLE, (left + entryWidth) - 32, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14);
-                RenderSystem.setShaderColor(blockData.getHex().red() / 255f, blockData.getHex().green() / 255f, blockData.getHex().blue() / 255f, 1);
-                guiGraphics.blit(GuiSelectionScreen.CIRCLE, (left + entryWidth) - 30, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10);
+
+                guiGraphics.blit(RenderType::guiTextured, GuiSelectionScreen.CIRCLE, (left + entryWidth) - 17, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14, BasicColor.rgbaToInt(0, 0, 0, .5f));
+                guiGraphics.blit(RenderType::guiTextured, GuiSelectionScreen.CIRCLE, (left + entryWidth) - 15, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10, blockData.getHex().toInt());
+
                 RenderSystem.disableBlend();
-                RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
             }
 
             @Override
