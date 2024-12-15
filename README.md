@@ -1,33 +1,28 @@
-![XRay Logo](.github/assets/xray-fabric-logo.svg)
+![XRay Logo](https://raw.githubusercontent.com/AdvancedXRay/XRay-Fabric/refs/heads/main/.github/assets/xray-fabric-logo.svg)
 
-# Advanced XRay (Fabric Edition)
+# [Advanced XRay (Fabric Edition)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 
-![Build and Package](https://github.com/MichaelHillcox/XRay-Mod/workflows/Build%20and%20Package/badge.svg)
-[![GitHub license](https://img.shields.io/github/license/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/stargazers)
-[![GitHub issues](https://img.shields.io/github/issues/MichaelHillcox/XRay-Fabric)](https://github.com/MichaelHillcox/XRay-Fabric/issues)
-![GitHub all releases](https://img.shields.io/github/downloads/michaelhillcox/xray-Fabric/total)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/michaelhillcox/xray-Fabric)
-![GitHub Release Date](https://img.shields.io/github/release-date/michaelhillcox/xray-Fabric)
-![GitHub last commit](https://img.shields.io/github/last-commit/michaelhillcox/xray-Fabric)
-[![Build Status](https://ci.mikey.pro/buildStatus/icon?job=XRay-Fabric%2Fmain)](https://ci.mikey.pro/job/XRay-Fabric/job/main/)
+Find the project on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 
-Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/MichaelHillcox/XRay-Mod/) which is typically the more up-to-date version of the mod.
+[![](https://cf.way2muchnoise.eu/short_444663.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
+[![](https://cf.way2muchnoise.eu/versions/444663.svg)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 
-[![Discord invite link](.github/assets/discord-join-badge.svg)](https://discord.gg/yYNuqJxucJ)
+[![GitHub license](https://img.shields.io/github/license/advancedxray/XRay-Fabric)](https://github.com/advancedxray/XRay-Fabric/blob/main/LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/advancedxray/XRay-Fabric)](https://github.com/advancedxray/XRay-Fabric/issues)
+![GitHub Release Date](https://img.shields.io/github/release-date/advancedxray/xray-Fabric)
+![GitHub last commit](https://img.shields.io/github/last-commit/advancedxray/xray-Fabric)
+
+Fabric Loader based XRay mod designed to aid players who don't like the ore searching process. This mod is an exact 1:1 copy of my [Advanced XRay Forge Mod](https://github.com/advancedxray/XRay-Mod/) which is typically the more up-to-date version of the mod.
 
 ##### Looking for the Forge version? Click the button below :tada:
 
-<a href="https://github.com/michaelhillcox/xray-mod"><img src=".github/assets/xray-forge-badge.svg" alt="drawing" width="265"/>
+<a href="https://github.com/advancedxray/xray-mod"><img src="https://raw.githubusercontent.com/AdvancedXRay/XRay-Fabric/refs/heads/main/.github/assets/xray-forge-badge.svg" alt="drawing" width="265"/>
 </a>
-
-## Disclaimer
-I am a `Forge Mod` Developer, not a Fabric Mod Developer, I am doing this mod per user request and out of pure intrest in learning a new API. The current status of this mod is `Unreleased` as the mod is currently a `WIP`. Don't `@` me.
 
 ## Features
 Advanced XRay Fabric Edition is a feature rich XRay / Block ESP mod designed to aid players in the block searching process. I've designed the mod to be as user friendly as possible. Out of the box you'll have *Easy to use GUI for adding, deleting and editing block you want to find*, *Full RGB color picker support*, *Searchable block list with in-hand and in-world options for adding blocks*, *Json Stored list to share and edit easily outside of the game*.
 
-## How to use (TBA)
+## How to use
 
 **Using XRay**
 

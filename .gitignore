@@ -28,3 +28,5 @@ bin/
 
 remappedSrc/
 run/
+
+.DS_Store

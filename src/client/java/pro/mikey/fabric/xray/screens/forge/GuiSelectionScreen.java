@@ -88,9 +88,6 @@ public class GuiSelectionScreen extends GuiBase {
         this.render = Minecraft.getInstance().getItemRenderer();
 //        this.buttons.clear();
 
-        this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
-        this.addRenderableWidget(this.scrollList);
-
         this.search = new EditBox(this.getFontRender(), this.getWidth() / 2 - 137, this.getHeight() / 2 - 105, 202, 18, Component.empty());
         this.search.setCanLoseFocus(true);
 
@@ -170,6 +167,9 @@ public class GuiSelectionScreen extends GuiBase {
             this.minecraft.setScreen(new GuiHelp());
         }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58).size(60,20).build());
         this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
+
+        this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
+        this.addRenderableWidget(this.scrollList);
     }
 
     private void updateSearch() {
@@ -277,10 +277,6 @@ public class GuiSelectionScreen extends GuiBase {
             blocks.forEach(block -> this.addEntry(new BlockSlot(block, this))); // @mcp: func_230513_b_ = addEntry
         }
 
-        @Override
-        public Optional<GuiEventListener> getChildAt(double mouseX, double mouseY) {
-            return Optional.empty();
-        }
 
         public class BlockSlot extends AbstractSelectionList.Entry<BlockSlot> {
             BlockEntry block;

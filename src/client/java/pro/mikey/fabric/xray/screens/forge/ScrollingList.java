@@ -22,7 +22,7 @@ public class ScrollingList<E extends AbstractSelectionList.Entry<E>> extends Abs
     }
 
     @Override
-    protected int getScrollbarPosition() {
+    protected int scrollBarX() {
         return (this.getX() + this.width) - 6;
     }
 
