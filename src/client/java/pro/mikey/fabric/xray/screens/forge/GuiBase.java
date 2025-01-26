@@ -47,7 +47,7 @@ public abstract class GuiBase extends Screen {
         int width = this.width;
         int height = this.height;
         if (this.hasSide) {
-            guiGraphics.blit(RenderType::guiTextured, this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 180, 150, 180);
+            guiGraphics.blit(RenderType::guiTextured, this.getBackground(), width / 2 + 60, height / 2 - 180 / 2, 0, 0, 150, 200, 150, 200);
             guiGraphics.blit(
                     RenderType::guiTextured,
                     this.getBackground(),

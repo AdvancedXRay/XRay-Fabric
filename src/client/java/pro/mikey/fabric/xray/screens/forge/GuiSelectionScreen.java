@@ -57,7 +57,6 @@ public class GuiSelectionScreen extends GuiBase {
     public GuiSelectionScreen() {
         super(true);
         this.setSideTitle(I18n.get("xray.single.tools"));
-
         populateDefault();
 
         this.itemList = BlockStore.getInstance().get().size() >= 1 ? BlockStore.getInstance().get().get(0).entries() : new ArrayList<>();
@@ -154,19 +153,29 @@ public class GuiSelectionScreen extends GuiBase {
                 .tooltip(Tooltip.create(Component.translatable("xray.tooltips.show_lava")))
                 .build());
 
+        this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.only-surface", SettingsStore.getInstance().get().isOnlySurface()), button -> {
+                    SettingsStore.getInstance().get().setOnlySurface(!SettingsStore.getInstance().get().isOnlySurface());
+                    ScanController.runTask(true);
+                    button.setMessage(Component.translatable("xray.input.only-surface", SettingsStore.getInstance().get().isOnlySurface()));
+                })
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 28)
+                .size(120, 20)
+                .tooltip(Tooltip.create(Component.translatable("xray.tooltips.only_surface")))
+                .build());
+
         this.addRenderableWidget(this.distButtons = Button.builder(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()), button -> {
             SettingsStore.getInstance().get().increaseRange();
             button.setMessage(Component.translatable("xray.input.distance", StateSettings.getVisualRadius()));
         })
-                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 36)
+                .pos((this.getWidth() / 2) + 79, this.getHeight() / 2 + 56)
                 .size(120, 20)
                 .tooltip(Tooltip.create(Component.translatable("xray.tooltips.distance")))
                 .build());
 
         this.addRenderableWidget(new Button.Builder( Component.translatable("xray.single.help"), button -> {
             this.minecraft.setScreen(new GuiHelp());
-        }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 58).size(60,20).build());
-        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 58).size(59,20).build());
+        }).pos(this.getWidth() / 2 + 79, this.getHeight() / 2 + 78).size(60,20).build());
+        this.addRenderableWidget(new Button.Builder(Component.translatable("xray.single.close"), button -> this.onClose()).pos((this.getWidth() / 2 + 79) + 62, this.getHeight() / 2 + 78).size(59,20).build());
 
         this.scrollList = new ScrollingBlockList((this.getWidth() / 2) - 37, this.getHeight() / 2 + 10, 203, 185, this.itemList, this);
         this.addRenderableWidget(this.scrollList);

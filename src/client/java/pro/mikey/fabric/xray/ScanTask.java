@@ -4,9 +4,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.IronBarsBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.material.LavaFluid;
+import net.minecraft.world.level.material.WaterFluid;
 import org.jetbrains.annotations.Nullable;
 import pro.mikey.fabric.xray.cache.BlockSearchEntry;
 import pro.mikey.fabric.xray.records.BasicColor;
@@ -43,11 +46,43 @@ public class ScanTask implements Runnable {
 
         BlockState defaultState = state.getBlock().defaultBlockState();
 
+        if(SettingsStore.getInstance().get().isOnlySurface() && !isBlockExposed(world, pos)) {
+            return null;
+        }
+
         return blocks.stream()
                 .filter(localState -> localState.isDefault() && defaultState == localState.getState() || !localState.isDefault() && state == localState.getState())
                 .findFirst()
                 .map(BlockSearchEntry::getColor)
                 .orElse(null);
+    }
+
+    public static boolean isBlockExposed(Level world, BlockPos pos) {
+        // Array of offsets for the 6 surrounding directions
+        BlockPos[] offsets = new BlockPos[]{
+                pos.north(),
+                pos.south(),
+                pos.east(),
+                pos.west(),
+                pos.above(),
+                pos.below()
+        };
+
+        for (BlockPos offset : offsets) {
+            BlockState state = world.getBlockState(offset);
+
+            if(world.getBlockState(pos).is(Blocks.ANCIENT_DEBRIS)) {
+                if (state.getFluidState().getType() instanceof LavaFluid)
+                    return true;
+            } else {
+                // Check if the block is air, water, or lava
+                if (state.isAir() || state.getFluidState().getType() instanceof LavaFluid || state.getFluidState().getType() instanceof WaterFluid)
+                    return true;
+            }
+        }
+
+        // If none of the surrounding blocks are exposed, return null
+        return false;
     }
 
     @Override

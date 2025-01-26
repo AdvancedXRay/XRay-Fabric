@@ -8,12 +8,14 @@ public class StateSettings {
 
     private transient boolean isActive;
     private boolean showLava;
+    private boolean onlySurface;
     private int range;
     private boolean showOverlay;
 
     public StateSettings() {
         this.isActive = false;
         this.showLava = false;
+        this.onlySurface = false;
         this.showOverlay = true;
         this.range = 3;
     }
@@ -30,8 +32,16 @@ public class StateSettings {
         return this.showLava;
     }
 
+    public boolean isOnlySurface() {
+        return this.onlySurface;
+    }
+
     public void setShowLava(boolean showLava) {
         this.showLava = showLava;
+    }
+
+    public void setOnlySurface(boolean onlySurface) {
+        this.onlySurface = onlySurface;
     }
 
     public static int getRadius() {
