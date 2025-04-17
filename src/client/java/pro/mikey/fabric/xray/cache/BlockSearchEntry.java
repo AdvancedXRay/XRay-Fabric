@@ -25,7 +25,7 @@ public class BlockSearchEntry {
     public static BlockState blockStateFromStringNBT(String nbt) {
         CompoundTag tag;
         try {
-            tag = TagParser.parseTag(nbt);
+            tag = TagParser.parseCompoundFully(nbt);
         } catch (CommandSyntaxException e) {
             e.printStackTrace();
             return Blocks.AIR.defaultBlockState();
