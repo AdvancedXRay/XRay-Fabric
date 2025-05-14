@@ -3,7 +3,6 @@ package pro.mikey.fabric.xray.render;
 import com.mojang.blaze3d.buffers.BufferType;
 import com.mojang.blaze3d.buffers.BufferUsage;
 import com.mojang.blaze3d.buffers.GpuBuffer;
-import com.mojang.blaze3d.opengl.GlStateManager;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.platform.DepthTestFunction;
@@ -13,13 +12,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.vertex.*;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.ShapeRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4fStack;
-import org.lwjgl.opengl.GL11;
 import pro.mikey.fabric.xray.ScanController;
 import pro.mikey.fabric.xray.XRay;
 import pro.mikey.fabric.xray.records.BlockPosWithColor;
@@ -29,24 +27,21 @@ import java.util.OptionalDouble;
 import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static net.minecraft.util.Mth.cos;
-import static net.minecraft.util.Mth.sin;
-
 public class RenderOutlines {
     private static GpuBuffer vertexBuffer;
     private static int indexCount = 0;
     private static final RenderSystem.AutoStorageIndexBuffer indices = RenderSystem.getSequentialBuffer(VertexFormat.Mode.LINES);
     public static AtomicBoolean requestedRefresh = new AtomicBoolean(false);
 
-    public static RenderPipeline LINES_NO_DEPTH = RenderPipeline.builder(RenderPipelines.POST_PROCESSING_SNIPPET)
+    public static RenderPipeline LINES_NO_DEPTH = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
             .withLocation("pipeline/render_outlines")
             .withVertexShader("core/rendertype_lines")
-            .withFragmentShader("core/rendertype_lines")
+            .withFragmentShader(ResourceLocation.fromNamespaceAndPath(XRay.MOD_ID, "frag/rendertype_lines_unaffected"))
             .withUniform("LineWidth", UniformType.FLOAT)
             .withUniform("ScreenSize", UniformType.VEC2)
             .withBlend(BlendFunction.TRANSLUCENT)
             .withCull(false)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES)
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build();
 
@@ -57,7 +52,6 @@ public class RenderOutlines {
         }
 
         RenderPipeline pipeline = LINES_NO_DEPTH;
-
         if (vertexBuffer == null || requestedRefresh.get()) {
             requestedRefresh.set(false);
 
