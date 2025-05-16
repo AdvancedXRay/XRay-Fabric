@@ -34,14 +34,14 @@ public class RenderOutlines {
     public static AtomicBoolean requestedRefresh = new AtomicBoolean(false);
 
     public static RenderPipeline LINES_NO_DEPTH = RenderPipeline.builder(RenderPipelines.MATRICES_COLOR_SNIPPET)
-            .withLocation("pipeline/render_outlines")
+            .withLocation("pipeline/xray_lines")
             .withVertexShader("core/rendertype_lines")
             .withFragmentShader(ResourceLocation.fromNamespaceAndPath(XRay.MOD_ID, "frag/rendertype_lines_unaffected"))
             .withUniform("LineWidth", UniformType.FLOAT)
             .withUniform("ScreenSize", UniformType.VEC2)
             .withBlend(BlendFunction.TRANSLUCENT)
             .withCull(false)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.LINES)
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR_NORMAL, VertexFormat.Mode.LINES)
             .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
             .build();
 
