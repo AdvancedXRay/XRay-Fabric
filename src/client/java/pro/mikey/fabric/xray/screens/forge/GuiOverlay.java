@@ -1,6 +1,6 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import com.mojang.blaze3d.platform.GlDebug;
+import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -21,7 +21,8 @@ public class GuiOverlay {
             return;
         }
 
-        boolean renderDebug = GlDebug.isDebugEnabled();
+        GpuDevice gpuDevice = RenderSystem.tryGetDevice();
+        boolean renderDebug = gpuDevice != null && gpuDevice.isDebuggingEnabled();
 
         int x = 5, y = 5;
         if (renderDebug) {

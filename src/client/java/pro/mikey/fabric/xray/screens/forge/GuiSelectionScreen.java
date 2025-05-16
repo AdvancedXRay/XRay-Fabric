@@ -1,8 +1,6 @@
 package pro.mikey.fabric.xray.screens.forge;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -302,13 +300,8 @@ public class GuiSelectionScreen extends GuiBase {
 
                 guiGraphics.renderItem(blockData.getStack(), left + 10, top + 7);
 
-                RenderSystem.enableBlend();
-                RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-
                 guiGraphics.blit(RenderType::guiTextured, GuiSelectionScreen.CIRCLE, (left + entryWidth) - 17, (int) (top + (entryHeight / 2f) - 9), 0, 0, 14, 14, 14, 14, BasicColor.rgbaToInt(0, 0, 0, .5f));
                 guiGraphics.blit(RenderType::guiTextured, GuiSelectionScreen.CIRCLE, (left + entryWidth) - 15, (int) (top + (entryHeight / 2f) - 7), 0, 0, 10, 10, 10, 10, blockData.getHex().toInt());
-
-                RenderSystem.disableBlend();
             }
 
             @Override

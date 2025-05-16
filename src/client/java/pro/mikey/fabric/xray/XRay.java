@@ -43,6 +43,7 @@ public class XRay implements ClientModInitializer {
 
         KeyBindingHelper.registerKeyBinding(this.xrayButton);
         KeyBindingHelper.registerKeyBinding(this.guiButton);
+
     }
 
     private void started(Minecraft minecraft) {
