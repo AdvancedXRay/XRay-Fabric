@@ -1,5 +1,9 @@
 ![XRay Logo](https://raw.githubusercontent.com/AdvancedXRay/XRay-Fabric/refs/heads/main/.github/assets/xray-fabric-logo.svg)
 
+# AS OF 1.21.8+ this codebase has been merged into the [original Forge codebase](https://github.com/AdvancedXRay/XRay-Mod).
+
+> This repo is now in **maintenance mode** and will not be accepting feature requests. Please use the other project. 
+
 # [Advanced XRay (Fabric Edition)](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
 
 Find the project on [CurseForge](https://www.curseforge.com/minecraft/mc-mods/advanced-xray-fabric-edition)
